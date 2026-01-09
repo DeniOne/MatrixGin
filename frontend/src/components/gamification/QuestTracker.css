@@ -1,0 +1,141 @@
+/* QuestTracker.css */
+.quest-tracker {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 12px;
+    padding: 20px;
+    color: #fff;
+}
+
+.quest-tracker h2 {
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quest-tracker h2::before {
+    content: '🎯';
+}
+
+.quest-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.quest-item {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 16px;
+    border-left: 3px solid #3498db;
+    transition: all 0.2s ease;
+}
+
+.quest-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.quest-item.completed {
+    border-left-color: #2ecc71;
+    opacity: 0.7;
+}
+
+.quest-item.abandoned {
+    border-left-color: #e74c3c;
+    opacity: 0.5;
+}
+
+.quest-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.quest-title {
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.quest-reward {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #f1c40f;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.quest-description {
+    color: #a0a0a0;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+}
+
+.quest-progress {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.quest-progress-bar {
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.quest-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #a0a0a0;
+}
+
+.quest-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.quest-actions button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-start {
+    background: #3498db;
+    color: #fff;
+}
+
+.btn-start:hover {
+    background: #2980b9;
+}
+
+.btn-abandon {
+    background: rgba(231, 76, 60, 0.2);
+    color: #e74c3c;
+}
+
+.btn-abandon:hover {
+    background: rgba(231, 76, 60, 0.3);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #a0a0a0;
+}
+
+.loader {
+    text-align: center;
+    padding: 20px;
+    color: #a0a0a0;
+}

@@ -1,0 +1,79 @@
+/* StatusProgressCard.css */
+.status-progress-card {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 12px;
+    padding: 24px;
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.status-progress-card h2 {
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+    color: #e0e0e0;
+}
+
+.status-progress-card h3 {
+    font-size: 1rem;
+    color: #a0a0a0;
+    margin: 12px 0 8px;
+}
+
+.current-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.current-status .badge {
+    background: linear-gradient(45deg, #f39c12, #f1c40f);
+    color: #1a1a2e;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.current-status .level {
+    color: #a0a0a0;
+    font-size: 0.85rem;
+}
+
+.progress-bar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    height: 12px;
+    overflow: hidden;
+    margin: 8px 0;
+}
+
+.progress-bar .filled {
+    background: linear-gradient(90deg, #3498db, #2ecc71);
+    height: 100%;
+    border-radius: 8px;
+    transition: width 0.5s ease;
+}
+
+.requirements {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+}
+
+.requirements li {
+    color: #a0a0a0;
+    font-size: 0.85rem;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.loader, .error {
+    padding: 20px;
+    text-align: center;
+    color: #a0a0a0;
+}
+
+.error {
+    color: #e74c3c;
+}

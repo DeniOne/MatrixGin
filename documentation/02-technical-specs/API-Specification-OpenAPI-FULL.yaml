@@ -1,0 +1,1379 @@
+openapi: 3.1.0
+info:
+  title: MatrixGin v2.0 API
+  version: 2.0.0
+  description: |
+    **MatrixGin v2.0** — Полная спецификация REST API для системы управления предприятием.
+    
+    ## Основные возможности
+    - 🔐 JWT Authentication + RBAC
+    - 👥 Управление сотрудниками и департаментами
+    - ✅ Smart Task Management с NLP
+    - 📊 KPI & Analytics
+    - 💰 MatrixCoin Economy (MC + GMC)
+    - ⚖️ Legal & Compliance (152-ФЗ, ТК РФ)
+    - 🎮 Gamification (Статусы и Ранги)
+    - 😊 Emotional Analytics
+    - 🤖 AI-powered модули
+    
+    ## Архитектура
+    - **Backend:** NestJS + PostgreSQL 16
+    - **AI:** GigaChat Pro, YandexGPT 3, Qwen 2.5
+    - **Cache:** Redis 7
+    - **Vector DB:** ChromaDB
+    
+  contact:
+    name: Photomatrix Development Team
+    email: dev@photomatrix.ru
+  license:
+    name: Proprietary
+    
+servers:
+  - url: https://api.matrixgin.photomatrix.ru/v1
+    description: Production
+  - url: https://staging-api.matrixgin.photomatrix.ru/v1
+    description: Staging
+  - url: http://localhost:3000/v1
+    description: Local Development
+
+tags:
+  - name: Authentication
+    description: Аутентификация и авторизация
+  - name: Employees
+    description: Управление сотрудниками
+  - name: Tasks
+    description: Управление задачами (Smart Task Management)
+  - name: Departments
+    description: Управление департаментами
+  - name: Economy
+    description: MatrixCoin Economy (MC + GMC + Auctions)
+  - name: Gamification
+    description: Статусы, ранги, достижения
+  - name: Legal
+    description: Юридические документы и комплаенс
+  - name: Compliance
+    description: Соответствие законодательству РФ
+  - name: Strategy
+    description: Стратегическое управление и OKR
+  - name: Feedback
+    description: Система фидбэков филиалов
+  - name: Education
+    description: Корпоративный университет
+  - name: Emotional
+    description: Эмоциональная аналитика
+  - name: Learning
+    description: Самообучающаяся система (MatrixGin College)
+  - name: Executive
+    description: Executive Dashboard
+  - name: HR Analytics
+    description: HR аналитика (Matrix360)
+  - name: Ethics
+    description: Ethics Manager
+  - name: Knowledge
+    description: База знаний и RAG
+  - name: Content
+    description: Content Factory
+  - name: Kaizen
+    description: Система улучшений
+  - name: Cabinet
+    description: Личный кабинет сотрудника
+  - name: Social
+    description: Мониторинг соцсетей
+
+security:
+  - BearerAuth: []
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT токен для аутентификации
+
+  schemas:
+    # Common Types
+    UUID:
+      type: string
+      format: uuid
+      pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+      example: '550e8400-e29b-41d4-a716-446655440000'
+      
+    ISODateTime:
+      type: string
+      format: date-time
+      example: '2025-11-21T15:30:00Z'
+      
+    ISODate:
+      type: string
+      format: date
+      pattern: '^\d{4}-\d{2}-\d{2}$'
+      example: '2025-11-21'
+      
+    Email:
+      type: string
+      format: email
+      pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+      minLength: 5
+      maxLength: 255
+      example: 'ivan@photomatrix.ru'
+      
+    # API Response Wrapper
+    ApiResponse:
+      type: object
+      required:
+        - success
+        - data
+      properties:
+        success:
+          type: boolean
+          description: Успешность операции
+        data:
+          type: object
+          description: Данные ответа
+        meta:
+          $ref: '#/components/schemas/MetaInfo'
+          
+    ApiError:
+      type: object
+      required:
+        - success
+        - error
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_ERROR
+                - UNAUTHORIZED
+                - FORBIDDEN
+                - NOT_FOUND
+                - CONFLICT
+                - INTERNAL_ERROR
+                - BAD_REQUEST
+                - TOKEN_EXPIRED
+                - INSUFFICIENT_PERMISSIONS
+            message:
+              type: string
+              description: Описание ошибки
+            details:
+              type: object
+              description: Дополнительные детали ошибки
+              
+    MetaInfo:
+      type: object
+      properties:
+        timestamp:
+          $ref: '#/components/schemas/ISODateTime'
+        requestId:
+          type: string
+          format: uuid
+        version:
+          type: string
+          example: '2.0.0'
+          
+    PaginationParams:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          default: 1
+          description: Номер страницы
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 20
+          description: Количество элементов на странице
+        sortBy:
+          type: string
+          description: Поле для сортировки
+        sortOrder:
+          type: string
+          enum: [asc, desc]
+          default: asc
+          
+    PaginatedResponse:
+      type: object
+      required:
+        - items
+        - pagination
+      properties:
+        items:
+          type: array
+          items: {}
+        pagination:
+          type: object
+          required:
+            - page
+            - limit
+            - total
+            - totalPages
+          properties:
+            page:
+              type: integer
+            limit:
+              type: integer
+            total:
+              type: integer
+              description: Общее количество элементов
+            totalPages:
+              type: integer
+              description: Общее количество страниц
+              
+    # Enums
+    UserRole:
+      type: string
+      enum:
+        - admin
+        - hr_manager
+        - department_head
+        - branch_manager
+        - employee
+      description: |
+        Роли пользователей:
+        - `admin` - Администратор системы
+        - `hr_manager` - HR менеджер
+        - `department_head` - Руководитель департамента
+        - `branch_manager` - Управляющий филиалом
+        - `employee` - Сотрудник
+        
+    UserStatus:
+      type: string
+      enum:
+        - active
+        - inactive
+        - suspended
+      description: Статус пользователя
+      
+    EmployeeStatus:
+      type: string
+      enum:
+        - UNIVERSE
+        - Звезда
+        - Кремень/Углерод
+        - Топчик
+        - Фотон
+      description: |
+        Первичные статусы сотрудников (иерархия):
+        - `UNIVERSE` - Высший статус (основатели)
+        - `Звезда` - Топ-менеджмент
+        - `Кремень/Углерод` - Опытные сотрудники (1+ год)
+        - `Топчик` - Прошедшие испытательный срок
+        - `Фотон` - Новички
+        
+    EmployeeRank:
+      type: string
+      enum:
+        - Коллекционер
+        - Инвестор
+        - Магнат
+      description: |
+        Вторичные ранги (на основе GMC):
+        - `Коллекционер` - 1-9 GMC
+        - `Инвестор` - 10-99 GMC
+        - `Магнат` - 100+ GMC
+        
+    TaskStatus:
+      type: string
+      enum:
+        - pending
+        - in_progress
+        - completed
+        - cancelled
+      description: Статус задачи
+      
+    TaskPriority:
+      type: string
+      enum:
+        - low
+        - medium
+        - high
+        - urgent
+      description: Приоритет задачи
+      
+    Currency:
+      type: string
+      enum:
+        - MC
+        - GMC
+        - RUB
+      description: |
+        Валюты:
+        - `MC` - MatrixCoin (сгораемые)
+        - `GMC` - Golden MatrixCoin (вечные)
+        - `RUB` - Российский рубль
+        
+    TransactionType:
+      type: string
+      enum:
+        - earn
+        - spend
+        - transfer
+        - reward
+        - penalty
+        - auction_bid
+        - auction_win
+        - store_purchase
+        - safe_activation
+      description: Тип транзакции
+      
+    EmotionalTone:
+      type: number
+      format: float
+      minimum: 0.0
+      maximum: 4.0
+      description: |
+        Эмоциональный тон (0.0-4.0):
+        - 0.0-0.5: Апатия/Горе
+        - 0.5-1.0: Страх/Тревога
+        - 1.0-1.5: Скрытая враждебность
+        - 1.5-2.0: Антагонизм
+        - 2.0-2.5: Скука
+        - 2.5-3.0: Консерватизм
+        - 3.0-3.5: Интерес
+        - 3.5-4.0: Действие/Игры
+      example: 2.8
+      
+    InteractionLevel:
+      type: string
+      enum:
+        - minimal
+        - moderate
+        - active
+        - intensive
+      description: |
+        Уровни взаимодействия MatrixGin с сотрудником:
+        - `minimal` - Минимальный (опытные)
+        - `moderate` - Умеренный (стандарт)
+        - `active` - Активный (новички)
+        - `intensive` - Интенсивный (проблемные ситуации)
+        
+    # Authentication Schemas
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - firstName
+        - lastName
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 128
+          pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+          description: |
+            Требования к паролю:
+            - Минимум 8 символов
+            - Хотя бы одна заглавная буква
+            - Хотя бы одна строчная буква
+            - Хотя бы одна цифра
+            - Хотя бы один спецсимвол (@$!%*?&)
+          example: 'SecurePass123!'
+        firstName:
+          type: string
+          minLength: 2
+          maxLength: 50
+          example: 'Иван'
+        lastName:
+          type: string
+          minLength: 2
+          maxLength: 50
+          example: 'Иванов'
+        middleName:
+          type: string
+          minLength: 2
+          maxLength: 50
+          example: 'Иванович'
+        phoneNumber:
+          type: string
+          pattern: '^\+7\d{10}$'
+          example: '+79991234567'
+        acceptedNDA:
+          type: boolean
+          description: Принятие NDA (обязательно)
+          example: true
+          
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+        password:
+          type: string
+          format: password
+          example: 'SecurePass123!'
+          
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: Refresh token для получения нового access token
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+          
+    AuthResponse:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+        - expiresIn
+        - user
+      properties:
+        accessToken:
+          type: string
+          description: JWT access token
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        refreshToken:
+          type: string
+          description: Refresh token
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        expiresIn:
+          type: integer
+          description: Время жизни access token в секундах
+          example: 86400
+        user:
+          $ref: '#/components/schemas/UserResponse'
+          
+    UserResponse:
+      type: object
+      required:
+        - id
+        - email
+        - role
+        - status
+        - createdAt
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        email:
+          $ref: '#/components/schemas/Email'
+        role:
+          $ref: '#/components/schemas/UserRole'
+        status:
+          $ref: '#/components/schemas/UserStatus'
+        firstName:
+          type: string
+          example: 'Иван'
+        lastName:
+          type: string
+          example: 'Иванов'
+        middleName:
+          type: string
+          example: 'Иванович'
+        phoneNumber:
+          type: string
+          example: '+79991234567'
+        avatar:
+          type: string
+          format: uri
+          example: 'https://cdn.photomatrix.ru/avatars/user-123.jpg'
+        departmentId:
+          $ref: '#/components/schemas/UUID'
+        lastLoginAt:
+          $ref: '#/components/schemas/ISODateTime'
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+        updatedAt:
+          $ref: '#/components/schemas/ISODateTime'
+          
+    ForgotPasswordRequest:
+      type: object
+      required:
+        - email
+      properties:
+        email:
+          $ref: '#/components/schemas/Email'
+          
+    ResetPasswordRequest:
+      type: object
+      required:
+        - token
+        - newPassword
+      properties:
+        token:
+          type: string
+          description: Токен сброса пароля из email
+        newPassword:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 128
+          
+    PermissionsResponse:
+      type: object
+      properties:
+        permissions:
+          type: array
+          items:
+            type: string
+          example:
+            - 'employees.read'
+            - 'tasks.create'
+            - 'economy.transfer'
+            
+    # Employee Schemas
+    CreateEmployeeRequest:
+      type: object
+      required:
+        - userId
+        - departmentId
+        - position
+        - hireDate
+      properties:
+        userId:
+          $ref: '#/components/schemas/UUID'
+        departmentId:
+          $ref: '#/components/schemas/UUID'
+        position:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: 'Фотограф'
+        hireDate:
+          $ref: '#/components/schemas/ISODate'
+        salary:
+          type: number
+          format: float
+          minimum: 0
+          example: 50000
+        employeeNumber:
+          type: string
+          pattern: '^EMP-\d{6}$'
+          example: 'EMP-000123'
+        status:
+          $ref: '#/components/schemas/EmployeeStatus'
+        rank:
+          $ref: '#/components/schemas/EmployeeRank'
+          
+    UpdateEmployeeRequest:
+      type: object
+      properties:
+        departmentId:
+          $ref: '#/components/schemas/UUID'
+        position:
+          type: string
+        salary:
+          type: number
+          format: float
+        status:
+          $ref: '#/components/schemas/EmployeeStatus'
+        rank:
+          $ref: '#/components/schemas/EmployeeRank'
+          
+    EmployeeResponse:
+      type: object
+      required:
+        - id
+        - userId
+        - departmentId
+        - position
+        - status
+        - rank
+        - hireDate
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        userId:
+          $ref: '#/components/schemas/UUID'
+        user:
+          $ref: '#/components/schemas/UserResponse'
+        departmentId:
+          $ref: '#/components/schemas/UUID'
+        department:
+          $ref: '#/components/schemas/DepartmentResponse'
+        position:
+          type: string
+        employeeNumber:
+          type: string
+        salary:
+          type: number
+          format: float
+        status:
+          $ref: '#/components/schemas/EmployeeStatus'
+        rank:
+          $ref: '#/components/schemas/EmployeeRank'
+        hireDate:
+          $ref: '#/components/schemas/ISODate'
+        terminationDate:
+          $ref: '#/components/schemas/ISODate'
+        emotionalTone:
+          $ref: '#/components/schemas/EmotionalTone'
+        mcBalance:
+          type: number
+          format: float
+          example: 1500.50
+        gmcBalance:
+          type: number
+          format: float
+          example: 25.0
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+        updatedAt:
+          $ref: '#/components/schemas/ISODateTime'
+          
+    EmployeeAnalyticsResponse:
+      type: object
+      properties:
+        employeeId:
+          $ref: '#/components/schemas/UUID'
+        kpiScore:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 85.5
+        tasksCompleted:
+          type: integer
+          example: 42
+        averageTaskCompletionTime:
+          type: number
+          format: float
+          description: Среднее время выполнения задачи в часах
+          example: 4.5
+        emotionalToneAverage:
+          $ref: '#/components/schemas/EmotionalTone'
+        burnoutRisk:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 1
+          description: Риск выгорания (0-1)
+          example: 0.3
+        engagementIndex:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+          example: 75.0
+          
+    EmployeeFilters:
+      type: object
+      properties:
+        departmentId:
+          $ref: '#/components/schemas/UUID'
+        status:
+          $ref: '#/components/schemas/EmployeeStatus'
+        rank:
+          $ref: '#/components/schemas/EmployeeRank'
+        minEmotionalTone:
+          type: number
+          format: float
+        maxEmotionalTone:
+          type: number
+          format: float
+        search:
+          type: string
+          description: Поиск по имени, email, номеру сотрудника
+          
+    # Department Schemas
+    DepartmentResponse:
+      type: object
+      required:
+        - id
+        - name
+        - code
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+          example: 'Коммерческий департамент'
+        code:
+          type: string
+          pattern: '^[A-Z]{2,5}$'
+          example: 'COMM'
+        description:
+          type: string
+        headId:
+          $ref: '#/components/schemas/UUID'
+          description: ID руководителя департамента
+        employeeCount:
+          type: integer
+          example: 15
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+        updatedAt:
+          $ref: '#/components/schemas/ISODateTime'
+          
+    DepartmentKPIResponse:
+      type: object
+      properties:
+        departmentId:
+          $ref: '#/components/schemas/UUID'
+        period:
+          type: string
+          enum: [daily, weekly, monthly, quarterly, yearly]
+        metrics:
+          type: object
+          properties:
+            revenue:
+              type: number
+              format: float
+            tasksCompleted:
+              type: integer
+            averageEmotionalTone:
+              $ref: '#/components/schemas/EmotionalTone'
+            employeeEngagement:
+              type: number
+              format: float
+              
+    MudaAnalysisResponse:
+      type: object
+      description: Анализ потерь (8 типов Muda)
+      properties:
+        departmentId:
+          $ref: '#/components/schemas/UUID'
+        period:
+          $ref: '#/components/schemas/ISODate'
+        mudaTypes:
+          type: object
+          properties:
+            overproduction:
+              type: number
+              description: Перепроизводство
+            waiting:
+              type: number
+              description: Ожидание
+            transportation:
+              type: number
+              description: Транспортировка
+            overprocessing:
+              type: number
+              description: Излишняя обработка
+            inventory:
+              type: number
+              description: Избыточные запасы
+            motion:
+              type: number
+              description: Лишние движения
+            defects:
+              type: number
+              description: Дефекты
+            unutilizedTalent:
+              type: number
+              description: Неиспользованный талант
+        totalLoss:
+          type: number
+          format: float
+          description: Общие потери в рублях
+          
+    # Task Schemas
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+        - description
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 200
+          example: 'Проверить принтеры на филиале Мира'
+        description:
+          type: string
+          minLength: 10
+          maxLength: 5000
+          example: 'Необходимо проверить работоспособность всех принтеров'
+        assigneeId:
+          $ref: '#/components/schemas/UUID'
+        departmentId:
+          $ref: '#/components/schemas/UUID'
+        priority:
+          $ref: '#/components/schemas/TaskPriority'
+        dueDate:
+          $ref: '#/components/schemas/ISODateTime'
+        tags:
+          type: array
+          items:
+            type: string
+          example: ['техника', 'филиал-мира']
+          
+    NLPTaskRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          minLength: 10
+          maxLength: 1000
+          description: Текст задачи на естественном языке
+          example: 'Проверить принтеры на Мира завтра в 10:00'
+          
+    UpdateTaskRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        assigneeId:
+          $ref: '#/components/schemas/UUID'
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        priority:
+          $ref: '#/components/schemas/TaskPriority'
+        dueDate:
+          $ref: '#/components/schemas/ISODateTime'
+          
+    TaskResponse:
+      type: object
+      required:
+        - id
+        - title
+        - description
+        - status
+        - priority
+        - createdAt
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        priority:
+          $ref: '#/components/schemas/TaskPriority'
+        creatorId:
+          $ref: '#/components/schemas/UUID'
+        assigneeId:
+          $ref: '#/components/schemas/UUID'
+        departmentId:
+          $ref: '#/components/schemas/UUID'
+        dueDate:
+          $ref: '#/components/schemas/ISODateTime'
+        completedAt:
+          $ref: '#/components/schemas/ISODateTime'
+        tags:
+          type: array
+          items:
+            type: string
+        mcReward:
+          type: number
+          format: float
+          description: Награда в MC за выполнение
+          example: 50.0
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+        updatedAt:
+          $ref: '#/components/schemas/ISODateTime'
+          
+    AssignTaskRequest:
+      type: object
+      required:
+        - assigneeId
+      properties:
+        assigneeId:
+          $ref: '#/components/schemas/UUID'
+          description: ID сотрудника для назначения
+          
+    TaskCommentRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          
+    TaskCommentResponse:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        taskId:
+          $ref: '#/components/schemas/UUID'
+        userId:
+          $ref: '#/components/schemas/UUID'
+        text:
+          type: string
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+          
+    TaskFilters:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/TaskStatus'
+        assigneeId:
+          $ref: '#/components/schemas/UUID'
+        departmentId:
+          $ref: '#/components/schemas/UUID'
+        priority:
+          $ref: '#/components/schemas/TaskPriority'
+        dueDateFrom:
+          $ref: '#/components/schemas/ISODateTime'
+        dueDateTo:
+          $ref: '#/components/schemas/ISODateTime'
+        search:
+          type: string
+          
+    # Economy Schemas
+    WalletResponse:
+      type: object
+      required:
+        - userId
+        - mcBalance
+        - gmcBalance
+      properties:
+        userId:
+          $ref: '#/components/schemas/UUID'
+        mcBalance:
+          type: number
+          format: float
+          description: Баланс MatrixCoin
+          example: 1500.50
+        gmcBalance:
+          type: number
+          format: float
+          description: Баланс Golden MatrixCoin
+          example: 25.0
+        mcFrozen:
+          type: number
+          format: float
+          description: Замороженные MC (в сейфе)
+          example: 500.0
+        safeActivatedAt:
+          $ref: '#/components/schemas/ISODateTime'
+        safeExpiresAt:
+          $ref: '#/components/schemas/ISODateTime'
+        updatedAt:
+          $ref: '#/components/schemas/ISODateTime'
+          
+    CreateTransactionRequest:
+      type: object
+      required:
+        - type
+        - currency
+        - amount
+      properties:
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        amount:
+          type: number
+          format: float
+          minimum: 0.01
+          example: 100.0
+        recipientId:
+          $ref: '#/components/schemas/UUID'
+          description: ID получателя (для transfer)
+        description:
+          type: string
+          maxLength: 500
+          example: 'Перевод за помощь с задачей'
+          
+    TransactionResponse:
+      type: object
+      required:
+        - id
+        - type
+        - currency
+        - amount
+        - createdAt
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        type:
+          $ref: '#/components/schemas/TransactionType'
+        currency:
+          $ref: '#/components/schemas/Currency'
+        amount:
+          type: number
+          format: float
+        senderId:
+          $ref: '#/components/schemas/UUID'
+        recipientId:
+          $ref: '#/components/schemas/UUID'
+        description:
+          type: string
+        metadata:
+          type: object
+          description: Дополнительные данные транзакции
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+          
+    ActivateSafeRequest:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          type: number
+          format: float
+          minimum: 100
+          description: Количество MC для заморозки (минимум 100)
+          example: 500.0
+          
+    AuctionResponse:
+      type: object
+      required:
+        - id
+        - title
+        - startingBid
+        - currentBid
+        - status
+        - startsAt
+        - endsAt
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        title:
+          type: string
+          example: 'GMC Аукцион #42'
+        description:
+          type: string
+        startingBid:
+          type: number
+          format: float
+          description: Начальная ставка в MC
+          example: 1000.0
+        currentBid:
+          type: number
+          format: float
+          description: Текущая ставка в MC
+          example: 1500.0
+        currentBidderId:
+          $ref: '#/components/schemas/UUID'
+        gmcAmount:
+          type: number
+          format: float
+          description: Количество GMC на продажу
+          example: 10.0
+        status:
+          type: string
+          enum: [upcoming, active, ended]
+        startsAt:
+          $ref: '#/components/schemas/ISODateTime'
+        endsAt:
+          $ref: '#/components/schemas/ISODateTime'
+        createdAt:
+          $ref: '#/components/schemas/ISODateTime'
+          
+    PlaceBidRequest:
+      type: object
+      required:
+        - amount
+      properties:
+        amount:
+          type: number
+          format: float
+          minimum: 0.01
+          description: Сумма ставки в MC
+          
+    StoreItemResponse:
+      type: object
+      required:
+        - id
+        - name
+        - price
+        - currency
+        - available
+      properties:
+        id:
+          $ref: '#/components/schemas/UUID'
+        name:
+          type: string
+          example: 'Дополнительный день отпуска'
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+          example: 500.0
+        currency:
+          $ref: '#/components/schemas/Currency'
+        image:
+          type: string
+          format: uri
+        available:
+          type: boolean
+        stock:
+          type: integer
+          description: Количество на складе
+        rankDiscount:
+          type: object
+          description: Скидки по рангам
+          properties:
+            Инвестор:
+              type: number
+              format: float
+              example: 0.05
+            Магнат:
+              type: number
+              format: float
+              example: 0.10
+              
+    PurchaseItemRequest:
+      type: object
+      required:
+        - itemId
+        - quantity
+      properties:
+        itemId:
+          $ref: '#/components/schemas/UUID'
+        quantity:
+          type: integer
+          minimum: 1
+          default: 1
+
+paths:
+  # Authentication Endpoints
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Регистрация нового пользователя
+      description: |
+        Создание нового пользователя с обязательным принятием NDA.
+        После регистрации автоматически создается:
+        - Профиль сотрудника со статусом "Фотон"
+        - Кошелек (MC + GMC)
+        - Запись в audit log
+      operationId: register
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthResponse'
+        '400':
+          description: Ошибка валидации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+        '409':
+          description: Email уже используется
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+                
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Вход в систему
+      description: Аутентификация пользователя и получение JWT токенов
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Успешная аутентификация
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Неверные учетные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+                
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Обновление access token
+      description: Получение нового access token используя refresh token
+      operationId: refreshToken
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Токен успешно обновлен
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Невалидный refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+                
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Выход из системы
+      description: Отзыв токенов пользователя
+      operationId: logout
+      responses:
+        '200':
+          description: Успешный выход
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: 'Successfully logged out'
+                            
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Восстановление пароля
+      description: Отправка email с ссылкой для сброса пароля
+      operationId: forgotPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+      responses:
+        '200':
+          description: Email отправлен
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: 'Password reset email sent'
+                            
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Сброс пароля
+      description: Установка нового пароля используя токен из email
+      operationId: resetPassword
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+      responses:
+        '200':
+          description: Пароль успешно изменен
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            example: 'Password successfully reset'
+                            
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Получить текущего пользователя
+      description: Информация о текущем аутентифицированном пользователе
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/UserResponse'
+                        
+  /auth/permissions:
+    get:
+      tags:
+        - Authentication
+      summary: Получить права доступа
+      description: Список разрешений текущего пользователя
+      operationId: getPermissions
+      responses:
+        '200':
+          description: Список разрешений
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PermissionsResponse'

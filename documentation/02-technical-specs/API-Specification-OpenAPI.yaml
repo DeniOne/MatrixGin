@@ -1,0 +1,1567 @@
+openapi: 3.1.0
+info:
+  title: MatrixGin API v2.0
+  version: 1.0.0
+  description: |
+    Полная спецификация API для MatrixGin v2.0 - интегрированной ERP/HRM платформы с AI-ассистентом.
+    
+    **MVP Modules (Phase 1):**
+    1. Authentication & Authorization
+    2. Employee Management
+    3. Task Management
+    4. KPI & Analytics
+    5. Telegram Bot Integration
+    6. Legal Compliance
+    7. MatrixCoin Economy
+    
+    **Философия:** Lean Production + AI-powered automation
+    
+  contact:
+    name: Photomatrix Development Team
+    email: dev@photomatrix.ru
+  license:
+    name: Proprietary
+    
+servers:
+  - url: https://api.matrixgin.ru/v1
+    description: Production server
+  - url: https://staging-api.matrixgin.ru/v1
+    description: Staging server
+  - url: http://localhost:3000/v1
+    description: Local development server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Authentication
+    description: Аутентификация и авторизация
+  - name: Employees
+    description: Управление сотрудниками
+  - name: Tasks
+    description: Управление задачами
+  - name: KPI
+    description: KPI и аналитика
+  - name: Economy
+    description: MatrixCoin экономика
+  - name: Legal
+    description: Юридический комплаенс
+  - name: Telegram
+    description: Telegram Bot интеграция
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT токен для аутентификации
+      
+  schemas:
+    # ============================================
+    # COMMON SCHEMAS
+    # ============================================
+    
+    Error:
+      type: object
+      required:
+        - success
+        - error
+        - meta
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              enum:
+                - VALIDATION_ERROR
+                - UNAUTHORIZED
+                - FORBIDDEN
+                - NOT_FOUND
+                - CONFLICT
+                - UNPROCESSABLE_ENTITY
+                - RATE_LIMIT_EXCEEDED
+                - INTERNAL_ERROR
+                - SERVICE_UNAVAILABLE
+              example: VALIDATION_ERROR
+            message:
+              type: string
+              example: "Некорректные данные"
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  field:
+                    type: string
+                    example: "email"
+                  message:
+                    type: string
+                    example: "Email обязателен"
+        meta:
+          $ref: '#/components/schemas/MetaInfo'
+    
+    MetaInfo:
+      type: object
+      required:
+        - timestamp
+        - request_id
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-11-21T18:30:00+03:00"
+        request_id:
+          type: string
+          format: uuid
+          example: "req-abc-123-def-456"
+    
+    Pagination:
+      type: object
+      required:
+        - page
+        - limit
+        - total
+        - total_pages
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          example: 1
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 20
+        total:
+          type: integer
+          example: 150
+        total_pages:
+          type: integer
+          example: 8
+    
+    # ============================================
+    # AUTHENTICATION SCHEMAS
+    # ============================================
+    
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "ivan@photomatrix.ru"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: "SecurePass123!"
+    
+    LoginResponse:
+      type: object
+      required:
+        - success
+        - data
+        - meta
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          required:
+            - access_token
+            - refresh_token
+            - expires_in
+            - user
+          properties:
+            access_token:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            refresh_token:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            expires_in:
+              type: integer
+              description: "Время жизни токена в секундах"
+              example: 86400
+            user:
+              $ref: '#/components/schemas/User'
+        meta:
+          $ref: '#/components/schemas/MetaInfo'
+    
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - first_name
+        - last_name
+        - department_id
+      properties:
+        email:
+          type: string
+          format: email
+          example: "ivan@photomatrix.ru"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: "SecurePass123!"
+        first_name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: "Иван"
+        last_name:
+          type: string
+          minLength: 2
+          maxLength: 100
+          example: "Иванов"
+        department_id:
+          type: string
+          format: uuid
+          example: "dept-123-456"
+        telegram_id:
+          type: string
+          nullable: true
+          example: "123456789"
+    
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refresh_token
+      properties:
+        refresh_token:
+          type: string
+          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    
+    # ============================================
+    # USER & EMPLOYEE SCHEMAS
+    # ============================================
+    
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - first_name
+        - last_name
+        - role
+        - department_id
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "user-123-456"
+        email:
+          type: string
+          format: email
+          example: "ivan@photomatrix.ru"
+        first_name:
+          type: string
+          example: "Иван"
+        last_name:
+          type: string
+          example: "Иванов"
+        middle_name:
+          type: string
+          nullable: true
+          example: "Петрович"
+        role:
+          type: string
+          enum:
+            - admin
+            - hr_manager
+            - department_head
+            - employee
+            - branch_manager
+          example: "employee"
+        department_id:
+          type: string
+          format: uuid
+          example: "dept-123-456"
+        telegram_id:
+          type: string
+          nullable: true
+          example: "123456789"
+        avatar_url:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://storage.matrixgin.ru/avatars/user-123.jpg"
+        created_at:
+          type: string
+          format: date-time
+          example: "2025-01-15T10:00:00+03:00"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2025-11-21T18:30:00+03:00"
+    
+    Employee:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            position:
+              type: string
+              example: "Менеджер по продажам"
+            hire_date:
+              type: string
+              format: date
+              example: "2024-01-15"
+            status:
+              type: string
+              enum:
+                - active
+                - on_vacation
+                - sick_leave
+                - dismissed
+              example: "active"
+            rank:
+              type: string
+              enum:
+                - trainee
+                - junior
+                - middle
+                - senior
+                - lead
+                - expert
+              example: "middle"
+            mc_balance:
+              type: integer
+              description: "Баланс MatrixCoin"
+              example: 5000
+            gmc_balance:
+              type: integer
+              description: "Баланс Golden MatrixCoin"
+              example: 50
+            emotional_tone:
+              type: number
+              format: float
+              minimum: 0.0
+              maximum: 4.0
+              description: "Эмоциональный тон (0.0-4.0)"
+              example: 2.8
+    
+    EmployeeListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - pagination
+        - meta
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Employee'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        meta:
+          $ref: '#/components/schemas/MetaInfo'
+    
+    CreateEmployeeRequest:
+      type: object
+      required:
+        - email
+        - first_name
+        - last_name
+        - department_id
+        - position
+        - hire_date
+      properties:
+        email:
+          type: string
+          format: email
+        first_name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        last_name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        middle_name:
+          type: string
+          nullable: true
+        department_id:
+          type: string
+          format: uuid
+        position:
+          type: string
+        hire_date:
+          type: string
+          format: date
+        telegram_id:
+          type: string
+          nullable: true
+    
+    # ============================================
+    # TASK SCHEMAS
+    # ============================================
+    
+    Task:
+      type: object
+      required:
+        - id
+        - title
+        - status
+        - priority
+        - created_by
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "task-123-456"
+        title:
+          type: string
+          minLength: 5
+          maxLength: 255
+          example: "Проверить принтеры на филиале Мира"
+        description:
+          type: string
+          nullable: true
+          example: "Необходимо проверить работоспособность всех принтеров"
+        status:
+          type: string
+          enum:
+            - pending
+            - in_progress
+            - completed
+            - cancelled
+          example: "pending"
+        priority:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+            - urgent
+          example: "medium"
+        assignee_id:
+          type: string
+          format: uuid
+          nullable: true
+          example: "user-123-456"
+        created_by:
+          type: string
+          format: uuid
+          example: "user-789-012"
+        department_id:
+          type: string
+          format: uuid
+          nullable: true
+          example: "dept-123-456"
+        due_date:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2025-11-22T18:00:00+03:00"
+        mc_reward:
+          type: integer
+          description: "Награда в MatrixCoin за выполнение"
+          example: 100
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["maintenance", "urgent"]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+    
+    CreateTaskRequest:
+      type: object
+      required:
+        - title
+        - priority
+      properties:
+        title:
+          type: string
+          minLength: 5
+          maxLength: 255
+        description:
+          type: string
+          nullable: true
+        priority:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+            - urgent
+        assignee_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: "Если не указан, назначается автоматически по MDR"
+        department_id:
+          type: string
+          format: uuid
+          nullable: true
+        due_date:
+          type: string
+          format: date-time
+          nullable: true
+        mc_reward:
+          type: integer
+          minimum: 0
+          default: 100
+        tags:
+          type: array
+          items:
+            type: string
+    
+    NaturalLanguageTaskRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          minLength: 10
+          example: "Проверить принтеры на Мира завтра до 18:00"
+          description: "Текст на естественном языке, из которого AI извлечет параметры задачи"
+    
+    TaskListResponse:
+      type: object
+      required:
+        - success
+        - data
+        - pagination
+        - meta
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        meta:
+          $ref: '#/components/schemas/MetaInfo'
+    
+    # ============================================
+    # KPI SCHEMAS
+    # ============================================
+    
+    KPI:
+      type: object
+      required:
+        - id
+        - employee_id
+        - metric_name
+        - target_value
+        - current_value
+        - period
+      properties:
+        id:
+          type: string
+          format: uuid
+        employee_id:
+          type: string
+          format: uuid
+        metric_name:
+          type: string
+          example: "Выполнено задач"
+        target_value:
+          type: number
+          format: float
+          example: 100
+        current_value:
+          type: number
+          format: float
+          example: 85
+        unit:
+          type: string
+          example: "шт"
+        period:
+          type: string
+          enum:
+            - daily
+            - weekly
+            - monthly
+            - quarterly
+            - yearly
+          example: "monthly"
+        achievement_percentage:
+          type: number
+          format: float
+          example: 85.0
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+    
+    # ============================================
+    # ECONOMY SCHEMAS
+    # ============================================
+    
+    Balance:
+      type: object
+      required:
+        - user_id
+        - mc_balance
+        - gmc_balance
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        mc_balance:
+          type: integer
+          description: "Баланс MatrixCoin"
+          example: 5000
+        gmc_balance:
+          type: integer
+          description: "Баланс Golden MatrixCoin"
+          example: 50
+        mc_frozen:
+          type: integer
+          description: "Замороженные MC (в сейфе)"
+          example: 1000
+          default: 0
+    
+    Transaction:
+      type: object
+      required:
+        - id
+        - from_user_id
+        - to_user_id
+        - amount
+        - currency
+        - type
+        - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        from_user_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: "null для системных начислений"
+        to_user_id:
+          type: string
+          format: uuid
+        amount:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          enum:
+            - MC
+            - GMC
+          example: "MC"
+        type:
+          type: string
+          enum:
+            - task_reward
+            - transfer
+            - purchase
+            - bonus
+            - penalty
+          example: "task_reward"
+        description:
+          type: string
+          example: "Награда за выполнение задачи #123"
+        metadata:
+          type: object
+          additionalProperties: true
+          example:
+            task_id: "task-123-456"
+        created_at:
+          type: string
+          format: date-time
+    
+    CreateTransactionRequest:
+      type: object
+      required:
+        - to_user_id
+        - amount
+        - currency
+        - type
+      properties:
+        to_user_id:
+          type: string
+          format: uuid
+        amount:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          enum:
+            - MC
+            - GMC
+        type:
+          type: string
+          enum:
+            - task_reward
+            - transfer
+            - bonus
+            - penalty
+        description:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: Номер страницы
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    
+    LimitParam:
+      name: limit
+      in: query
+      description: Количество элементов на странице
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+    
+    SortParam:
+      name: sort
+      in: query
+      description: Поле для сортировки
+      required: false
+      schema:
+        type: string
+        example: "created_at"
+    
+    OrderParam:
+      name: order
+      in: query
+      description: Направление сортировки
+      required: false
+      schema:
+        type: string
+        enum:
+          - asc
+          - desc
+        default: desc
+
+paths:
+  # ============================================
+  # AUTHENTICATION ENDPOINTS
+  # ============================================
+  
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Регистрация нового пользователя
+      description: Создание нового аккаунта сотрудника
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: Email уже используется
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Вход в систему
+      description: Аутентификация пользователя и получение JWT токенов
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Успешная аутентификация
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Неверные учетные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Обновление access токена
+      description: Получение нового access токена используя refresh токен
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Токен успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: Невалидный refresh токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Выход из системы
+      description: Инвалидация текущего токена
+      responses:
+        '200':
+          description: Успешный выход
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Успешный выход"
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+  
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Получить данные текущего пользователя
+      description: Информация о текущем аутентифицированном пользователе
+      responses:
+        '200':
+          description: Данные пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/User'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+        '401':
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  # ============================================
+  # EMPLOYEE ENDPOINTS
+  # ============================================
+  
+  /employees:
+    get:
+      tags:
+        - Employees
+      summary: Список всех сотрудников
+      description: Получить список сотрудников с фильтрацией и пагинацией
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/OrderParam'
+        - name: department_id
+          in: query
+          description: Фильтр по департаменту
+          schema:
+            type: string
+            format: uuid
+        - name: status
+          in: query
+          description: Фильтр по статусу
+          schema:
+            type: string
+            enum:
+              - active
+              - on_vacation
+              - sick_leave
+              - dismissed
+        - name: rank
+          in: query
+          description: Фильтр по рангу
+          schema:
+            type: string
+            enum:
+              - trainee
+              - junior
+              - middle
+              - senior
+              - lead
+              - expert
+      responses:
+        '200':
+          description: Список сотрудников
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmployeeListResponse'
+    
+    post:
+      tags:
+        - Employees
+      summary: Создать нового сотрудника
+      description: Добавление нового сотрудника в систему (только HR/Admin)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmployeeRequest'
+      responses:
+        '201':
+          description: Сотрудник создан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Employee'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Недостаточно прав
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /employees/{id}:
+    get:
+      tags:
+        - Employees
+      summary: Получить данные сотрудника
+      description: Детальная информация о сотруднике
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID сотрудника
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Данные сотрудника
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Employee'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+        '404':
+          description: Сотрудник не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      tags:
+        - Employees
+      summary: Обновить данные сотрудника (полностью)
+      description: Полное обновление данных сотрудника
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEmployeeRequest'
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Employee'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+    
+    patch:
+      tags:
+        - Employees
+      summary: Частичное обновление данных сотрудника
+      description: Обновление отдельных полей сотрудника
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                position:
+                  type: string
+                status:
+                  type: string
+                  enum:
+                    - active
+                    - on_vacation
+                    - sick_leave
+                    - dismissed
+                rank:
+                  type: string
+                  enum:
+                    - trainee
+                    - junior
+                    - middle
+                    - senior
+                    - lead
+                    - expert
+      responses:
+        '200':
+          description: Данные обновлены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Employee'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+    
+    delete:
+      tags:
+        - Employees
+      summary: Удалить сотрудника (soft delete)
+      description: Мягкое удаление сотрудника из системы
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Сотрудник удален
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Сотрудник успешно удален"
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+  
+  # ============================================
+  # TASK ENDPOINTS
+  # ============================================
+  
+  /tasks:
+    get:
+      tags:
+        - Tasks
+      summary: Список задач
+      description: Получить список задач с фильтрацией
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - $ref: '#/components/parameters/SortParam'
+        - $ref: '#/components/parameters/OrderParam'
+        - name: status
+          in: query
+          description: Фильтр по статусу
+          schema:
+            type: string
+            enum:
+              - pending
+              - in_progress
+              - completed
+              - cancelled
+        - name: assignee_id
+          in: query
+          description: Фильтр по исполнителю
+          schema:
+            type: string
+            format: uuid
+        - name: department_id
+          in: query
+          description: Фильтр по департаменту
+          schema:
+            type: string
+            format: uuid
+        - name: priority
+          in: query
+          description: Фильтр по приоритету
+          schema:
+            type: string
+            enum:
+              - low
+              - medium
+              - high
+              - urgent
+      responses:
+        '200':
+          description: Список задач
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskListResponse'
+    
+    post:
+      tags:
+        - Tasks
+      summary: Создать задачу
+      description: Создание новой задачи
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '201':
+          description: Задача создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Task'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+  
+  /tasks/natural-language:
+    post:
+      tags:
+        - Tasks
+      summary: Создать задачу из текста (NLP)
+      description: AI парсит текст на естественном языке и создает структурированную задачу
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NaturalLanguageTaskRequest'
+      responses:
+        '201':
+          description: Задача создана из текста
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Task'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+  
+  /tasks/{id}:
+    get:
+      tags:
+        - Tasks
+      summary: Получить задачу
+      description: Детальная информация о задаче
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Данные задачи
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Task'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+    
+    put:
+      tags:
+        - Tasks
+      summary: Обновить задачу
+      description: Полное обновление задачи
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTaskRequest'
+      responses:
+        '200':
+          description: Задача обновлена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Task'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+    
+    delete:
+      tags:
+        - Tasks
+      summary: Удалить задачу
+      description: Удаление задачи
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Задача удалена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Задача успешно удалена"
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+  
+  /tasks/{id}/assign:
+    post:
+      tags:
+        - Tasks
+      summary: Назначить задачу
+      description: Назначение задачи сотруднику
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - assignee_id
+              properties:
+                assignee_id:
+                  type: string
+                  format: uuid
+                  description: "ID сотрудника или 'auto' для автоназначения по MDR"
+      responses:
+        '200':
+          description: Задача назначена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Task'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+  
+  /tasks/{id}/complete:
+    post:
+      tags:
+        - Tasks
+      summary: Завершить задачу
+      description: Отметить задачу как выполненную
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  description: "Комментарий к завершению"
+      responses:
+        '200':
+          description: Задача завершена
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Task'
+                  message:
+                    type: string
+                    example: "Задача завершена. Начислено 100 MC"
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+  
+  # ============================================
+  # ECONOMY ENDPOINTS
+  # ============================================
+  
+  /economy/balance/{userId}:
+    get:
+      tags:
+        - Economy
+      summary: Получить баланс пользователя
+      description: Баланс MC и GMC
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Баланс пользователя
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Balance'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+  
+  /economy/transactions:
+    get:
+      tags:
+        - Economy
+      summary: История транзакций
+      description: Получить историю транзакций пользователя
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/LimitParam'
+        - name: user_id
+          in: query
+          description: Фильтр по пользователю
+          schema:
+            type: string
+            format: uuid
+        - name: currency
+          in: query
+          description: Фильтр по валюте
+          schema:
+            type: string
+            enum:
+              - MC
+              - GMC
+        - name: type
+          in: query
+          description: Фильтр по типу транзакции
+          schema:
+            type: string
+            enum:
+              - task_reward
+              - transfer
+              - purchase
+              - bonus
+              - penalty
+      responses:
+        '200':
+          description: История транзакций
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+    
+    post:
+      tags:
+        - Economy
+      summary: Создать транзакцию
+      description: Перевод MC/GMC между пользователями или начисление
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionRequest'
+      responses:
+        '201':
+          description: Транзакция создана
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    $ref: '#/components/schemas/Transaction'
+                  meta:
+                    $ref: '#/components/schemas/MetaInfo'
+        '400':
+          description: Недостаточно средств
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'

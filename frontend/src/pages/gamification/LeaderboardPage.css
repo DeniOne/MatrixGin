@@ -1,0 +1,120 @@
+/* LeaderboardPage.css */
+.leaderboard-page {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.leaderboard-page h1 {
+    font-size: 2rem;
+    margin-bottom: 24px;
+    color: #fff;
+}
+
+.metrics-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.metrics-tabs button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #a0a0a0;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.metrics-tabs button:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.metrics-tabs button.active {
+    background: linear-gradient(45deg, #3498db, #2ecc71);
+    color: #fff;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.leaderboard-table th {
+    background: rgba(255, 255, 255, 0.1);
+    color: #a0a0a0;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.leaderboard-table td {
+    color: #fff;
+}
+
+.leaderboard-table tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.rank-badge.gold {
+    background: linear-gradient(45deg, #f39c12, #f1c40f);
+    color: #1a1a2e;
+}
+
+.rank-badge.silver {
+    background: linear-gradient(45deg, #95a5a6, #bdc3c7);
+    color: #1a1a2e;
+}
+
+.rank-badge.bronze {
+    background: linear-gradient(45deg, #cd6133, #e67e22);
+    color: #fff;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.loader,
+.error {
+    text-align: center;
+    padding: 40px;
+    color: #a0a0a0;
+}
+
+.error {
+    color: #e74c3c;
+}
