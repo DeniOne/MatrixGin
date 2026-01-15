@@ -1,0 +1,31 @@
+{
+  "name": "photo-session-economic-engine",
+  "version": "1.0.0",
+  "description": "PhotoSession Economic Engine - PSEE",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "npx tsx server.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "psee",
+    "photosession",
+    "erp"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "tsx": "^4.7.0",
+    "@types/node": "^20.11.0"
+  },
+  "dependencies": {
+    "@fastify/type-provider-typebox": "^6.1.0",
+    "@sinclair/typebox": "^0.34.47",
+    "drizzle-orm": "^0.45.1",
+    "fastify": "^5.6.2",
+    "postgres": "^3.4.8"
+  }
+}

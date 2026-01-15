@@ -16,7 +16,7 @@ const TrainersAccreditPage: React.FC = () => {
             <div className="bg-white rounded-xl border p-8 mb-8">
                 <h2 className="text-xl font-bold text-gray-900 mb-6">Путь к сертификации</h2>
                 <div className="space-y-6">
-                    {steps.map((step, idx) => (
+                    {steps.map((step) => (
                         <div key={step.id} className="flex items-start">
                             <div className="mr-4 flex-shrink-0">
                                 {step.status === 'completed' ? (

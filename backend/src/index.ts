@@ -24,7 +24,15 @@ import swaggerUi from 'swagger-ui-express';
 import storeRoutes from './routes/store.routes';
 import gamificationRoutes from './routes/gamification.routes';
 import universityRoutes from './routes/university.routes';
+import productionRoutes from './routes/production.routes';
+import mesRoutes from './mes/mes.routes';
+import registryRoutes from './registry/registry.routes';
 import { cache } from './config/cache';
+import { bootstrapRegistry } from './registry/core';
+import { entityCardService, entityCardRoutes } from './entity-cards';
+import graphRoutes from './graph/graph.routes';
+import impactRoutes from './impact/impact.routes';
+import aiOpsRoutes from './ai-ops/ai-ops.routes';
 
 
 // Handle BigInt serialization
@@ -88,6 +96,13 @@ app.use('/api/telegram', telegramRoutes);
 app.use('/api/store', storeRoutes);
 app.use('/api/gamification', gamificationRoutes);
 app.use('/api/university', universityRoutes);
+app.use('/api/production', productionRoutes);
+app.use('/api/mes', mesRoutes);
+app.use('/api/registry', registryRoutes);
+app.use('/api/entity-cards', entityCardRoutes);
+app.use('/api/graph', graphRoutes);
+app.use('/api/impact', impactRoutes);
+app.use('/api/ai-ops', aiOpsRoutes);
 
 app.get('/', (req, res) => {
     res.send('MatrixGin v2.0 API');
@@ -97,17 +112,41 @@ app.get('/', (req, res) => {
 app.use(notFoundHandler);
 app.use(errorHandler);
 
-// Initialize Telegram Bot
-telegramService.initializeBot().catch(error => {
-    logger.error('Failed to initialize Telegram bot', { error: error.message });
-});
+// =============================================================================
+// ASYNC STARTUP - Registry Bootstrap MUST succeed before server starts
+// =============================================================================
 
-// Initialize Redis cache
-cache.connect().catch(error => {
-    logger.warn('Redis not available, caching disabled', { error: error.message });
-});
+async function startServer() {
+    try {
+        // 1. Bootstrap Registry (CRITICAL - fail-fast)
+        logger.info('=== STARTING MATRIXGIN SERVER ===');
+        await bootstrapRegistry();
 
-app.listen(port, () => {
-    logger.info(`Server is running at http://localhost:${port}`);
-});
+        // 2. Initialize Entity Cards (CRITICAL - depends on Registry)
+        entityCardService.initialize();
+
+        // 3. Initialize Telegram Bot (non-critical)
+        telegramService.initializeBot().catch(error => {
+            logger.error('Failed to initialize Telegram bot', { error: error.message });
+        });
+
+        // 4. Initialize Redis cache (non-critical)
+        cache.connect().catch(error => {
+            logger.warn('Redis not available, caching disabled', { error: error.message });
+        });
+
+        // 5. Start HTTP server
+        app.listen(port, () => {
+            logger.info(`Server is running at http://localhost:${port}`);
+        });
+
+    } catch (error) {
+        // Registry bootstrap failed - EXIT IMMEDIATELY
+        logger.error('=== SERVER STARTUP FAILED ===');
+        logger.error(`Critical error: ${error instanceof Error ? error.message : String(error)}`);
+        process.exit(1);
+    }
+}
+
+startServer();
 

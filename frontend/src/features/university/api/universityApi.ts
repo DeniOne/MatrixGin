@@ -98,7 +98,7 @@ export const universityApi = createApi({
         >({
             query: (params) => ({
                 url: '/courses',
-                params,
+                params: params || {},
             }),
             providesTags: ['Courses'],
         }),
@@ -143,7 +143,7 @@ export const universityApi = createApi({
         >({
             query: (params) => ({
                 url: '/trainers',
-                params,
+                params: params || {},
             }),
             providesTags: ['Trainers'],
         }),

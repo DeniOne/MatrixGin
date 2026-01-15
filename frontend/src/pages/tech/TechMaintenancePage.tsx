@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wrench, Calendar, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Wrench } from 'lucide-react';
 
 const TechMaintenancePage: React.FC = () => {
     const tickets = [
@@ -29,8 +29,8 @@ const TechMaintenancePage: React.FC = () => {
                         </div>
                         <div className="flex items-center space-x-3">
                             <span className={`text-xs font-bold px-2 py-1 rounded ${ticket.status === 'completed' ? 'bg-green-100 text-green-700' :
-                                    ticket.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
-                                        'bg-red-100 text-red-700'
+                                ticket.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
+                                    'bg-red-100 text-red-700'
                                 }`}>
                                 {ticket.status === 'completed' ? 'Выполнено' :
                                     ticket.status === 'in-progress' ? 'В работе' : 'Открыто'}

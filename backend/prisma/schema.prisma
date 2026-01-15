@@ -21,6 +21,158 @@ enum UserStatus {
   SUSPENDED
 }
 
+// ============================================================================
+// PHASE 0.1 - CORE DOMAIN MODELS (ERP Foundation)
+// Based on: Core Domain Schemas v1, ERP + AI Roadmap V1
+// Canon: Нет роли без контракта, нет KPI без события
+// ============================================================================
+
+// Role Model - Роли в системе (отдельная таблица, не enum)
+model Role {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  code        String   @unique // e.g., "PHOTOGRAPHER", "RETOUCHER", "SELLER"
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  contracts RoleContract[]
+  users     User[]
+
+  @@map("roles")
+}
+
+// RoleContract Model - Контракты ролей (МДР + Мотивация)
+// Canon: RoleContract = API между человеком и системой
+model RoleContract {
+  id                   String   @id @default(uuid())
+  role_id              String
+  mission              String   // Миссия роли
+  value_product        String   // ЦКП (Целевой Конечный Продукт)
+  responsibility_zones Json     // String[] - зоны ответственности
+  kpi_definitions      Json     // KPIDefinition[] - формулы, пороги
+  permissions          Json     // Permission[] - права и ограничения
+  growth_paths         Json     // QualificationPath[] - пути роста
+  version              Int      @default(1)
+  is_active            Boolean  @default(true)
+  effective_from       DateTime @default(now())
+  effective_to         DateTime?
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  role Role @relation(fields: [role_id], references: [id])
+
+  @@unique([role_id, version])
+  @@map("role_contracts")
+}
+
+// QualificationLevel Model - Уровни квалификации
+model QualificationLevel {
+  id           String   @id @default(uuid())
+  name         String   @unique // e.g., "PHOTON", "TOPCHIK", "FLINT_CARBON", "STAR", "UNIVERSE"
+  level        Int      @unique // 1-5
+  description  String?
+  requirements Json?    // Требования для достижения
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  users User[]
+
+  @@map("qualification_levels")
+}
+
+// EventType Enum - Типы событий в системе
+enum EventType {
+  SHIFT_STARTED
+  SHIFT_COMPLETED
+  KPI_RECORDED
+  FEEDBACK_SUBMITTED
+  COURSE_COMPLETED
+  TEST_PASSED
+  MENTORING_COMPLETED
+  QUALIFICATION_PROPOSED
+  QUALIFICATION_CHANGED
+  REWARD_GRANTED
+  TASK_CREATED
+  TASK_COMPLETED
+  TRANSACTION_CREATED
+}
+
+// Event Model - Event Store (единственный источник фактов)
+// Canon: События — единственный источник фактов
+model Event {
+  id           String    @id @default(uuid())
+  type         EventType
+  source       String    // e.g., "system", "user", "api"
+  subject_id   String    // User ID or Entity ID
+  subject_type String    // "user", "task", "shift", etc.
+  payload      Json      // Event-specific data
+  metadata     Json?     // Additional context
+  timestamp    DateTime  @default(now())
+
+  @@index([type, timestamp])
+  @@index([subject_id, subject_type])
+  @@map("events")
+}
+
+// KPI Model - KPI как датчики (не цели)
+// Canon: KPI вычисляются из Events + HypothesisContext
+model KPI {
+  id                 String   @id @default(uuid())
+  name               String   @unique
+  description        String?
+  formula            String   // Mathematical formula or calculation logic
+  source_events      Json     // EventType[] - источники событий
+  calculation_period String   // "daily", "weekly", "monthly"
+  unit               String?  // "count", "percentage", "rubles"
+  is_active          Boolean  @default(true)
+  created_at         DateTime @default(now())
+  updated_at         DateTime @updatedAt
+
+  records KPIRecord[]
+
+  @@map("kpis")
+}
+
+// KPIRecord Model - Записи KPI (всегда вычисляются из Events)
+model KPIRecord {
+  id               String   @id @default(uuid())
+  kpi_id           String
+  user_id          String?
+  department_id    String?
+  value            Decimal  @db.Decimal(15, 4)
+  period_start     DateTime
+  period_end       DateTime
+  calculated_at    DateTime @default(now())
+  source_event_ids Json     // String[] - IDs событий, из которых вычислен KPI
+
+  kpi KPI @relation(fields: [kpi_id], references: [id])
+
+  @@index([kpi_id, period_start, period_end])
+  @@map("kpi_records")
+}
+
+// RewardRule Model - Правила вознаграждения
+// Canon: Reward — следствие, не причина
+model RewardRule {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  trigger     Json     // EventType | KPIThreshold
+  condition   Json     // Condition logic
+  reward      Json     // Reward { type: "MC" | "GMC" | "RUB", amount: number }
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("reward_rules")
+}
+
+// ============================================================================
+// END PHASE 0.1 CORE DOMAIN MODELS
+// ============================================================================
+
 model User {
   id            String    @id @default(uuid())
   email         String    @unique
@@ -30,10 +182,15 @@ model User {
   middle_name   String?
   phone_number  String?
   telegram_id   String?   @unique
-  role          UserRole  @default(EMPLOYEE)
+  role          UserRole  @default(EMPLOYEE) // Legacy field, будет заменён на role_id
   status        UserStatus @default(ACTIVE)
   avatar        String?
   department_id String?
+  
+  // Phase 0.1 - Core Domain Model Links
+  role_id                String? // Link to Role model
+  qualification_level_id String? // Link to QualificationLevel model
+  
   last_login_at DateTime?
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
@@ -64,6 +221,16 @@ model User {
   raci_entries            RaciMatrix[]
   submitted_ideas         IdeaChannel[]
   hybrid_interactions     HybridTeamInteraction[]
+
+  // MES Module Relations
+  mes_created_orders      ProductionOrder[]
+  mes_assigned_works      WorkOrder[]
+  mes_quality_checks      QualityCheck[]
+  mes_registered_defects  Defect[]
+  
+  // Phase 0.1 - Core Domain Model Relations
+  erp_role            Role?              @relation(fields: [role_id], references: [id])
+  qualification_level QualificationLevel? @relation(fields: [qualification_level_id], references: [id])
 
   @@map("users")
 }
@@ -950,4 +1117,208 @@ model TrainingResult {
   assignment           TrainerAssignment @relation(fields: [assignment_id], references: [id], onDelete: Cascade)
 
   @@map("training_results")
+}
+
+// ===================================
+// REGISTRY MODULE (METADATA PLATFORM)
+// ===================================
+
+model RegistryEntity {
+  urn             String   @id
+  entity_type_urn String
+  version         Int      @default(1)
+  name            String?
+  description     String?
+  attributes      Json     // All other properties
+  fsm_state       String
+  is_system       Boolean  @default(false)
+  is_active       Boolean  @default(true)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@index([entity_type_urn])
+  @@index([fsm_state])
+  @@map("registry_entities")
+}
+
+model RegistryAuditEvent {
+  id              String   @id @default(uuid())
+  entity_urn      String?
+  action          String   // CREATE, UPDATE, TRANSITION, BOOTSTRAP
+  actor_urn       String?  // Who did it
+  payload         Json?
+  created_at      DateTime @default(now())
+
+  @@index([entity_urn])
+  @@map("registry_audit_events")
+}
+
+model RegistryRelationship {
+  id             String   @id @default(uuid())
+  definition_urn String   // References valid active relationship_definition
+  from_urn       String
+  to_urn         String
+  attributes     Json?    // Instance-specific attributes
+  created_at     DateTime @default(now())
+
+  @@index([definition_urn])
+  @@index([from_urn])
+  @@index([to_urn])
+  @@map("registry_relationships")
+}
+
+// ============================================================================
+// REGISTRY PROJECTIONS (Read-Only Views)
+// Derived strictly from Registry Core.
+// ============================================================================
+
+model RegistryOrgProjection {
+  id            String   @id @default(uuid())
+  urn           String   @unique
+  path          String   // Materialized path (e.g., "/root/child")
+  depth         Int
+  parent_urn    String?
+  root_urn      String
+  snapshot_hash String   // Reference to Core Snapshot
+  updated_at    DateTime @updatedAt
+  
+  @@index([path])
+  @@index([parent_urn])
+  @@index([root_urn])
+  @@map("registry_org_projections")
+}
+
+model RegistryOwnerProjection {
+  id            String   @id @default(uuid())
+  owner_urn     String   // User URN
+  asset_urn     String   // Wallet/Device URN
+  asset_type    String   // 'wallet', 'device'
+  relation_urn  String   // Core Relationship URN
+  snapshot_hash String
+  updated_at    DateTime @updatedAt
+
+  @@unique([owner_urn, asset_urn])
+  @@index([owner_urn])
+  @@index([asset_type])
+  @@map("registry_owner_projections")
+}
+
+// ===================================
+// MODULE 06 - PRODUCTION MES & QUALITY
+// ===================================
+
+enum ProductionOrderStatus {
+  DRAFT
+  PLANNED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum WorkOrderStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum QualityCheckType {
+  VISUAL
+  MEASUREMENT
+  FUNCTIONAL
+}
+
+enum QualityResult {
+  PASS
+  FAIL
+}
+
+enum DefectSeverity {
+  MINOR
+  MAJOR
+  CRITICAL
+}
+
+model ProductionOrder {
+  id              String                @id @default(uuid())
+  source_type     String                // PSEE, MANUAL
+  source_ref_id   String?               // PSEE Session ID or similar
+  product_type    String
+  quantity        Int
+  status          ProductionOrderStatus @default(DRAFT)
+  created_at      DateTime              @default(now())
+  closed_at       DateTime?
+  created_by_id   String
+  updated_at      DateTime              @updatedAt
+
+  created_by      User                  @relation(fields: [created_by_id], references: [id])
+  work_orders     WorkOrder[]
+  quality_checks  QualityCheck[]
+  defects         Defect[]
+
+  @@index([status])
+  @@index([source_ref_id])
+  @@map("mes_production_orders")
+}
+
+model WorkOrder {
+  id                  String          @id @default(uuid())
+  production_order_id String
+  operation_type      String
+  status              WorkOrderStatus @default(PENDING)
+  sequence_order      Int
+  started_at          DateTime?
+  finished_at         DateTime?
+  assigned_to_id      String?
+  created_at          DateTime        @default(now())
+  updated_at          DateTime        @updatedAt
+
+  production_order    ProductionOrder @relation(fields: [production_order_id], references: [id], onDelete: Cascade)
+  assigned_to         User?           @relation(fields: [assigned_to_id], references: [id])
+  quality_checks      QualityCheck[]
+
+  @@index([production_order_id])
+  @@index([status])
+  @@map("mes_work_orders")
+}
+
+model QualityCheck {
+  id                  String           @id @default(uuid())
+  production_order_id String
+  work_order_id       String?
+  check_type          QualityCheckType
+  result              QualityResult
+  created_by_id       String
+  created_at          DateTime         @default(now())
+  comments            String?
+
+  production_order    ProductionOrder  @relation(fields: [production_order_id], references: [id])
+  work_order          WorkOrder?       @relation(fields: [work_order_id], references: [id])
+  created_by          User             @relation(fields: [created_by_id], references: [id])
+  defects             Defect[]
+
+  @@index([production_order_id])
+  @@map("mes_quality_checks")
+}
+
+model Defect {
+  id                  String         @id @default(uuid())
+  production_order_id String
+  quality_check_id    String?
+  defect_type         String
+  severity            DefectSeverity
+  root_cause          String?
+  requires_rework     Boolean        @default(false)
+  resolved            Boolean        @default(false)
+  registered_by_id    String
+  registered_at       DateTime       @default(now())
+  updated_at          DateTime       @updatedAt
+
+  production_order    ProductionOrder @relation(fields: [production_order_id], references: [id])
+  quality_check       QualityCheck?   @relation(fields: [quality_check_id], references: [id])
+  registered_by       User            @relation(fields: [registered_by_id], references: [id])
+
+  @@index([production_order_id])
+  @@index([resolved])
+  @@map("mes_defects")
 }

@@ -5,7 +5,6 @@ import {
   Calendar,
   Award,
   Bell,
-  ChevronRight,
   PlayCircle,
   Clock
 } from 'lucide-react';
@@ -169,7 +168,7 @@ const PhotoDashboardPage: React.FC = () => {
               {notifications.map(notif => (
                 <div key={notif.id} className="flex items-start pb-4 border-b border-gray-100 last:border-0 last:pb-0">
                   <div className={`w-2 h-2 mt-1.5 rounded-full mr-3 flex-shrink-0 ${notif.type === 'info' ? 'bg-blue-500' :
-                      notif.type === 'success' ? 'bg-green-500' : 'bg-yellow-500'
+                    notif.type === 'success' ? 'bg-green-500' : 'bg-yellow-500'
                     }`}></div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">{notif.title}</p>

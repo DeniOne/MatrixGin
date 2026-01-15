@@ -5,9 +5,7 @@ import {
     MapPin,
     Users,
     Video,
-    Filter,
-    Search,
-    ArrowRight
+    Search
 } from 'lucide-react';
 
 interface Event {
@@ -139,7 +137,7 @@ const SoftEventsPage: React.FC = () => {
                                 <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
                                 <div className="absolute top-3 left-3">
                                     <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wide text-white ${event.type === 'workshop' ? 'bg-purple-600' :
-                                            event.type === 'webinar' ? 'bg-blue-600' : 'bg-orange-500'
+                                        event.type === 'webinar' ? 'bg-blue-600' : 'bg-orange-500'
                                         }`}>
                                         {event.type === 'workshop' ? 'Воркшоп' :
                                             event.type === 'webinar' ? 'Вебинар' : 'Митап'}

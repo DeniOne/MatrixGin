@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
+import { CheckCircle, AlertTriangle, FileText } from 'lucide-react';
 
 const TechSecurityPage: React.FC = () => {
     const policies = [
@@ -37,8 +37,8 @@ const TechSecurityPage: React.FC = () => {
                             </div>
                         </div>
                         <button className={`px-4 py-2 rounded-lg text-sm font-medium ${policy.status === 'read'
-                                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-indigo-600 text-white hover:bg-indigo-700'
                             }`}>
                             {policy.status === 'read' ? 'Повторить' : 'Прочитать'}
                         </button>

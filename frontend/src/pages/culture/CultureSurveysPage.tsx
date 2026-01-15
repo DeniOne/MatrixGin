@@ -1,5 +1,5 @@
 import React from 'react';
-import { MessageSquare, TrendingUp, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 
 const CultureSurveysPage: React.FC = () => {
     return (

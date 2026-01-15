@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, TrendingUp, Calendar } from 'lucide-react';
+import { DollarSign, Calendar } from 'lucide-react';
 
 const TrainersRewardsPage: React.FC = () => {
     const payouts = [

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, TrendingUp, Plus, ChevronRight } from 'lucide-react';
+import { Target, Plus } from 'lucide-react';
 
 const MgmtKPIPage: React.FC = () => {
     const objectives = [

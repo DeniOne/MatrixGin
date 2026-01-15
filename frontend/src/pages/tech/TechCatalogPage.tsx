@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, Lightbulb, Printer, Monitor, FileText, Download } from 'lucide-react';
+import { Camera, Lightbulb, Printer, FileText } from 'lucide-react';
 
 const TechCatalogPage: React.FC = () => {
     const equipment = [

@@ -109,6 +109,39 @@ router.post('/login', validateDto(LoginRequestDto), authController.login);
 
 /**
  * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Refresh access token using refresh token
+ *     tags: [Auth]
+ *     security: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [refreshToken]
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: Valid refresh token
+ *     responses:
+ *       200:
+ *         description: New access token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/refresh', authController.refresh);
+
+/**
+ * @swagger
  * /api/auth/me:
  *   get:
  *     summary: Get current authenticated user
@@ -122,6 +155,30 @@ router.post('/login', validateDto(LoginRequestDto), authController.login);
  *         description: Not authenticated
  */
 router.get('/me', passport.authenticate('jwt', { session: false }), authController.me);
+
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Logout current user
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: OK
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/logout', passport.authenticate('jwt', { session: false }), authController.logout);
 
 export default router;
 

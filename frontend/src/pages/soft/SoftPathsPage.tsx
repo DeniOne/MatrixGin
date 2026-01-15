@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Map,
     Flag,
@@ -139,13 +139,13 @@ const SoftPathsPage: React.FC = () => {
                 <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200"></div>
 
                 <div className="space-y-8">
-                    {currentPath.steps.map((step, index) => (
+                    {currentPath.steps.map((step) => (
                         <div key={step.id} className={`relative flex items-start group ${step.status === 'locked' ? 'opacity-60' : ''}`}>
                             {/* Step Indicator */}
                             <div className={`absolute left-0 w-16 flex justify-center pt-2 bg-gray-50 z-10`}>
                                 <div className={`w-16 h-16 rounded-full border-4 flex items-center justify-center transition-colors ${step.status === 'completed' ? 'border-green-500 bg-green-50 text-green-600' :
-                                        step.status === 'current' ? 'border-indigo-600 bg-white text-indigo-600 shadow-lg scale-110' :
-                                            'border-gray-200 bg-gray-50 text-gray-400'
+                                    step.status === 'current' ? 'border-indigo-600 bg-white text-indigo-600 shadow-lg scale-110' :
+                                        'border-gray-200 bg-gray-50 text-gray-400'
                                     }`}>
                                     {step.status === 'completed' ? <CheckCircle className="w-8 h-8" /> :
                                         step.status === 'locked' ? <Lock className="w-6 h-6" /> :
@@ -155,15 +155,15 @@ const SoftPathsPage: React.FC = () => {
 
                             {/* Content Card */}
                             <div className={`ml-24 flex-1 bg-white rounded-xl border p-6 transition-all ${step.status === 'current'
-                                    ? 'border-indigo-200 shadow-md ring-1 ring-indigo-100'
-                                    : 'border-gray-200 hover:border-gray-300'
+                                ? 'border-indigo-200 shadow-md ring-1 ring-indigo-100'
+                                : 'border-gray-200 hover:border-gray-300'
                                 }`}>
                                 <div className="flex justify-between items-start">
                                     <div>
                                         <div className="flex items-center space-x-2 mb-1">
                                             <span className={`text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded ${step.type === 'course' ? 'bg-blue-50 text-blue-600' :
-                                                    step.type === 'practice' ? 'bg-green-50 text-green-600' :
-                                                        'bg-purple-50 text-purple-600'
+                                                step.type === 'practice' ? 'bg-green-50 text-green-600' :
+                                                    'bg-purple-50 text-purple-600'
                                                 }`}>
                                                 {step.type === 'course' ? 'Курс' :
                                                     step.type === 'practice' ? 'Практика' : 'Тест'}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGetMyStatusQuery, EmployeeStatus, EmployeeRank } from '../../features/gamification/gamificationApi';
-import { Trophy, TrendingUp, Loader2 } from 'lucide-react';
+import { Trophy, Loader2 } from 'lucide-react';
 
 const StatusBadge: React.FC = () => {
     const { data: status, isLoading, error } = useGetMyStatusQuery();

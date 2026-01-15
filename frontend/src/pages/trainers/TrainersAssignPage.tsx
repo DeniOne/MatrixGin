@@ -1,5 +1,5 @@
 import React from 'react';
-import { UserPlus, Users, ArrowRight } from 'lucide-react';
+import { UserPlus, ArrowRight } from 'lucide-react';
 
 const TrainersAssignPage: React.FC = () => {
     const assignments = [

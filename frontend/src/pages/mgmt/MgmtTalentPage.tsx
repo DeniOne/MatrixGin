@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, TrendingUp, Star, ChevronRight } from 'lucide-react';
+import { Users, ChevronRight } from 'lucide-react';
 
 const MgmtTalentPage: React.FC = () => {
     const talents = [
@@ -65,7 +65,7 @@ const MgmtTalentPage: React.FC = () => {
                             <div className="w-full bg-gray-100 rounded-full h-2">
                                 <div
                                     className={`h-2 rounded-full ${talent.readiness >= 80 ? 'bg-green-600' :
-                                            talent.readiness >= 60 ? 'bg-blue-600' : 'bg-yellow-600'
+                                        talent.readiness >= 60 ? 'bg-blue-600' : 'bg-yellow-600'
                                         }`}
                                     style={{ width: `${talent.readiness}%` }}
                                 ></div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, User, ChevronRight, Filter } from 'lucide-react';
+import { Calendar, Clock, User } from 'lucide-react';
 
 interface Shift {
   id: number;
@@ -169,8 +169,8 @@ const PhotoShiftsPage: React.FC = () => {
                 <button
                   disabled={shift.status === 'FULL'}
                   className={`px-6 py-2 rounded-lg font-medium transition-colors ${shift.status === 'FULL'
-                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
                     }`}
                 >
                   {shift.status === 'FULL' ? 'Заполнен' : 'Записаться'}

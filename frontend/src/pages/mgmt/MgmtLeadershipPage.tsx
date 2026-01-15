@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, TrendingUp, DollarSign, Award, BookOpen, Clock } from 'lucide-react';
+import { Users, DollarSign, Award, BookOpen, Clock } from 'lucide-react';
 
 const MgmtLeadershipPage: React.FC = () => {
     const programs = [

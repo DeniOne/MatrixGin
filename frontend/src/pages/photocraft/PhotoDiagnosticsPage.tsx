@@ -5,10 +5,7 @@ import {
     TrendingUp,
     AlertTriangle,
     CheckCircle,
-    FileText,
-    Calendar,
-    Download,
-    Filter
+    FileText
 } from 'lucide-react';
 
 interface Audit {

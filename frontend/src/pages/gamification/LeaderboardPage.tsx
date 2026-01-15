@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useGetLeaderboardQuery } from '../../features/gamification/gamificationApi';
 import { useNavigate } from 'react-router-dom';
-import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/solid';
+
 import './LeaderboardPage.css'; // We'll create a simple CSS file for styling
 
 interface LeaderboardEntry {
@@ -12,6 +12,7 @@ interface LeaderboardEntry {
     score: number;
     status?: string;
     level?: number;
+    rankChange: number; // Added required property based on usage
 }
 
 const metrics = [

@@ -17,7 +17,7 @@ declare global {
 
 // In development, use a global variable to preserve the client across hot reloads
 // In production, create a new client for each server instance
-export const prisma: PrismaClient =
+export const prisma =
     global.__prisma ||
     new PrismaClient({
         log: process.env.NODE_ENV === 'development'

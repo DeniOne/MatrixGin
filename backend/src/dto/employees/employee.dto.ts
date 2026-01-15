@@ -1,5 +1,9 @@
 /**
  * Employee DTOs for MatrixGin v2.0 API
+ * 
+ * REMEDIATION: MODULE 02
+ * Removed: KPI, emotional analytics, ratings, engagement metrics
+ * All personal evaluation features are DEFERRED
  */
 
 import {
@@ -9,17 +13,15 @@ import {
     IsOptional,
     IsNumber,
     IsDateString,
-    IsInt,
     MinLength,
     MaxLength,
     Min,
-    Max,
     Matches,
     ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 import { EmployeeStatus, EmployeeRank } from '../common/common.enums';
-import { UUID, ISODate, ISODateTime, EmotionalTone } from '../common/common.types';
+import { UUID, ISODate, ISODateTime } from '../common/common.types';
 import { UserResponseDto } from '../auth/auth.dto';
 import { DepartmentResponseDto } from '../departments/department.dto';
 
@@ -91,17 +93,17 @@ export class UpdateEmployeeRequestDto {
 }
 
 /**
- * Update emotional tone request
+ * Update employee status request (replaces promote/demote)
+ * Requires explicit human decision - no automatic logic
  */
-export class UpdateEmotionalToneDto {
-    @IsNumber()
-    @Min(0)
-    @Max(4)
-    tone: number;
+export class UpdateStatusRequestDto {
+    @IsEnum(EmployeeStatus)
+    status: EmployeeStatus;
 }
 
 /**
  * Employee response
+ * Note: salary field is filtered by role (see field-level access control)
  */
 export class EmployeeResponseDto {
     @IsUUID()
@@ -132,7 +134,7 @@ export class EmployeeResponseDto {
 
     @IsOptional()
     @IsNumber()
-    salary?: number;
+    salary?: number; // Field-level access: HR only
 
     @IsEnum(EmployeeStatus)
     status: EmployeeStatus;
@@ -146,12 +148,6 @@ export class EmployeeResponseDto {
     @IsOptional()
     @IsDateString()
     terminationDate?: ISODate;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    @Max(4)
-    emotionalTone?: EmotionalTone;
 
     @IsOptional()
     @IsNumber()
@@ -169,44 +165,8 @@ export class EmployeeResponseDto {
 }
 
 /**
- * Employee analytics response
- */
-export class EmployeeAnalyticsResponseDto {
-    @IsUUID()
-    employeeId: UUID;
-
-    @IsNumber()
-    @Min(0)
-    @Max(100)
-    kpiScore: number;
-
-    @IsInt()
-    @Min(0)
-    tasksCompleted: number;
-
-    @IsNumber()
-    @Min(0)
-    averageTaskCompletionTime: number;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    @Max(4)
-    emotionalToneAverage?: EmotionalTone;
-
-    @IsNumber()
-    @Min(0)
-    @Max(1)
-    burnoutRisk: number;
-
-    @IsNumber()
-    @Min(0)
-    @Max(100)
-    engagementIndex: number;
-}
-
-/**
  * Employee filters for queries
+ * Removed: emotional tone filters (DEFERRED)
  */
 export class EmployeeFiltersDto {
     @IsOptional()
@@ -220,20 +180,6 @@ export class EmployeeFiltersDto {
     @IsOptional()
     @IsEnum(EmployeeRank)
     rank?: EmployeeRank;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    @Max(4)
-    @Type(() => Number)
-    minEmotionalTone?: number;
-
-    @IsOptional()
-    @IsNumber()
-    @Min(0)
-    @Max(4)
-    @Type(() => Number)
-    maxEmotionalTone?: number;
 
     @IsOptional()
     @IsString()

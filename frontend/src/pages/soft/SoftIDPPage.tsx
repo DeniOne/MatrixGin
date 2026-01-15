@@ -6,8 +6,7 @@ import {
     Plus,
     MoreHorizontal,
     TrendingUp,
-    AlertCircle,
-    Flag
+    AlertCircle
 } from 'lucide-react';
 
 interface IDPGoal {
@@ -22,7 +21,7 @@ interface IDPGoal {
 
 const SoftIDPPage: React.FC = () => {
     // Mock Data
-    const [goals, setGoals] = useState<IDPGoal[]>([
+    const [goals] = useState<IDPGoal[]>([
         {
             id: '1',
             title: 'Развить навыки публичных выступлений',
@@ -163,7 +162,7 @@ const SoftIDPPage: React.FC = () => {
                             <div className="w-full bg-gray-100 rounded-full h-2">
                                 <div
                                     className={`h-2 rounded-full transition-all duration-500 ${goal.status === 'overdue' ? 'bg-red-500' :
-                                            goal.status === 'completed' ? 'bg-green-500' : 'bg-indigo-600'
+                                        goal.status === 'completed' ? 'bg-green-500' : 'bg-indigo-600'
                                         }`}
                                     style={{ width: `${goal.progress}%` }}
                                 ></div>

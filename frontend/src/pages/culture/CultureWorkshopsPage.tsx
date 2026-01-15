@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Users, MapPin, Clock } from 'lucide-react';
+import { Calendar, Users, MapPin } from 'lucide-react';
 
 const CultureWorkshopsPage: React.FC = () => {
     const workshops = [

@@ -17,7 +17,7 @@ const AchievementsGallery: React.FC = () => {
     if (loadingEarned || loadingAvailable) return <div className="loader">Loading achievements...</div>;
     if (errorEarned || errorAvailable) return <div className="error">Failed to load achievements.</div>;
 
-    const earnedIds = new Set((earned as Achievement[]).map(a => a.id));
+    const earnedIds = new Set((earned || []).map(ua => ua.achievement_id));
 
     const renderAchievement = (achievement: Achievement, unlocked: boolean) => (
         <div key={achievement.id} className={`achievement-card ${unlocked ? 'unlocked' : 'locked'}`}>
@@ -40,7 +40,7 @@ const AchievementsGallery: React.FC = () => {
         <div className="achievements-gallery">
             <h2>Your Achievements</h2>
             <div className="grid">
-                {(earned as Achievement[]).map(a => renderAchievement(a, true))}
+                {(earned || []).map(ua => renderAchievement(ua.achievement, true))}
             </div>
             <h2>All Achievements</h2>
             <div className="grid">

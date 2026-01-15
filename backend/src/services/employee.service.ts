@@ -1,8 +1,13 @@
 import { Employee, User } from '@prisma/client';
-import { CreateEmployeeRequestDto, UpdateEmployeeRequestDto, EmployeeResponseDto, UpdateEmotionalToneDto } from '../dto/employees/employee.dto';
+import { CreateEmployeeRequestDto, UpdateEmployeeRequestDto, EmployeeResponseDto } from '../dto/employees/employee.dto';
 import { EmployeeStatus, EmployeeRank, UserRole, UserStatus } from '../dto/common/common.enums';
 import { prisma } from '../config/prisma';
+import { logger } from '../config/logger';
 
+/**
+ * Employee Service
+ * REMEDIATION: Removed emotional analytics, promote/demote replaced with updateStatus
+ */
 export class EmployeeService {
     async createEmployee(dto: CreateEmployeeRequestDto): Promise<EmployeeResponseDto> {
         // Verify user exists
@@ -74,74 +79,64 @@ export class EmployeeService {
         return this.mapToResponse(employee);
     }
 
-    async updateEmotionalTone(id: string, tone: number): Promise<EmployeeResponseDto> {
-        const employee = await prisma.employee.update({
-            where: { id },
-            data: { emotional_tone: tone },
-            include: { user: true, department: true }
-        });
-        return this.mapToResponse(employee);
-    }
-
-    async promoteEmployee(id: string): Promise<EmployeeResponseDto> {
-        const employee = await prisma.employee.findUnique({ where: { id } });
-        if (!employee) throw new Error('Employee not found');
-
-        const statusOrder = [
-            EmployeeStatus.PHOTON,
-            EmployeeStatus.TOPCHIK,
-            EmployeeStatus.FLINT_CARBON,
-            EmployeeStatus.STAR,
-            EmployeeStatus.UNIVERSE
-        ];
-
-        const currentIndex = statusOrder.indexOf(employee.status as unknown as EmployeeStatus);
-        if (currentIndex === -1 || currentIndex === statusOrder.length - 1) {
-            throw new Error('Employee cannot be promoted further');
+    /**
+     * Update employee status
+     * REMEDIATION: Replaces promote/demote - no automatic logic
+     * Requires explicit human decision
+     */
+    async updateStatus(id: string, status: EmployeeStatus): Promise<EmployeeResponseDto> {
+        // Validate status is a valid enum value
+        const validStatuses = Object.values(EmployeeStatus);
+        if (!validStatuses.includes(status)) {
+            throw new Error('Invalid status');
         }
 
-        const newStatus = statusOrder[currentIndex + 1];
+        const employee = await prisma.employee.findUnique({ where: { id } });
+        if (!employee) {
+            throw new Error('Employee not found');
+        }
+
         const updatedEmployee = await prisma.employee.update({
             where: { id },
-            data: { status: newStatus as any },
+            data: { status: status as any },
             include: { user: true, department: true }
+        });
+
+        logger.info('Employee status updated', {
+            employeeId: id,
+            oldStatus: employee.status,
+            newStatus: status
         });
 
         return this.mapToResponse(updatedEmployee);
     }
 
-    async demoteEmployee(id: string): Promise<EmployeeResponseDto> {
-        const employee = await prisma.employee.findUnique({ where: { id } });
-        if (!employee) throw new Error('Employee not found');
-
-        const statusOrder = [
-            EmployeeStatus.PHOTON,
-            EmployeeStatus.TOPCHIK,
-            EmployeeStatus.FLINT_CARBON,
-            EmployeeStatus.STAR,
-            EmployeeStatus.UNIVERSE
-        ];
-
-        const currentIndex = statusOrder.indexOf(employee.status as unknown as EmployeeStatus);
-        if (currentIndex <= 0) {
-            throw new Error('Employee cannot be demoted further');
+    /**
+     * Audit log for reading personal data
+     * REMEDIATION: Required for compliance
+     */
+    async logRead(actorId: string | undefined, targetEmployeeId: string, dataClass: string): Promise<void> {
+        try {
+            await prisma.auditLog.create({
+                data: {
+                    user_id: actorId,
+                    action: 'EMPLOYEE_READ',
+                    entity_type: 'employee',
+                    entity_id: targetEmployeeId,
+                    details: { dataClass },
+                }
+            });
+        } catch (error) {
+            logger.error('Failed to create audit log for employee read', { error });
+            // Don't block the main flow
         }
-
-        const newStatus = statusOrder[currentIndex - 1];
-        const updatedEmployee = await prisma.employee.update({
-            where: { id },
-            data: { status: newStatus as any },
-            include: { user: true, department: true }
-        });
-
-        return this.mapToResponse(updatedEmployee);
     }
 
     private mapToResponse(emp: Employee & { user: User; department?: any }): EmployeeResponseDto {
         return {
             id: emp.id,
             userId: emp.user_id,
-            departmentId: emp.department_id || '', // Should ideally not be null if created properly
+            departmentId: emp.department_id || '',
             position: emp.position || '',
             employeeNumber: emp.employee_number || undefined,
             salary: emp.salary ? Number(emp.salary) : undefined,
@@ -149,7 +144,6 @@ export class EmployeeService {
             rank: emp.rank as unknown as EmployeeRank,
             hireDate: emp.hired_at.toISOString().split('T')[0],
             terminationDate: emp.termination_date?.toISOString().split('T')[0],
-            emotionalTone: emp.emotional_tone as any,
             mcBalance: emp.mc_balance ? Number(emp.mc_balance) : 0,
             gmcBalance: emp.gmc_balance ? Number(emp.gmc_balance) : 0,
             createdAt: emp.created_at.toISOString(),

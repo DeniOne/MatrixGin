@@ -6,6 +6,7 @@ import { endOfWeek } from 'date-fns/endOfWeek';
 import { endOfMonth } from 'date-fns/endOfMonth';
 
 import { prisma } from '../config/prisma';
+import { analyticsRegistryBridge } from './analytics-registry.bridge';
 
 /**
  * Service responsible for calculating KPI statistics based on wallet transactions and task rewards.
@@ -110,6 +111,56 @@ export class KpiService {
             totalTransaction,
             totalReward,
             transactionCount: transactions.length,
+        };
+    }
+
+    /**
+     * Get Department Performance (Registry Integrated)
+     * Demonstrates Step 8: Analytics as Read-Only Registry Consumer.
+     * 
+     * Uses Analytics Registry Bridge to find the *true* structural scope (subtree)
+     * of the department, then aggregates KPI records for that scope.
+     */
+    async getDepartmentPerformance(departmentId: string, period: 'weekly' | 'monthly' = 'monthly') {
+        const now = new Date();
+        const startDate = period === 'weekly' ? startOfWeek(now, { weekStartsOn: 1 }) : startOfMonth(now);
+        const endDate = period === 'weekly' ? endOfWeek(now, { weekStartsOn: 1 }) : endOfMonth(now);
+
+        // 1. Structural Resolution via Registry (Canonical)
+        // We do NOT use departments.parent_id or path column.
+        // We ask the Bridge: "Who is in this organization?"
+        const scopeIds = await analyticsRegistryBridge.getDepartmentSubtreeIds(departmentId);
+
+        if (scopeIds.length === 0) {
+            return {
+                departmentId,
+                scopeSize: 0,
+                totalKpiValue: 0,
+                message: 'No structural trace found in Registry'
+            };
+        }
+
+        // 2. Data Aggregation (Domain)
+        // Now we query the domain facts (KPI Records) for these resolved IDs.
+        // Assuming KPIRecord has department_id.
+        const records = await prisma.kPIRecord.findMany({
+            where: {
+                department_id: { in: scopeIds },
+                period_start: { gte: startDate },
+                period_end: { lte: endDate }
+            },
+            select: { value: true }
+        });
+
+        const totalValue = records.reduce((sum, r) => sum + Number(r.value), 0);
+
+        return {
+            departmentId,
+            period,
+            scopeSize: scopeIds.length,
+            scopeIds: scopeIds, // Audit/Explainability
+            totalKpiValue: totalValue,
+            registrySnapshotHash: 'current' // Placeholder, ideally fetched from Bridge
         };
     }
 }

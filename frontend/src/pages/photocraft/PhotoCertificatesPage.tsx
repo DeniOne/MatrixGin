@@ -5,7 +5,6 @@ import {
     Lock,
     Download,
     Share2,
-    Calendar,
     Star
 } from 'lucide-react';
 

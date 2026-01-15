@@ -10,7 +10,7 @@ import {
     TrendingUp,
     BookOpen,
     Award,
-    ChevronRight
+
 } from 'lucide-react';
 
 interface AcademyCardProps {

@@ -18,16 +18,16 @@ const StatusProgressCard: React.FC = () => {
 
     useEffect(() => {
         if (statusData && statusData.status) {
-            // Assuming backend returns current status with level and requirements for next level
-            const currentLevel = statusData.status.level;
-            // Find next level from a predefined list (could be fetched from API)
             const allLevels: StatusLevel[] = [
-                { id: '1', name: 'Фотон', level: 1, requirements: { tasks: 0, mc: 0 } },
-                { id: '2', name: 'Топчик', level: 2, requirements: { tasks: 10, mc: 100 } },
-                { id: '3', name: 'Кремень', level: 3, requirements: { tasks: 50, mc: 500, tenure_months: 12 } },
-                { id: '4', name: 'Углерод', level: 4, requirements: { tasks: 100, mc: 2000, kpi_percent: 100, tenure_months: 24 } },
-                { id: '5', name: 'UNIVERSE', level: 5, requirements: { tasks: 500, mc: 10000, is_founder: true } }
+                { id: 'PHOTON', name: 'Фотон', level: 1, requirements: { tasks: 0, mc: 0 } },
+                { id: 'TOPCHIK', name: 'Топчик', level: 2, requirements: { tasks: 10, mc: 100 } },
+                { id: 'KREMEN', name: 'Кремень', level: 3, requirements: { tasks: 50, mc: 500, tenure_months: 12 } },
+                { id: 'CARBON', name: 'Углерод', level: 4, requirements: { tasks: 100, mc: 2000, kpi_percent: 100, tenure_months: 24 } },
+                { id: 'UNIVERSE', name: 'UNIVERSE', level: 5, requirements: { tasks: 500, mc: 10000, is_founder: true } }
             ];
+
+            const currentLevelObj = allLevels.find(l => l.id === statusData.status);
+            const currentLevel = currentLevelObj ? currentLevelObj.level : 1;
 
             const next = allLevels.find(l => l.level > currentLevel) || null;
             setNextLevel(next);
@@ -50,14 +50,22 @@ const StatusProgressCard: React.FC = () => {
     if (errorStatus || errorRank) return <div className="error">Failed to load status.</div>;
 
     const current = statusData?.status;
+    const allLevels: StatusLevel[] = [
+        { id: 'PHOTON', name: 'Фотон', level: 1, requirements: { tasks: 0, mc: 0 } },
+        { id: 'TOPCHIK', name: 'Топчик', level: 2, requirements: { tasks: 10, mc: 100 } },
+        { id: 'KREMEN', name: 'Кремень', level: 3, requirements: { tasks: 50, mc: 500, tenure_months: 12 } },
+        { id: 'CARBON', name: 'Углерод', level: 4, requirements: { tasks: 100, mc: 2000, kpi_percent: 100, tenure_months: 24 } },
+        { id: 'UNIVERSE', name: 'UNIVERSE', level: 5, requirements: { tasks: 500, mc: 10000, is_founder: true } }
+    ];
+    const currentLevelObj = current ? allLevels.find(l => l.id === current) : null;
 
     return (
         <div className="status-progress-card">
             <h2>Your Gamification Status</h2>
-            {current && (
+            {currentLevelObj && (
                 <div className="current-status">
-                    <span className="badge">{current.name}</span>
-                    <span className="level">Level {current.level}</span>
+                    <span className="badge">{currentLevelObj.name}</span>
+                    <span className="level">Level {currentLevelObj.level}</span>
                 </div>
             )}
             {nextLevel ? (
@@ -69,7 +77,7 @@ const StatusProgressCard: React.FC = () => {
                     <p>{progressPercent}% towards next level</p>
                     <ul className="requirements">
                         {Object.entries(nextLevel.requirements).map(([key, value]) => (
-                            <li key={key}>{key}: {value}</li>
+                            <li key={key}>{key}: {String(value)}</li>
                         ))}
                     </ul>
                 </>

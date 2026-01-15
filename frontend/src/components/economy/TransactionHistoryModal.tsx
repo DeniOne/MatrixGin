@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGetTransactionsQuery, Transaction, TransactionType, Currency } from '../../features/economy/economyApi';
-import { X, Filter, ArrowUpRight, ArrowDownLeft, Loader2 } from 'lucide-react';
+import { X, ArrowUpRight, ArrowDownLeft, Loader2 } from 'lucide-react';
 
 interface TransactionHistoryModalProps {
     isOpen: boolean;

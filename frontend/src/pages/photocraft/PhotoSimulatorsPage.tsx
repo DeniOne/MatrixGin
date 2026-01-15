@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
     Play,
-    MessageCircle,
     CheckCircle,
     XCircle,
     Award,
@@ -150,7 +149,7 @@ const PhotoSimulatorsPage: React.FC = () => {
                                 <img src={scenario.image} alt={scenario.title} className="w-full h-full object-cover" />
                                 <div className="absolute top-3 right-3">
                                     <span className={`px-3 py-1 rounded-full text-xs font-bold text-white uppercase tracking-wide ${scenario.difficulty === 'easy' ? 'bg-green-500' :
-                                            scenario.difficulty === 'medium' ? 'bg-yellow-500' : 'bg-red-500'
+                                        scenario.difficulty === 'medium' ? 'bg-yellow-500' : 'bg-red-500'
                                         }`}>
                                         {scenario.difficulty}
                                     </span>

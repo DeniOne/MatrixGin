@@ -1,9 +1,7 @@
 import React from 'react';
 import {
     Award,
-    Star,
     Zap,
-    TrendingUp,
     Users,
     MessageSquare,
     Heart,
@@ -123,8 +121,8 @@ const SoftBadgesPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {badges.map(badge => (
                     <div key={badge.id} className={`bg-white rounded-xl border p-6 flex flex-col items-center text-center transition-all ${badge.unlocked
-                            ? 'border-indigo-100 shadow-sm hover:shadow-md'
-                            : 'border-gray-200 bg-gray-50 opacity-70 grayscale'
+                        ? 'border-indigo-100 shadow-sm hover:shadow-md'
+                        : 'border-gray-200 bg-gray-50 opacity-70 grayscale'
                         }`}>
                         <div className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${badge.unlocked ? 'bg-indigo-50' : 'bg-gray-200'
                             }`}>

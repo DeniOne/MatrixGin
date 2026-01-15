@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, FileText, Video, CheckSquare, Sparkles } from 'lucide-react';
+import { Plus, FileText, Sparkles } from 'lucide-react';
 
 const TrainersAuthorPage: React.FC = () => {
     const courses = [

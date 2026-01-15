@@ -155,25 +155,25 @@ export const gamificationApi = api.injectEndpoints({
         // Quests
         getActiveQuests: builder.query<Quest[], void>({
             query: () => '/gamification/quests',
-            providesTags: ['Gamification', 'Quests'],
+            providesTags: ['Gamification', 'Quests'] as any,
         }),
         startQuest: builder.mutation<QuestProgress, string>({
             query: (questId) => ({
                 url: `/gamification/quests/${questId}/start`,
                 method: 'POST',
             }),
-            invalidatesTags: ['Gamification', 'Quests'],
+            invalidatesTags: ['Gamification', 'Quests'] as any,
         }),
         getQuestProgress: builder.query<QuestProgress, string>({
             query: (questId) => `/gamification/quests/${questId}/progress`,
-            providesTags: ['Gamification', 'Quests'],
+            providesTags: ['Gamification', 'Quests'] as any,
         }),
         abandonQuest: builder.mutation<QuestProgress, string>({
             query: (questId) => ({
                 url: `/gamification/quests/${questId}/abandon`,
                 method: 'POST',
             }),
-            invalidatesTags: ['Gamification', 'Quests'],
+            invalidatesTags: ['Gamification', 'Quests'] as any,
         }),
     }),
 });
@@ -189,5 +189,6 @@ export const {
     useGetActiveQuestsQuery,
     useStartQuestMutation,
     useGetQuestProgressQuery,
+    useLazyGetQuestProgressQuery,
     useAbandonQuestMutation,
 } = gamificationApi;

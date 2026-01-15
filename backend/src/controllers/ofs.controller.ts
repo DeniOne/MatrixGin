@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import ofsService from '../services/ofs.service';
+import { filterRoleMatrixByRole, filterHistoryByRole, filterOFSArrayByRole } from '../services/ofs-acl.service';
+import { UserRole } from '../dto/common/common.enums';
 
 class OFSController {
     /**
@@ -32,9 +34,15 @@ class OFSController {
      * POST /api/ofs/departments
      * Create new department
      */
+    /**
+     * POST /api/ofs/departments
+     * Create new department
+     */
     async createDepartment(req: Request, res: Response): Promise<void> {
         try {
-            const department = await ofsService.createDepartment(req.body);
+            const { force, reason, ...body } = req.body;
+            // Pass force/reason merged into data
+            const department = await ofsService.createDepartment({ ...body, force, reason });
 
             res.status(201).json({
                 success: true,
@@ -75,12 +83,21 @@ class OFSController {
      * DELETE /api/ofs/departments/:id
      * Delete/deactivate department
      */
+    /**
+     * DELETE /api/ofs/departments/:id
+     * Delete/deactivate department
+     */
     async deleteDepartment(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params;
-            const { hard } = req.query;
+            const { hard, force, reason } = req.query;
 
-            const result = await ofsService.deleteDepartment(id, hard !== 'true');
+            const result = await ofsService.deleteDepartment(
+                id,
+                hard !== 'true',
+                force === 'true',
+                reason as string
+            );
 
             res.status(200).json({
                 success: true,
@@ -99,17 +116,22 @@ class OFSController {
      * POST /api/ofs/departments/:id/move
      * Move department to new parent
      */
+    /**
+     * POST /api/ofs/departments/:id/move
+     * Move department to new parent
+     */
     async moveDepartment(req: Request, res: Response): Promise<void> {
         try {
             const { id } = req.params;
-            const { new_parent_id, reason } = req.body;
+            const { new_parent_id, reason, force } = req.body;
             const userId = (req.user as any)?.id;
 
             const department = await ofsService.moveDepartment(
                 id,
                 new_parent_id,
                 reason,
-                userId
+                userId,
+                force
             );
 
             res.status(200).json({
@@ -132,12 +154,14 @@ class OFSController {
     async getRoleMatrix(req: Request, res: Response): Promise<void> {
         try {
             const { department_id } = req.query;
+            const userRole = (req.user as any)?.role as UserRole || UserRole.EMPLOYEE;
 
             const matrix = await ofsService.getRoleMatrix(department_id as string);
+            const filtered = filterRoleMatrixByRole(matrix, userRole);
 
             res.status(200).json({
                 success: true,
-                data: matrix
+                data: filtered
             });
         } catch (error) {
             console.error('Get role matrix error:', error);
@@ -257,6 +281,8 @@ class OFSController {
     async getEmployees(req: Request, res: Response): Promise<void> {
         try {
             const { department_id, role, status, has_competencies, page, limit } = req.query;
+            const userRole = (req.user as any)?.role as UserRole || UserRole.EMPLOYEE;
+            const userId = (req.user as any)?.id;
 
             const result = await ofsService.getEmployees({
                 department_id: department_id as string,
@@ -267,9 +293,11 @@ class OFSController {
                 limit: limit ? Number(limit) : undefined
             });
 
+            const filteredData = filterOFSArrayByRole(result.data, userRole, userId);
+
             res.status(200).json({
                 success: true,
-                data: result.data,
+                data: filteredData,
                 pagination: result.pagination
             });
         } catch (error) {
@@ -429,6 +457,7 @@ class OFSController {
                 page,
                 limit
             } = req.query;
+            const userRole = (req.user as any)?.role as UserRole || UserRole.EMPLOYEE;
 
             const result = await ofsService.getStructureHistory({
                 entity_type: entity_type as any,
@@ -441,9 +470,11 @@ class OFSController {
                 limit: limit ? Number(limit) : undefined
             });
 
+            const filteredData = filterHistoryByRole(result.data, userRole);
+
             res.status(200).json({
                 success: true,
-                data: result.data,
+                data: filteredData,
                 pagination: result.pagination
             });
         } catch (error) {

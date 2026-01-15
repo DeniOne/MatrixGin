@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import {
     Trophy,
     Medal,
-    TrendingUp,
-    Calendar,
     Filter,
     Download,
     User,

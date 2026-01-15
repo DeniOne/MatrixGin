@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useGetActiveQuestsQuery, useStartQuestMutation, useGetQuestProgressQuery, useAbandonQuestMutation } from '../../features/gamification/gamificationApi';
+import React, { useState } from 'react';
+import { useGetActiveQuestsQuery, useStartQuestMutation, useLazyGetQuestProgressQuery, useAbandonQuestMutation } from '../../features/gamification/gamificationApi';
 import './QuestTracker.css'; // Simple styling
 
 interface Quest {
@@ -25,21 +25,21 @@ const QuestTracker: React.FC = () => {
     const { data: quests, isLoading: loadingQuests, error: errorQuests } = useGetActiveQuestsQuery();
     const [startQuest] = useStartQuestMutation();
     const [abandonQuest] = useAbandonQuestMutation();
-    const { data: progressData, refetch: refetchProgress } = useGetQuestProgressQuery(undefined, { skip: true });
+    const [triggerProgress] = useLazyGetQuestProgressQuery();
 
     const [activeQuestId, setActiveQuestId] = useState<string | null>(null);
     const [progress, setProgress] = useState<QuestProgress | null>(null);
 
     const handleStart = async (questId: string) => {
-        await startQuest({ questId });
+        await startQuest(questId);
         setActiveQuestId(questId);
         // Fetch progress after starting
-        const result = await refetchProgress({ questId, userId: '' }); // TODO: replace userId with auth context
+        const result = await triggerProgress(questId);
         setProgress(result.data as QuestProgress);
     };
 
     const handleAbandon = async (questId: string) => {
-        await abandonQuest({ questId });
+        await abandonQuest(questId);
         if (activeQuestId === questId) {
             setActiveQuestId(null);
             setProgress(null);

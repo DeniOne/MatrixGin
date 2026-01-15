@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import {
     Sun,
     Check,
-    Calendar,
     Flame,
     Zap,
     Smile,
-    Coffee,
     Moon
 } from 'lucide-react';
 
@@ -102,8 +100,8 @@ const SoftPracticesPage: React.FC = () => {
                         key={day.day}
                         onClick={() => setSelectedDay(day.day)}
                         className={`flex flex-col items-center justify-center w-12 h-16 rounded-lg transition-all ${selectedDay === day.day
-                                ? 'bg-indigo-600 text-white shadow-md transform scale-105'
-                                : 'hover:bg-gray-50 text-gray-500'
+                            ? 'bg-indigo-600 text-white shadow-md transform scale-105'
+                            : 'hover:bg-gray-50 text-gray-500'
                             }`}
                     >
                         <span className="text-xs font-medium mb-1">{day.name}</span>
@@ -121,8 +119,8 @@ const SoftPracticesPage: React.FC = () => {
                     <div
                         key={practice.id}
                         className={`bg-white rounded-xl border p-5 transition-all ${practice.completed
-                                ? 'border-green-200 bg-green-50/30'
-                                : 'border-gray-200 hover:border-indigo-300 hover:shadow-md'
+                            ? 'border-green-200 bg-green-50/30'
+                            : 'border-gray-200 hover:border-indigo-300 hover:shadow-md'
                             }`}
                     >
                         <div className="flex items-start">
@@ -149,7 +147,7 @@ const SoftPracticesPage: React.FC = () => {
 
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center text-sm text-gray-400">
-                                        <Clock className="w-4 h-4 mr-1" />
+                                        <div className="w-4 h-4 mr-1" />
                                         {practice.duration}
                                     </div>
 

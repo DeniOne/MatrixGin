@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import {
     Search,
-    Filter,
     Download,
     FileText,
     Image,
     Video,
     Grid,
     List,
-    Star,
-    Clock
+    Star
 } from 'lucide-react';
 
 interface Resource {
@@ -148,8 +146,8 @@ const PhotoLibraryPage: React.FC = () => {
                         key={type}
                         onClick={() => setFilterType(type)}
                         className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filterType === type
-                                ? 'bg-indigo-600 text-white'
-                                : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+                            ? 'bg-indigo-600 text-white'
+                            : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                             }`}
                     >
                         {type === 'all' ? 'Все материалы' :

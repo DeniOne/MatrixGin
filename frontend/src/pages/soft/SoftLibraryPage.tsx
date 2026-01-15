@@ -4,10 +4,8 @@ import {
     Headphones,
     FileText,
     Search,
-    Filter,
     Star,
     Clock,
-    Download,
     PlayCircle,
     Bookmark
 } from 'lucide-react';
@@ -147,7 +145,7 @@ const SoftLibraryPage: React.FC = () => {
                         <div className="p-5 flex-1 flex flex-col">
                             <div className="flex items-center text-xs text-gray-500 mb-2 space-x-2">
                                 <span className={`px-2 py-0.5 rounded bg-gray-100 font-medium uppercase tracking-wide ${resource.type === 'book' ? 'text-blue-600 bg-blue-50' :
-                                        resource.type === 'podcast' ? 'text-purple-600 bg-purple-50' : 'text-orange-600 bg-orange-50'
+                                    resource.type === 'podcast' ? 'text-purple-600 bg-purple-50' : 'text-orange-600 bg-orange-50'
                                     }`}>
                                     {resource.type === 'book' ? 'Книга' : resource.type === 'podcast' ? 'Подкаст' : 'Статья'}
                                 </span>

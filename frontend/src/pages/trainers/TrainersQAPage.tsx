@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckSquare, Star, TrendingUp } from 'lucide-react';
+import { Star, TrendingUp } from 'lucide-react';
 
 const TrainersQAPage: React.FC = () => {
     const audits = [

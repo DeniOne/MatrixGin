@@ -7,11 +7,36 @@ import { UserRole } from '../dto/common/common.enums';
 const router = Router();
 const employeeController = new EmployeeController();
 
-router.post('/', passport.authenticate('jwt', { session: false }), requireRoles(UserRole.ADMIN, UserRole.HR_MANAGER), (req, res) => employeeController.create(req, res));
-router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) => employeeController.getById(req, res));
-router.put('/:id', passport.authenticate('jwt', { session: false }), requireRoles(UserRole.ADMIN, UserRole.HR_MANAGER), (req, res) => employeeController.update(req, res));
-router.patch('/:id/emotional-tone', passport.authenticate('jwt', { session: false }), requireRoles(UserRole.ADMIN, UserRole.HR_MANAGER, UserRole.DEPARTMENT_HEAD), (req, res) => employeeController.updateEmotionalTone(req, res));
-router.post('/:id/promote', passport.authenticate('jwt', { session: false }), requireRoles(UserRole.ADMIN, UserRole.HR_MANAGER), (req, res) => employeeController.promote(req, res));
-router.post('/:id/demote', passport.authenticate('jwt', { session: false }), requireRoles(UserRole.ADMIN, UserRole.HR_MANAGER), (req, res) => employeeController.demote(req, res));
+/**
+ * Employee Routes
+ * REMEDIATION: Removed emotional-tone route, replaced promote/demote with status update
+ */
+
+// Create employee - HR/Admin only
+router.post('/',
+    passport.authenticate('jwt', { session: false }),
+    requireRoles(UserRole.ADMIN, UserRole.HR_MANAGER),
+    (req, res) => employeeController.create(req, res)
+);
+
+// Get employee by ID - all authenticated users (field-level ACL applied)
+router.get('/:id',
+    passport.authenticate('jwt', { session: false }),
+    (req, res) => employeeController.getById(req, res)
+);
+
+// Update employee - HR/Admin only
+router.put('/:id',
+    passport.authenticate('jwt', { session: false }),
+    requireRoles(UserRole.ADMIN, UserRole.HR_MANAGER),
+    (req, res) => employeeController.update(req, res)
+);
+
+// Update employee status - HR/Admin only (explicit human decision)
+router.patch('/:id/status',
+    passport.authenticate('jwt', { session: false }),
+    requireRoles(UserRole.ADMIN, UserRole.HR_MANAGER),
+    (req, res) => employeeController.updateStatus(req, res)
+);
 
 export default router;

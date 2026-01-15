@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
-    PieChart,
-    BarChart2,
     Activity,
     Brain,
     Target,
@@ -133,13 +131,13 @@ const SoftAssessmentPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {assessments.map(test => (
                     <div key={test.id} className={`bg-white rounded-xl border p-6 flex flex-col ${test.status === 'locked' ? 'border-gray-200 opacity-70' :
-                            test.status === 'completed' ? 'border-green-200 bg-green-50/10' :
-                                'border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all'
+                        test.status === 'completed' ? 'border-green-200 bg-green-50/10' :
+                            'border-gray-200 hover:border-indigo-300 hover:shadow-md transition-all'
                         }`}>
                         <div className="flex justify-between items-start mb-4">
                             <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wide ${test.category === 'EQ' ? 'bg-purple-100 text-purple-700' :
-                                    test.category === 'Leadership' ? 'bg-blue-100 text-blue-700' :
-                                        'bg-orange-100 text-orange-700'
+                                test.category === 'Leadership' ? 'bg-blue-100 text-blue-700' :
+                                    'bg-orange-100 text-orange-700'
                                 }`}>
                                 {test.category}
                             </span>

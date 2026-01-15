@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, FileText, CheckCircle, AlertTriangle, Download } from 'lucide-react';
+import { FileText, CheckCircle } from 'lucide-react';
 
 const CultureCompliancePage: React.FC = () => {
     const policies = [

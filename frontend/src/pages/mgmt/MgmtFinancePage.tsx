@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign, TrendingUp, Calculator, PieChart } from 'lucide-react';
+import { DollarSign, Calculator } from 'lucide-react';
 
 const MgmtFinancePage: React.FC = () => {
     const courses = [

@@ -18,7 +18,7 @@ services:
   postgres:
     image: postgres:15
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -32,6 +32,19 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+
+  psee:
+    build: ./photo-session-economic-engine
+    container_name: psee-api
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/matrixgin_dev
+      - PSEE_PORT=3001
+    depends_on:
+      postgres:
+        condition: service_started
+    restart: unless-stopped
 
 volumes:
   postgres_data:

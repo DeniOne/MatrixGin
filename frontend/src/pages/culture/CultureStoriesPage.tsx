@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, Share2, Award } from 'lucide-react';
+import { Heart, MessageCircle, Share2 } from 'lucide-react';
 
 const CultureStoriesPage: React.FC = () => {
     const stories = [

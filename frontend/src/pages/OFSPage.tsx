@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Users, Building2, Network, UserPlus, GitBranch, Lightbulb, Bot, Briefcase } from 'lucide-react';
+import { Users, Building2, Network, UserPlus, GitBranch, Lightbulb, Bot, Briefcase, Workflow } from 'lucide-react';
+import OFSGraphView from '../features/ofs/components/graph/OFSGraphView';
 import OrgChart from '../features/ofs/components/OrgChart';
 import DepartmentList from '../features/ofs/components/DepartmentList';
 import HierarchyView from '../features/ofs/components/HierarchyView';
@@ -9,13 +10,14 @@ import IdeaChannels from '../features/ofs/components/IdeaChannels';
 import RoleMatrixView from '../features/ofs/components/RoleMatrixView';
 import RegistrationList from '../features/ofs/components/RegistrationList';
 
-type Tab = 'orgchart' | 'departments' | 'hierarchy' | 'pyramid' | 'triangle' | 'roles' | 'ideas' | 'registration';
+type Tab = 'orgchart' | 'graph' | 'departments' | 'hierarchy' | 'pyramid' | 'triangle' | 'roles' | 'ideas' | 'registration';
 
 export default function OFSPage() {
   const [activeTab, setActiveTab] = useState<Tab>('orgchart');
 
   const tabs = [
     { id: 'orgchart' as Tab, label: 'Org Chart', icon: Network },
+    { id: 'graph' as Tab, label: 'Graph View (v2)', icon: Workflow },
     { id: 'departments' as Tab, label: 'Департаменты', icon: Building2 },
     { id: 'hierarchy' as Tab, label: '7-уровневая иерархия', icon: GitBranch },
     { id: 'pyramid' as Tab, label: 'Пирамида', icon: Users },
@@ -75,6 +77,7 @@ export default function OFSPage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activeTab === 'orgchart' && <OrgChart />}
+        {activeTab === 'graph' && <div className="h-[800px] border border-slate-200 rounded-xl overflow-hidden shadow-sm"><OFSGraphView /></div>}
         {activeTab === 'departments' && <DepartmentList />}
         {activeTab === 'hierarchy' && <HierarchyView />}
         {activeTab === 'pyramid' && <PyramidView />}

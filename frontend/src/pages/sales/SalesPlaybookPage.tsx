@@ -3,7 +3,6 @@ import {
     BookOpen,
     Search,
     ChevronRight,
-    ChevronDown,
     MessageCircle,
     ThumbsUp,
     ThumbsDown,
@@ -181,14 +180,14 @@ const SalesPlaybookPage: React.FC = () => {
                                 key={playbook.id}
                                 onClick={() => handlePlaybookSelect(playbook)}
                                 className={`p-3 rounded-lg cursor-pointer transition-colors ${activePlaybook?.id === playbook.id
-                                        ? 'bg-blue-50 border border-blue-200'
-                                        : 'hover:bg-gray-50 border border-transparent'
+                                    ? 'bg-blue-50 border border-blue-200'
+                                    : 'hover:bg-gray-50 border border-transparent'
                                     }`}
                             >
                                 <div className="flex justify-between items-start mb-1">
                                     <span className={`text-xs font-bold px-2 py-0.5 rounded ${playbook.category === 'COLD_CALL' ? 'bg-orange-100 text-orange-700' :
-                                            playbook.category === 'OBJECTIONS' ? 'bg-red-100 text-red-700' :
-                                                'bg-gray-100 text-gray-700'
+                                        playbook.category === 'OBJECTIONS' ? 'bg-red-100 text-red-700' :
+                                            'bg-gray-100 text-gray-700'
                                         }`}>
                                         {playbook.category === 'COLD_CALL' ? 'Холодный звонок' :
                                             playbook.category === 'OBJECTIONS' ? 'Возражения' : playbook.category}

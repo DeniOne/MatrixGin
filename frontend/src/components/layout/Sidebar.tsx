@@ -17,7 +17,10 @@ import {
     LucideIcon,
     LogOut,
     Settings,
-    User
+    User,
+    Factory,
+    Camera,
+    History
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -53,7 +56,15 @@ const Sidebar: React.FC = () => {
         { path: '/tasks', label: 'Задачи', icon: CheckSquare },
         { path: '/employees', label: 'Сотрудники', icon: Users },
         { path: '/departments', label: 'Отделы', icon: Briefcase },
-        { path: '/ofs', label: 'ОФС', icon: Building2 },
+        {
+            path: '/ofs',
+            label: 'ОФС',
+            icon: Building2,
+            subItems: [
+                { path: '/ofs', label: 'Панель управления', icon: Building2 },
+                { path: '/ofs/legacy', label: 'Классический вид', icon: History },
+            ]
+        },
         {
             path: '/university',
             label: 'Университет',
@@ -71,6 +82,16 @@ const Sidebar: React.FC = () => {
         { path: '/analytics', label: 'Аналитика', icon: BarChart2 },
         { path: '/store', label: 'Магазин', icon: ShoppingBag },
         { path: '/gamification', label: 'Геймификация', icon: Trophy },
+        {
+            path: '/production',
+            label: 'Производство',
+            icon: Factory,
+            subItems: [
+                { path: '/production/sessions', label: 'Фотосессии', icon: Camera },
+            ]
+        },
+        // BLOCKER REQUIREMENT: SYSTEM REGISTRY
+        { path: '/registry', label: 'Системный реестр', icon: Settings },
     ];
 
     const renderNavItem = (item: NavItem, depth = 0) => {

@@ -1,0 +1,8 @@
+[
+  {
+    "entity_type": "org_unit_type",
+    "code": "test_dep_seed",
+    "name": "Test Department Seed",
+    "description": "Functional area of the company"
+  }
+]

@@ -12,6 +12,12 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      // System Registry Service (v2.x) - порт 3002
+      '/api/v1/registry': {
+        target: 'http://localhost:3002',
+        changeOrigin: true,
+      },
+      // Main Backend API - порт 3000
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,

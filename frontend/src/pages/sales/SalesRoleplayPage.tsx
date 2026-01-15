@@ -8,7 +8,6 @@ import {
     User,
     Bot,
     Award,
-    ChevronRight,
     AlertCircle
 } from 'lucide-react';
 
@@ -116,15 +115,15 @@ const SalesRoleplayPage: React.FC = () => {
                                 key={scenario.id}
                                 onClick={() => startScenario(scenario)}
                                 className={`p-4 rounded-xl border transition-all cursor-pointer ${activeScenario?.id === scenario.id
-                                        ? 'border-pink-500 bg-pink-50 shadow-sm'
-                                        : 'border-gray-200 hover:border-pink-300 hover:shadow-sm'
+                                    ? 'border-pink-500 bg-pink-50 shadow-sm'
+                                    : 'border-gray-200 hover:border-pink-300 hover:shadow-sm'
                                     }`}
                             >
                                 <div className="flex justify-between items-start mb-2">
                                     <h3 className="font-bold text-gray-900">{scenario.title}</h3>
                                     <span className={`text-xs px-2 py-1 rounded-full font-medium ${scenario.difficulty === 'Easy' ? 'bg-green-100 text-green-700' :
-                                            scenario.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                                                'bg-red-100 text-red-700'
+                                        scenario.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                                            'bg-red-100 text-red-700'
                                         }`}>
                                         {scenario.difficulty}
                                     </span>
@@ -173,8 +172,8 @@ const SalesRoleplayPage: React.FC = () => {
                                                 {msg.sender === 'user' ? <User className="w-5 h-5 text-blue-600" /> : <Bot className="w-5 h-5 text-pink-600" />}
                                             </div>
                                             <div className={`p-4 rounded-2xl shadow-sm ${msg.sender === 'user'
-                                                    ? 'bg-blue-600 text-white rounded-tr-none'
-                                                    : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
+                                                ? 'bg-blue-600 text-white rounded-tr-none'
+                                                : 'bg-white text-gray-800 border border-gray-100 rounded-tl-none'
                                                 }`}>
                                                 <p className="text-sm leading-relaxed">{msg.text}</p>
                                                 <span className={`text-[10px] mt-1 block ${msg.sender === 'user' ? 'text-blue-200' : 'text-gray-400'
@@ -198,8 +197,8 @@ const SalesRoleplayPage: React.FC = () => {
                                     <button
                                         onClick={toggleRecording}
                                         className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg transition-all transform hover:scale-105 ${isRecording
-                                                ? 'bg-red-500 animate-pulse ring-4 ring-red-200'
-                                                : 'bg-blue-600 hover:bg-blue-700'
+                                            ? 'bg-red-500 animate-pulse ring-4 ring-red-200'
+                                            : 'bg-blue-600 hover:bg-blue-700'
                                             }`}
                                     >
                                         {isRecording ? (

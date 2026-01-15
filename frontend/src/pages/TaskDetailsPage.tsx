@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useGetTaskQuery, useUpdateTaskMutation, useCompleteTaskMutation, TaskStatus, TaskPriority } from '../features/tasks/tasksApi';
-import { ArrowLeft, Calendar, User, Tag, Clock, CheckCircle, Edit2, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Tag, Clock, CheckCircle, Edit2 } from 'lucide-react';
 import clsx from 'clsx';
 
 const TaskDetailsPage: React.FC = () => {
@@ -50,20 +50,7 @@ const TaskDetailsPage: React.FC = () => {
         }
     };
 
-    const getStatusColor = (status: TaskStatus) => {
-        switch (status) {
-            case TaskStatus.TODO:
-                return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
-            case TaskStatus.IN_PROGRESS:
-                return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-            case TaskStatus.REVIEW:
-                return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
-            case TaskStatus.DONE:
-                return 'bg-green-500/10 text-green-400 border-green-500/20';
-            case TaskStatus.ARCHIVED:
-                return 'bg-gray-700/10 text-gray-500 border-gray-700/20';
-        }
-    };
+
 
     const handleComplete = async () => {
         try {

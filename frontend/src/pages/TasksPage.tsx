@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGetTasksQuery, TaskStatus, TaskPriority } from '../features/tasks/tasksApi';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import TaskCard from '../components/tasks/TaskCard';
 import CreateTaskModal from '../components/tasks/CreateTaskModal';
 

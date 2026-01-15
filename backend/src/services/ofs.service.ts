@@ -2,6 +2,7 @@ import { prisma } from '../config/prisma';
 import departmentService from './department.service';
 import roleMatrixService from './role-matrix.service';
 import orgChartService from './org-chart.service';
+import { registryBridgeService } from './registry-bridge.service';
 
 /**
  * OFS Service - Facade
@@ -27,19 +28,32 @@ export class OFSService {
         return departmentService.getDepartments(includeInactive, format);
     }
 
-    async createDepartment(data: Parameters<typeof departmentService.createDepartment>[0]) {
-        return departmentService.createDepartment(data);
+    async createDepartment(data: Parameters<typeof departmentService.createDepartment>[0] & { force?: boolean; reason?: string }) {
+        const dept = await departmentService.createDepartment(data);
+        try {
+            await registryBridgeService.createDepartmentStructure(dept.id, data.parent_id || null, data.force, data.reason);
+        } catch (error) {
+            // Compensating transaction: Rollback OFS creation
+            await departmentService.deleteDepartment(dept.id, false);
+            throw error;
+        }
+        return dept;
     }
 
     async updateDepartment(id: string, data: Parameters<typeof departmentService.updateDepartment>[1]) {
         return departmentService.updateDepartment(id, data);
     }
 
-    async deleteDepartment(id: string, softDelete = true) {
+    async deleteDepartment(id: string, softDelete = true, force: boolean = false, reason?: string) {
+        // Enforce Registry Impact Check first
+        await registryBridgeService.deleteDepartmentStructure(id, force, reason);
         return departmentService.deleteDepartment(id, softDelete);
     }
 
-    async moveDepartment(id: string, newParentId: string | null, reason?: string, changedBy?: string) {
+    async moveDepartment(id: string, newParentId: string | null, reason?: string, changedBy?: string, force: boolean = false) {
+        // 1. Validate with Registry (Impact Analysis + Execution)
+        await registryBridgeService.moveDepartmentStructure(id, newParentId!, force, reason);
+
         const oldDept = await prisma.$queryRaw<any[]>`SELECT * FROM departments WHERE id = ${id}`;
         if (oldDept.length === 0) throw new Error('Department not found');
 

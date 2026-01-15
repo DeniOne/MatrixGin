@@ -14,14 +14,14 @@ import {
 import {
   useGetCourseByIdQuery,
   useEnrollInCourseMutation,
-  useCompleteCourseMutation,
 } from '../../features/university/api/universityApi';
 
 const PhotoCoursePage: React.FC = () => {
   const { id } = useParams();
   const { data, isLoading, error } = useGetCourseByIdQuery(id || '');
+  // const [enroll, { isLoading: enrolling }] = useEnrollInCourseMutation();
+  // const [complete, { isLoading: completing }] = useCompleteCourseMutation();
   const [enroll, { isLoading: enrolling }] = useEnrollInCourseMutation();
-  const [complete, { isLoading: completing }] = useCompleteCourseMutation();
   const [activeTab, setActiveTab] = useState<'info' | 'files' | 'tests'>('info');
 
   // Mock Modules Data
@@ -241,13 +241,13 @@ const PhotoCoursePage: React.FC = () => {
                     {module.lessons.map(lesson => (
                       <div
                         key={lesson.id}
-                        className={`px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer ${lesson.isLocked ? 'opacity-60' : ''
+                        className={`px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors cursor-pointer ${(lesson as any).isLocked ? 'opacity-60' : ''
                           }`}
                       >
                         <div className="flex items-center overflow-hidden">
-                          {lesson.isCompleted ? (
+                          {(lesson as any).isCompleted ? (
                             <CheckCircle className="w-4 h-4 text-green-500 mr-3 flex-shrink-0" />
-                          ) : lesson.isLocked ? (
+                          ) : (lesson as any).isLocked ? (
                             <Lock className="w-4 h-4 text-gray-400 mr-3 flex-shrink-0" />
                           ) : (
                             <PlayCircle className="w-4 h-4 text-blue-500 mr-3 flex-shrink-0" />

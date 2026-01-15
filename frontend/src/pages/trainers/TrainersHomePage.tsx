@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trophy, Award, TrendingUp, Users, Star } from 'lucide-react';
+import { Trophy, Users, Star } from 'lucide-react';
 
 const TrainersHomePage: React.FC = () => {
     const topTrainers = [

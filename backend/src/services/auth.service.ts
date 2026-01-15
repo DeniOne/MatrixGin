@@ -69,6 +69,51 @@ export class AuthService {
         return user || null;
     }
 
+    /**
+     * Refresh access token using a valid refresh token.
+     * NO rotation, NO scoring, NO auto-block per MODULE 01 canon.
+     */
+    async refresh(refreshToken: string): Promise<{ accessToken: string }> {
+        try {
+            // Verify the refresh token
+            const payload = jwt.verify(refreshToken, this.jwtSecret) as { sub: string; email: string; role: string };
+
+            // Validate user still exists and is active
+            const user = await prisma.user.findUnique({ where: { id: payload.sub } });
+
+            if (!user) {
+                logger.debug('Refresh failed: user not found');
+                throw new Error('Unauthorized');
+            }
+
+            // Generate new access token only (NO rotation of refresh token)
+            const newPayload = { sub: user.id, email: user.email, role: user.role };
+            const accessToken = jwt.sign(newPayload, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
+
+            logger.info('Token refresh successful', { userId: user.id });
+            return { accessToken };
+        } catch (error: any) {
+            // Handle JWT verification errors (expired, invalid, etc.)
+            if (error.name === 'TokenExpiredError') {
+                logger.debug('Refresh failed: token expired');
+            } else if (error.name === 'JsonWebTokenError') {
+                logger.debug('Refresh failed: invalid token');
+            }
+            throw new Error('Unauthorized');
+        }
+    }
+
+    /**
+     * Logout - records user intent to end session.
+     * NO token invalidation, NO session storage per MODULE 01 canon.
+     * Token expiration is the only mechanism.
+     */
+    async logout(userId: string): Promise<void> {
+        logger.info('User logout', { userId });
+        // No token invalidation - this is an ACCEPTED LIMITATION
+        // Frontend handles local token cleanup
+    }
+
     private generateAuthResponse(user: User): AuthResponseDto {
         const payload = { sub: user.id, email: user.email, role: user.role };
         const accessToken = jwt.sign(payload, this.jwtSecret, { expiresIn: this.jwtExpiresIn });

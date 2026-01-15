@@ -1,5 +1,5 @@
 import React from 'react';
-import { Beaker, Zap, Lock } from 'lucide-react';
+import { Beaker, Lock } from 'lucide-react';
 
 const TechLabsPage: React.FC = () => {
     const labs = [

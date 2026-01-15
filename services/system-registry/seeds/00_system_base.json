@@ -1,0 +1,20 @@
+[
+  {
+    "entity_type": "org_unit_type",
+    "code": "department",
+    "name": "Department",
+    "description": "Functional area of the company"
+  },
+  {
+    "entity_type": "org_unit_type",
+    "code": "squad",
+    "name": "Squad",
+    "description": "Cross-functional agile team"
+  },
+  {
+    "entity_type": "task_state",
+    "code": "todo",
+    "name": "To Do",
+    "description": "Task is waiting for action"
+  }
+]

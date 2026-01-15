@@ -73,7 +73,8 @@ export const tasksApi = api.injectEndpoints({
         getTasks: builder.query<PaginatedTasksResponse, TaskFilters | void>({
             query: (filters = {}) => {
                 const params = new URLSearchParams();
-                Object.entries(filters).forEach(([key, value]) => {
+                const safeFilters = filters || {};
+                Object.entries(safeFilters).forEach(([key, value]) => {
                     if (value !== undefined) {
                         params.append(key, String(value));
                     }
@@ -84,7 +85,7 @@ export const tasksApi = api.injectEndpoints({
         }),
         getTask: builder.query<Task, string>({
             query: (id) => `/tasks/${id}`,
-            providesTags: (result, error, id) => [{ type: 'Task', id }],
+            providesTags: (_result, _error, id) => [{ type: 'Task', id }],
         }),
         createTask: builder.mutation<Task, CreateTaskRequest>({
             query: (task) => ({
@@ -100,7 +101,7 @@ export const tasksApi = api.injectEndpoints({
                 method: 'PUT',
                 body: data,
             }),
-            invalidatesTags: (result, error, { id }) => [{ type: 'Task', id }, 'Task'],
+            invalidatesTags: (_result, _error, { id }) => [{ type: 'Task', id }, 'Task'],
         }),
         deleteTask: builder.mutation<void, string>({
             query: (id) => ({
@@ -114,7 +115,7 @@ export const tasksApi = api.injectEndpoints({
                 url: `/tasks/${id}/complete`,
                 method: 'POST',
             }),
-            invalidatesTags: (result, error, id) => [{ type: 'Task', id }, 'Task'],
+            invalidatesTags: (_result, _error, id) => [{ type: 'Task', id }, 'Task'],
         }),
     }),
 });

@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
     Calendar,
     Clock,
     User,
-    MessageSquare,
     Target,
     CheckCircle,
-    ChevronRight,
     Video
 } from 'lucide-react';
 
@@ -29,7 +27,7 @@ interface Goal {
 }
 
 const SoftCoachingPage: React.FC = () => {
-    const [selectedCoach, setSelectedCoach] = useState<string | null>(null);
+    // const [selectedCoach, setSelectedCoach] = useState<string | null>(null);
 
     // Mock Data
     const coaches: Coach[] = [
