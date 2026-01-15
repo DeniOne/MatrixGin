@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "lint:mg-chat": "node documentation/ai/mg-chat/lint/mg-chat.lint.js"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.8",
+    "ajv": "^8.17.1",
+    "typescript": "^5.9.3"
+  }
+}

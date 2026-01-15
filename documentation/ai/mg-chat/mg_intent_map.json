@@ -1,0 +1,346 @@
+{
+    "version": "1.0",
+    "agent": "MatrixGinChat",
+    "language": "ru",
+    "principles": {
+        "ai_role": "advisory_only",
+        "no_auto_actions": true,
+        "human_confirmation_required": true,
+        "one_screen_response": true,
+        "max_cta_buttons": 4
+    },
+    "intents": [
+        {
+            "id": "get_my_day",
+            "category": "navigation",
+            "examples": [
+                "что у меня сегодня",
+                "мой день",
+                "что сегодня"
+            ],
+            "response": {
+                "type": "summary",
+                "data_sources": [
+                    "shifts",
+                    "tasks",
+                    "alerts"
+                ],
+                "template": "Сегодня у тебя:\n• Смена: {{shift}}\n• Задач: {{tasks_count}}\n• Критичные: {{alerts_count}}",
+                "actions": [
+                    "my_tasks",
+                    "my_shifts",
+                    "focus_mode"
+                ]
+            }
+        },
+        {
+            "id": "my_tasks",
+            "category": "tasks",
+            "examples": [
+                "мои задачи",
+                "что мне делать",
+                "задачи"
+            ],
+            "response": {
+                "type": "list",
+                "data_sources": [
+                    "tasks"
+                ],
+                "template": "Текущие задачи:\n{{tasks_short}}",
+                "actions": [
+                    "task_details",
+                    "problem_report"
+                ]
+            }
+        },
+        {
+            "id": "task_details",
+            "category": "tasks",
+            "requires_context": [
+                "task_id"
+            ],
+            "examples": [
+                "что с задачей",
+                "статус задачи"
+            ],
+            "response": {
+                "type": "details",
+                "data_sources": [
+                    "tasks"
+                ],
+                "template": "Задача {{task_id}}:\n• Статус: {{status}}\n• Дедлайн: {{deadline}}",
+                "actions": [
+                    "confirm_task_done",
+                    "problem_report"
+                ]
+            }
+        },
+        {
+            "id": "confirm_task_done",
+            "category": "tasks",
+            "confirmation_required": true,
+            "response": {
+                "type": "confirmation",
+                "template": "Подтверди, что задача завершена.",
+                "actions": [
+                    "yes_confirm",
+                    "cancel"
+                ]
+            }
+        },
+        {
+            "id": "problem_report",
+            "category": "support",
+            "examples": [
+                "есть проблема",
+                "не получается",
+                "проблема"
+            ],
+            "response": {
+                "type": "choice",
+                "template": "Понял. Что случилось?",
+                "actions": [
+                    "problem_tech",
+                    "problem_client",
+                    "problem_task",
+                    "problem_other"
+                ]
+            }
+        },
+        {
+            "id": "my_shifts",
+            "category": "shifts",
+            "examples": [
+                "мои смены",
+                "график",
+                "когда работаю"
+            ],
+            "response": {
+                "type": "list",
+                "data_sources": [
+                    "shifts"
+                ],
+                "template": "Твой график:\n{{shifts_short}}",
+                "actions": [
+                    "comment_shift"
+                ]
+            }
+        },
+        {
+            "id": "comment_shift",
+            "category": "shifts",
+            "examples": [
+                "хочу замену",
+                "комментарий к смене"
+            ],
+            "response": {
+                "type": "input",
+                "template": "Опиши комментарий к смене. Я передам руководителю."
+            }
+        },
+        {
+            "id": "my_status",
+            "category": "motivation",
+            "examples": [
+                "мой статус",
+                "какой у меня статус"
+            ],
+            "response": {
+                "type": "info",
+                "data_sources": [
+                    "status"
+                ],
+                "template": "Твой статус: {{status}}\nПрогресс до следующего: {{progress}}%",
+                "actions": [
+                    "my_progress"
+                ]
+            }
+        },
+        {
+            "id": "coins_balance",
+            "category": "motivation",
+            "examples": [
+                "сколько у меня коинов",
+                "мой баланс"
+            ],
+            "response": {
+                "type": "info",
+                "data_sources": [
+                    "wallet"
+                ],
+                "template": "Баланс:\n• MC: {{mc}}\n• GMC: {{gmc}}"
+            }
+        },
+        {
+            "id": "my_metrics",
+            "category": "analytics",
+            "examples": [
+                "мои показатели",
+                "мой kpi"
+            ],
+            "response": {
+                "type": "summary",
+                "data_sources": [
+                    "kpi"
+                ],
+                "template": "Текущие показатели:\n{{kpi_short}}",
+                "actions": [
+                    "why_metric_down"
+                ]
+            }
+        },
+        {
+            "id": "why_metric_down",
+            "category": "analytics",
+            "requires_context": [
+                "metric_id"
+            ],
+            "response": {
+                "type": "explanation",
+                "data_sources": [
+                    "kpi",
+                    "tasks"
+                ],
+                "template": "Показатель снизился из-за:\n{{reasons}}",
+                "actions": [
+                    "focus_mode",
+                    "request_help"
+                ]
+            }
+        },
+        {
+            "id": "im_tired",
+            "category": "emotional",
+            "examples": [
+                "я устал",
+                "перегруз",
+                "не вывожу"
+            ],
+            "response": {
+                "type": "support",
+                "template": "Понял. Хочешь выбрать вариант?",
+                "actions": [
+                    "focus_mode",
+                    "request_help",
+                    "take_break"
+                ]
+            }
+        },
+        {
+            "id": "focus_mode",
+            "category": "utility",
+            "response": {
+                "type": "action",
+                "template": "Фокус-режим включён на 60 минут.\nУведомления минимизированы."
+            }
+        },
+        {
+            "id": "yes_confirm",
+            "category": "utility",
+            "confirmation_required": true,
+            "response": {
+                "type": "action",
+                "template": "Принято. Действие выполнено."
+            }
+        },
+        {
+            "id": "cancel",
+            "category": "utility",
+            "response": {
+                "type": "action",
+                "template": "Отменено."
+            }
+        },
+        {
+            "id": "go_back",
+            "category": "utility",
+            "response": {
+                "type": "action",
+                "template": "Возвращаюсь назад."
+            }
+        },
+        {
+            "id": "problem_tech",
+            "category": "support",
+            "response": {
+                "type": "input",
+                "template": "Опиши техническую проблему. Я передам в поддержку."
+            }
+        },
+        {
+            "id": "problem_client",
+            "category": "support",
+            "response": {
+                "type": "input",
+                "template": "Опиши ситуацию с клиентом. Я передам руководителю."
+            }
+        },
+        {
+            "id": "problem_task",
+            "category": "support",
+            "response": {
+                "type": "input",
+                "template": "Опиши проблему с задачей. Что не получается?"
+            }
+        },
+        {
+            "id": "problem_other",
+            "category": "support",
+            "response": {
+                "type": "input",
+                "template": "Опиши проблему. Я постараюсь помочь."
+            }
+        },
+        {
+            "id": "my_progress",
+            "category": "motivation",
+            "response": {
+                "type": "info",
+                "data_sources": [
+                    "progress"
+                ],
+                "template": "Твой прогресс:\n{{progress_details}}"
+            }
+        },
+        {
+            "id": "request_help",
+            "category": "support",
+            "response": {
+                "type": "action",
+                "template": "Запрос на помощь отправлен руководителю."
+            }
+        },
+        {
+            "id": "take_break",
+            "category": "utility",
+            "response": {
+                "type": "action",
+                "template": "Хорошо. Отдохни. Я подожду."
+            }
+        },
+        {
+            "id": "focus_30",
+            "category": "utility",
+            "response": {
+                "type": "action",
+                "template": "Фокус-режим включён на 30 минут."
+            }
+        },
+        {
+            "id": "focus_60",
+            "category": "utility",
+            "response": {
+                "type": "action",
+                "template": "Фокус-режим включён на 60 минут."
+            }
+        },
+        {
+            "id": "cancel_focus",
+            "category": "utility",
+            "response": {
+                "type": "action",
+                "template": "Фокус-режим отключён."
+            }
+        }
+    ]
+}

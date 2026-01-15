@@ -1,0 +1,148 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "mg-chat-intent-schema",
+    "title": "MG Chat Intent Map Schema",
+    "type": "object",
+    "required": [
+        "version",
+        "agent",
+        "intents"
+    ],
+    "properties": {
+        "version": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+$"
+        },
+        "agent": {
+            "type": "string",
+            "const": "MatrixGinChat"
+        },
+        "language": {
+            "type": "string",
+            "enum": [
+                "ru",
+                "en"
+            ]
+        },
+        "principles": {
+            "type": "object",
+            "required": [
+                "ai_role",
+                "no_auto_actions",
+                "human_confirmation_required"
+            ],
+            "properties": {
+                "ai_role": {
+                    "type": "string",
+                    "const": "advisory_only"
+                },
+                "no_auto_actions": {
+                    "type": "boolean",
+                    "const": true
+                },
+                "human_confirmation_required": {
+                    "type": "boolean",
+                    "const": true
+                },
+                "one_screen_response": {
+                    "type": "boolean"
+                },
+                "max_cta_buttons": {
+                    "type": "integer",
+                    "maximum": 4
+                }
+            }
+        },
+        "intents": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "id",
+                    "category",
+                    "response"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9_]*$",
+                        "description": "Unique intent identifier, lowercase with underscores"
+                    },
+                    "category": {
+                        "type": "string",
+                        "enum": [
+                            "navigation",
+                            "tasks",
+                            "support",
+                            "shifts",
+                            "motivation",
+                            "analytics",
+                            "emotional",
+                            "utility"
+                        ]
+                    },
+                    "examples": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "minItems": 1
+                    },
+                    "requires_context": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "confirmation_required": {
+                        "type": "boolean"
+                    },
+                    "response": {
+                        "type": "object",
+                        "required": [
+                            "type",
+                            "template"
+                        ],
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "enum": [
+                                    "summary",
+                                    "list",
+                                    "details",
+                                    "confirmation",
+                                    "choice",
+                                    "input",
+                                    "info",
+                                    "explanation",
+                                    "support",
+                                    "action"
+                                ]
+                            },
+                            "data_sources": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "template": {
+                                "type": "string",
+                                "minLength": 1
+                            },
+                            "actions": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "pattern": "^[a-z][a-z0-9_]*$"
+                                },
+                                "maxItems": 4
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

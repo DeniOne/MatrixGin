@@ -1,0 +1,111 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "mg-chat-ux-components-schema",
+    "title": "MG Chat UX Components Schema",
+    "type": "object",
+    "required": [
+        "version",
+        "platform",
+        "render_rules",
+        "components"
+    ],
+    "properties": {
+        "version": {
+            "type": "string",
+            "pattern": "^\\d+\\.\\d+$"
+        },
+        "platform": {
+            "type": "string",
+            "const": "telegram"
+        },
+        "render_rules": {
+            "type": "object",
+            "required": [
+                "max_buttons_per_row",
+                "max_rows",
+                "use_inline_keyboard"
+            ],
+            "properties": {
+                "max_buttons_per_row": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 2
+                },
+                "max_rows": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 3
+                },
+                "use_inline_keyboard": {
+                    "type": "boolean"
+                },
+                "use_reply_keyboard": {
+                    "type": "boolean"
+                },
+                "confirmation_required_for": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "danger",
+                            "state_change"
+                        ]
+                    }
+                }
+            }
+        },
+        "components": {
+            "type": "object",
+            "additionalProperties": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "layout"
+                ],
+                "properties": {
+                    "type": {
+                        "type": "string",
+                        "enum": [
+                            "inline_keyboard",
+                            "reply_keyboard"
+                        ]
+                    },
+                    "layout": {
+                        "type": "array",
+                        "maxItems": 3,
+                        "items": {
+                            "type": "array",
+                            "maxItems": 2,
+                            "items": {
+                                "type": "object",
+                                "required": [
+                                    "text",
+                                    "action_id"
+                                ],
+                                "properties": {
+                                    "text": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 64
+                                    },
+                                    "action_id": {
+                                        "type": "string",
+                                        "pattern": "^[a-z][a-z0-9_]*$"
+                                    },
+                                    "style": {
+                                        "type": "string",
+                                        "enum": [
+                                            "primary",
+                                            "danger",
+                                            "default"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
