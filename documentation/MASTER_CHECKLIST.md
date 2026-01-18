@@ -1,7 +1,7 @@
 # MatrixGin — MASTER CHECKLIST
 
-> **Версия:** 2.0  
-> **Дата обновления:** 2026-01-11  
+> **Версия:** 2.1  
+> **Дата обновления:** 2026-01-18  
 > **Легенда:** ✅ Done | 🔄 In Progress | ⏳ Planned | ❌ Blocked | 🏁 CLOSED
 ---
 
@@ -83,7 +83,7 @@ MODULE → PHASE → TRACK
 - [x] Employee CRUD
 - [x] Department CRUD
 - [x] Employee registration flow
-- [x] Status system (Universe → Photon)
+- [x] Status system (Strategic Canon — see STATUS-RANKS-CANON.md)
 - [x] Emotional state tracking (basic)
 - [x] API endpoints
 
@@ -177,6 +177,10 @@ MODULE → PHASE → TRACK
 ---
 
 ## 💰 7. MatrixCoin Economy — 60%
+
+> [!CAUTION]
+> **Status & Ranks** не входят в текущий implementation scope.  
+> См. стратегический регламент: [STATUS-RANKS-CANON.md](../00-strategic/STATUS-RANKS-CANON.md).
 
 ### Backend
 - [x] Wallet service
@@ -335,5 +339,5 @@ MODULE → PHASE → TRACK
 
 ---
 
-**Последнее обновление:** 2026-01-11  
+**Последнее обновление:** 2026-01-18  
 **Ответственный:** TECHLEAD

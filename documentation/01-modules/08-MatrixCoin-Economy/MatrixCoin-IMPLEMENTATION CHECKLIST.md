@@ -172,8 +172,13 @@
 ---
 
 ## 6. STATUS & MULTIPLIERS
-> [!IMPORTANT]
-> Реализация отложена. Каноническое описание см. [STATUS-RANKS-CANON.md](../../00-strategic/STATUS-RANKS-CANON.md).
+> ⚠️ STATUS & MULTIPLIERS  
+> Данный блок **осознанно не реализован**.
+>  
+> Статусы и ранги зафиксированы на стратегическом уровне и описаны в  
+> `documentation/00-strategic/STATUS-RANKS-CANON.md`.
+>  
+> Отсутствие реализации не является техническим долгом или дефектом.
 
 ### 6.1 Backend
 - [ ] CORE: Implement Status Ranks Logic (Photon -> Universe) <!-- id: 50 -->
