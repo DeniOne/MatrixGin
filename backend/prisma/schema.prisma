@@ -393,6 +393,14 @@ enum TransactionType {
   SAFE_ACTIVATION
 }
 
+// PHASE 0: Store Purchase Core
+enum PurchaseStatus {
+  COMPLETED
+  PENDING_APPROVAL
+  REJECTED
+  ROLLED_BACK
+}
+
 model Wallet {
   id                String    @id @default(uuid())
   user_id           String    @unique
@@ -469,24 +477,52 @@ model Product {
   created_at  DateTime @default(now())
   updated_at  DateTime @updatedAt
 
-  purchases   Purchase[]
-
   @@map("products")
 }
 
+// PHASE 0: Store Purchase Core - StoreItem
+model StoreItem {
+  id            String    @id @default(uuid())
+  title         String
+  description   String
+  priceMC       Int       // MC — целочисленный актив (STORE-TECH.md)
+  category      String
+  active        Boolean   @default(true)
+  stock         Int?
+  purchaseLimit Int?
+  metadata      Json      @default("{}")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  purchases     Purchase[]
+
+  @@map("store_items")
+}
+
+// PHASE 0: Store Purchase Core - Purchase (NEW)
 model Purchase {
-  id         String   @id @default(uuid())
-  user_id    String
-  product_id String
-  price_paid Decimal  @db.Decimal(10, 2)
-  status     String   @default("COMPLETED")
-  created_at DateTime @default(now())
+  id             String         @id @default(uuid())
+  userId         String
+  itemId         String
+  priceMC        Int            // MC — целочисленный актив (STORE-TECH.md)
+  status         PurchaseStatus @default(COMPLETED)
+  transactionId  String
+  idempotencyKey String
+  createdAt      DateTime       @default(now())
 
-  user    User    @relation(fields: [user_id], references: [id])
-  product Product @relation(fields: [product_id], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
+  item           StoreItem      @relation(fields: [itemId], references: [id])
 
+  // Idempotency: (userId + endpoint + idempotencyKey)
+  // На PHASE 0: endpoint зашит логически (только POST /store/purchase)
+  // Уникальность по (userId, idempotencyKey) достаточна для одного endpoint
+  @@unique([userId, idempotencyKey])
+  @@index([userId])
+  @@index([itemId])
   @@map("purchases")
 }
+
+
 
 model GamificationLevel {
   id           String       @id @default(uuid())
@@ -1321,4 +1357,113 @@ model Defect {
   @@index([production_order_id])
   @@index([resolved])
   @@map("mes_defects")
+}
+
+// ============================================================================
+// CANONICAL GUARD - GMC Philosophy Enforcement
+// ============================================================================
+
+enum CanonType {
+  MC
+  GMC
+}
+
+model CanonicalViolation {
+  id         String   @id @default(uuid())
+  canon      CanonType
+  violation  String   // CanonicalViolationType as string
+  source     String   // 'UI', 'API', 'AI', 'CRON'
+  action     String   // Action that was attempted
+  payload    Json?    // Full context of the violation attempt
+  user_id    String?  // User who triggered the violation (if applicable)
+  created_at DateTime @default(now())
+
+  @@index([canon, created_at])
+  @@index([violation])
+  @@map("canonical_violations")
+}
+
+// ============================================================================
+// MODULE 08 - MATRIXCOIN ECONOMY PERSISTENCE (STRICT ADAPTER LAYER)
+// ============================================================================
+
+// AUDIT LOG (IMMUTABLE, APPEND-ONLY)
+model EconomyAuditLog {
+  id              String   @id @default(uuid())
+  event_id        String   @unique // From Domain Event
+  event_type      String   // AuditEventType Enum value
+  occurred_at     DateTime
+  actor_id        String
+  actor_role      String
+  
+  // Normalized searchable fields
+  user_id         String?
+  context_id      String?  @map("usage_context_id")
+  
+  // Full Payload
+  payload         Json     // Stores full typed event interface
+  
+  created_at      DateTime @default(now())
+
+  @@index([user_id])
+  @@index([event_type])
+  @@index([context_id])
+  @@map("economy_audit_logs")
+}
+
+// MC SNAPSHOT (IMMUTABLE STATE HISTORY)
+model MatrixCoinSnapshot {
+  id              String   @id @default(uuid())
+  snapshot_id     String   @unique
+  user_id         String
+  total_amount    Decimal  @db.Decimal(20, 8)
+  
+  // Serialized State
+  mc_state_json   Json     // Stores readonly MCState[]
+  
+  captured_at     DateTime
+  created_at      DateTime @default(now())
+
+  @@index([user_id, captured_at])
+  @@map("matrixcoin_snapshots")
+}
+
+// AUCTION EVENT STATE (RAW PERSISTENCE)
+model AuctionEventState {
+  id              String   @id @default(uuid())
+  event_id        String   @unique
+  status          String   // AuctionEventStatus Enum
+  
+  // Raw State Data
+  state_payload   Json     // Stores complete AuctionEventContext/State
+  
+  updated_at      DateTime @updatedAt
+  created_at      DateTime @default(now())
+
+  @@index([status])
+  @@map("auction_event_states")
+}
+
+// GOVERNANCE FLAGS (REVIEW QUEUE)
+model GovernanceFlag {
+  id              String   @id @default(uuid())
+  flag_id         String   @unique
+  user_id         String
+  context_id      String
+  
+  review_level    String   // GovernanceReviewLevel Enum
+  status          String   // Pending, Resolved, Ignored
+  
+  // Details
+  reason          String
+  payload         Json     // Full GovernanceDecision + Context
+  
+  flagged_at      DateTime
+  resolved_at     DateTime?
+  
+  created_at      DateTime @default(now())
+
+  @@index([status])
+  @@index([review_level])
+  @@map("economy_governance_flags")
 }

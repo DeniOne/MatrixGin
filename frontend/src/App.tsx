@@ -8,6 +8,10 @@ import OFSPage from './pages/OFSPage';
 import ExecutiveOFSPage from './pages/ofs/ExecutiveOFSPage';
 import { UniversityPage } from './pages/UniversityPage';
 import { MyCoursesPage } from './pages/MyCoursesPage';
+// Economy Module
+import StorePage from './pages/economy/StorePage';
+import WalletPage from './pages/economy/WalletPage';
+import EconomyDashboard from './pages/economy/EconomyDashboard';
 // Import gamification pages
 import LeaderboardPage from './pages/gamification/LeaderboardPage';
 import AchievementsGallery from './components/gamification/AchievementsGallery';
@@ -76,6 +80,10 @@ const AppRoutes: React.FC = () => {
                         <Route path="/gamification/quests" element={<QuestTracker />} />
                         {/* Production routes */}
                         <Route path="/production/sessions" element={<ProductionSessionsPage />} />
+                        {/* Economy routes */}
+                        <Route path="/economy/store" element={<StorePage />} />
+                        <Route path="/economy/wallet" element={<WalletPage />} />
+                        <Route path="/economy/analytics" element={<EconomyDashboard />} />
                     </Routes>
                 </AppLayout>
             } />

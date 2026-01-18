@@ -1,0 +1,239 @@
+{
+    "version": "1.0.0",
+    "intents": [
+        {
+            "id": "employee.show_my_schedule",
+            "examples": [
+                "мой график",
+                "моя смена",
+                "когда я работаю",
+                "мое расписание",
+                "во сколько мне на работу"
+            ],
+            "response": {
+                "text": "Твой график на сегодня:",
+                "actions": [
+                    "employee.show_my_tasks",
+                    "employee.explain_status"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.show_my_tasks",
+            "examples": [
+                "мои задачи",
+                "что мне делать",
+                "мой список дел",
+                "какие у меня задачи"
+            ],
+            "response": {
+                "text": "Твои текущие задачи:",
+                "actions": [
+                    "employee.show_my_schedule",
+                    "employee.guide_next_step"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.show_my_kpi",
+            "examples": [
+                "мои показатели",
+                "мой KPI",
+                "как я работаю",
+                "моя статистика"
+            ],
+            "response": {
+                "text": "Твои показатели:",
+                "actions": [
+                    "employee.explain_status"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.explain_status",
+            "examples": [
+                "объясни мой статус",
+                "почему такой статус",
+                "что со мной не так",
+                "почему я в этом статусе"
+            ],
+            "response": {
+                "text": "Твой текущий статус:",
+                "actions": [
+                    "employee.show_my_kpi",
+                    "employee.guide_next_step"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.guide_next_step",
+            "examples": [
+                "что делать дальше",
+                "следующий шаг",
+                "куда идти",
+                "что мне нужно сделать"
+            ],
+            "response": {
+                "text": "Следующий шаг:",
+                "actions": [
+                    "employee.show_my_tasks"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "manager.show_shift_status",
+            "examples": [
+                "статус смены",
+                "кто на смене",
+                "текущая смена",
+                "смена сейчас",
+                "обзор смены"
+            ],
+            "response": {
+                "text": "Статус текущей смены:",
+                "actions": [
+                    "manager.show_absences",
+                    "manager.show_team_overview"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "manager.show_team_overview",
+            "examples": [
+                "обзор команды",
+                "моя команда",
+                "статус команды",
+                "как команда"
+            ],
+            "response": {
+                "text": "Обзор твоей команды:",
+                "actions": [
+                    "manager.show_shift_status",
+                    "manager.show_absences"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "manager.show_absences",
+            "examples": [
+                "отсутствия",
+                "кто отсутствует",
+                "кого нет",
+                "больничные"
+            ],
+            "response": {
+                "text": "Текущие отсутствия:",
+                "actions": [
+                    "manager.manage_shift_reassign"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "manager.resolve_incident",
+            "examples": [
+                "решить инцидент",
+                "закрыть инцидент",
+                "обработать проблему"
+            ],
+            "response": {
+                "text": "Какой инцидент нужно решить?",
+                "actions": [
+                    "manager.show_shift_status"
+                ]
+            },
+            "confirmation_required": true
+        },
+        {
+            "id": "manager.manage_shift_reassign",
+            "examples": [
+                "переназначить смену",
+                "изменить график",
+                "перераспределить смену"
+            ],
+            "response": {
+                "text": "Переназначение смены:",
+                "actions": [
+                    "manager.show_shift_status"
+                ]
+            },
+            "confirmation_required": true
+        },
+        {
+            "id": "exec.show_system_health",
+            "examples": [
+                "здоровье системы",
+                "общий статус",
+                "что происходит",
+                "системный обзор",
+                "как дела"
+            ],
+            "response": {
+                "text": "Системный обзор:",
+                "actions": [
+                    "exec.show_kpi_summary",
+                    "exec.explain_risk"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "exec.show_kpi_summary",
+            "examples": [
+                "сводка KPI",
+                "ключевые показатели",
+                "метрики",
+                "показатели системы"
+            ],
+            "response": {
+                "text": "Сводка ключевых показателей:",
+                "actions": [
+                    "exec.explain_risk",
+                    "exec.navigate_dashboard"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "exec.explain_risk",
+            "examples": [
+                "объясни риск",
+                "какие риски",
+                "что может пойти не так",
+                "проблемные зоны"
+            ],
+            "response": {
+                "text": "Анализ рисков:",
+                "actions": [
+                    "exec.show_system_health",
+                    "exec.navigate_dashboard"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "exec.navigate_dashboard",
+            "examples": [
+                "дашборд",
+                "панель управления",
+                "показать дашборд",
+                "навигация"
+            ],
+            "response": {
+                "text": "Навигация по дашборду:",
+                "actions": [
+                    "exec.show_system_health",
+                    "exec.show_kpi_summary"
+                ]
+            },
+            "confirmation_required": false
+        }
+    ]
+}

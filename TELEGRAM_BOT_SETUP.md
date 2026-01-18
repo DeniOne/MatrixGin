@@ -6,7 +6,7 @@ The Telegram bot **@MatrixGin_bot** has been successfully configured and is read
 
 ### Bot Details
 - **Bot Username**: @MatrixGin_bot
-- **Bot Token**: `7229406488:AAGLdEVaYLVBPGaY76HGfaYQIRcUvG2nkWU`
+- **Bot Token**: `[REDACTED]`
 - **Superuser Telegram ID**: `41610858`
 
 ### Database Status
@@ -136,13 +136,13 @@ TELEGRAM_WEBHOOK_PATH=/api/telegram/webhook
 
 2. Set webhook via Telegram API:
 ```bash
-curl -X POST "https://api.telegram.org/bot7229406488:AAGLdEVaYLVBPGaY76HGfaYQIRcUvG2nkWU/setWebhook" \
+curl -X POST "https://api.telegram.org/bot[REDACTED]/setWebhook" \
   -d "url=https://your-domain.com/api/telegram/webhook"
 ```
 
 3. Verify webhook:
 ```bash
-curl "https://api.telegram.org/bot7229406488:AAGLdEVaYLVBPGaY76HGfaYQIRcUvG2nkWU/getWebhookInfo"
+curl "https://api.telegram.org/bot[REDACTED]/getWebhookInfo"
 ```
 
 ## Security Notes

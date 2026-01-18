@@ -134,6 +134,24 @@
             }
         },
         {
+            "id": "acl_forbidden",
+            "trigger": "ACL_FORBIDDEN",
+            "severity": "high",
+            "response": {
+                "text": "❌ У вас нет доступа к этой функции.",
+                "actions": []
+            }
+        },
+        {
+            "id": "acl_out_of_scope",
+            "trigger": "ACL_OUT_OF_SCOPE",
+            "severity": "high",
+            "response": {
+                "text": "❌ Эта функция недоступна в вашей области ответственности.",
+                "actions": []
+            }
+        },
+        {
             "id": "system_error",
             "trigger": "internal_exception",
             "severity": "critical",

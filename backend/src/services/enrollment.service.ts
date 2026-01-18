@@ -279,17 +279,37 @@ export class EnrollmentService {
             });
         }
 
-        // Update wallet balances
-        await prisma.wallet.update({
-            where: { user_id: userId },
-            data: {
-                mc_balance: { increment: course.reward_mc },
-                gmc_balance: { increment: course.reward_gmc },
-            },
-        });
-
-        // Create transaction records
+        // Award MC (via canonical registry)
         if (course.reward_mc > 0) {
+            const { checkCanon } = require('../core/canon');
+
+            // Validate via centralized registry
+            await checkCanon({
+                canon: 'MC',
+                action: 'MC_EARN',
+                source: 'API',
+                payload: {
+                    courseId: course.id,
+                    userId,
+                    amount: course.reward_mc,
+                    // Course completion is operational engagement - allowed
+                    monetaryEquivalent: false,
+                    kpiBased: false,
+                    creativeTask: false,
+                    noExpiration: false,
+                    unlimited: false
+                },
+                userId
+            });
+
+            // Registry handles validation, logging, and errors
+            await prisma.wallet.update({
+                where: { user_id: userId },
+                data: {
+                    mc_balance: { increment: course.reward_mc },
+                },
+            });
+
             await prisma.transaction.create({
                 data: {
                     type: 'EARN',
@@ -305,23 +325,29 @@ export class EnrollmentService {
             });
         }
 
+        // GMC rewards are FORBIDDEN by canonical rules
         if (course.reward_gmc > 0) {
-            await prisma.transaction.create({
-                data: {
-                    type: 'EARN',
-                    currency: 'GMC',
-                    amount: course.reward_gmc,
-                    recipient_id: userId,
-                    description: `Course completion: ${course.title}`,
-                    metadata: {
-                        courseId: course.id,
-                        type: 'course_completion',
-                    },
+            const { checkCanon } = require('../core/canon');
+
+            // Validate via centralized registry
+            // This will throw CanonicalViolationError and log automatically
+            await checkCanon({
+                canon: 'GMC',
+                action: 'GMC_GRANT_AUTOMATIC',
+                source: 'API',
+                payload: {
+                    automatic: true,
+                    courseId: course.id,
+                    userId,
+                    amount: course.reward_gmc
                 },
+                userId
             });
+
+            // Registry will block this operation
+            // This code should never execute
         }
     }
 }
 
 export const enrollmentService = new EnrollmentService();
-

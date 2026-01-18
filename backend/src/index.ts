@@ -21,7 +21,7 @@ import { errorHandler, notFoundHandler } from './middleware/error.middleware';
 import { logger } from './config/logger';
 import { swaggerSpec } from './config/swagger';
 import swaggerUi from 'swagger-ui-express';
-import storeRoutes from './routes/store.routes';
+
 import gamificationRoutes from './routes/gamification.routes';
 import universityRoutes from './routes/university.routes';
 import productionRoutes from './routes/production.routes';
@@ -93,7 +93,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/economy', economyRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/telegram', telegramRoutes);
-app.use('/api/store', storeRoutes);
+
 app.use('/api/gamification', gamificationRoutes);
 app.use('/api/university', universityRoutes);
 app.use('/api/production', productionRoutes);

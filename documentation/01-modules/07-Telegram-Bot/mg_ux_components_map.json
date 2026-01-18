@@ -1,0 +1,211 @@
+{
+    "version": "1.0",
+    "platform": "telegram",
+    "render_rules": {
+        "max_buttons_per_row": 2,
+        "max_rows": 3,
+        "use_inline_keyboard": true,
+        "use_reply_keyboard": false,
+        "confirmation_required_for": [
+            "danger",
+            "state_change"
+        ]
+    },
+    "components": {
+        "main_entry": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "📋 Задачи",
+                        "action_id": "my_tasks"
+                    },
+                    {
+                        "text": "🗓 График",
+                        "action_id": "my_shifts"
+                    }
+                ],
+                [
+                    {
+                        "text": "🎯 Фокус",
+                        "action_id": "focus_mode"
+                    }
+                ]
+            ]
+        },
+        "tasks_list_actions": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "🔍 Детали",
+                        "action_id": "task_details"
+                    },
+                    {
+                        "text": "⚠️ Проблема",
+                        "action_id": "problem_report"
+                    }
+                ]
+            ]
+        },
+        "task_details_actions": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "✅ Завершено",
+                        "action_id": "confirm_task_done",
+                        "style": "primary"
+                    }
+                ],
+                [
+                    {
+                        "text": "⚠️ Сообщить о проблеме",
+                        "action_id": "problem_report"
+                    }
+                ]
+            ]
+        },
+        "confirmation_yes_no": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "✅ Да",
+                        "action_id": "yes_confirm",
+                        "style": "danger"
+                    },
+                    {
+                        "text": "❌ Отмена",
+                        "action_id": "cancel"
+                    }
+                ]
+            ]
+        },
+        "problem_type_selector": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "🛠 Техника",
+                        "action_id": "problem_tech"
+                    },
+                    {
+                        "text": "👤 Клиент",
+                        "action_id": "problem_client"
+                    }
+                ],
+                [
+                    {
+                        "text": "📋 Задача",
+                        "action_id": "problem_task"
+                    },
+                    {
+                        "text": "❓ Другое",
+                        "action_id": "problem_other"
+                    }
+                ]
+            ]
+        },
+        "shift_actions": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "💬 Комментарий",
+                        "action_id": "comment_shift"
+                    }
+                ]
+            ]
+        },
+        "status_actions": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "📈 Прогресс",
+                        "action_id": "my_progress"
+                    },
+                    {
+                        "text": "💰 Баланс",
+                        "action_id": "coins_balance"
+                    }
+                ]
+            ]
+        },
+        "metrics_actions": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "❓ Почему упало",
+                        "action_id": "why_metric_down"
+                    }
+                ],
+                [
+                    {
+                        "text": "🎯 Фокус",
+                        "action_id": "focus_mode"
+                    },
+                    {
+                        "text": "🤝 Помощь",
+                        "action_id": "request_help"
+                    }
+                ]
+            ]
+        },
+        "emotional_support_actions": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "🎯 Фокус-режим",
+                        "action_id": "focus_mode"
+                    }
+                ],
+                [
+                    {
+                        "text": "🤝 Запросить помощь",
+                        "action_id": "request_help"
+                    },
+                    {
+                        "text": "⏸ Перерыв",
+                        "action_id": "take_break"
+                    }
+                ]
+            ]
+        },
+        "focus_mode_ack": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "⏱ 30 мин",
+                        "action_id": "focus_30"
+                    },
+                    {
+                        "text": "⏱ 60 мин",
+                        "action_id": "focus_60"
+                    }
+                ],
+                [
+                    {
+                        "text": "❌ Отменить",
+                        "action_id": "cancel_focus"
+                    }
+                ]
+            ]
+        },
+        "simple_back": {
+            "type": "inline_keyboard",
+            "layout": [
+                [
+                    {
+                        "text": "⬅️ Назад",
+                        "action_id": "go_back"
+                    }
+                ]
+            ]
+        }
+    }
+}

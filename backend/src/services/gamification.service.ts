@@ -557,47 +557,88 @@ export class GamificationService {
             }
         });
 
-        // Award rewards
-        if (quest.reward_mc > 0 || quest.reward_gmc > 0) {
+        // Award MC rewards (via canonical registry)
+        if (quest.reward_mc > 0) {
+            const { checkCanon } = require('../core/canon');
+
+            // Validate via centralized registry
+            await checkCanon({
+                canon: 'MC',
+                action: 'MC_EARN',
+                source: 'API',
+                payload: {
+                    questId,
+                    userId,
+                    amount: quest.reward_mc,
+                    // Quest rewards are operational engagement - allowed
+                    monetaryEquivalent: false,
+                    kpiBased: false,
+                    creativeTask: false,
+                    noExpiration: false,
+                    unlimited: false
+                },
+                userId
+            });
+
+            // Registry handles validation, logging, and errors
+            // If we reach here, operation is allowed
             await prisma.wallet.update({
                 where: { user_id: userId },
                 data: {
-                    mc_balance: { increment: quest.reward_mc },
-                    gmc_balance: { increment: quest.reward_gmc }
+                    mc_balance: { increment: quest.reward_mc }
                 }
             });
 
-            // Create transaction records
-            if (quest.reward_mc > 0) {
-                await prisma.transaction.create({
-                    data: {
-                        type: 'REWARD',
-                        currency: 'MC',
-                        amount: quest.reward_mc,
-                        recipient_id: userId,
-                        description: `Quest reward: ${quest.title}`
-                    }
-                });
-            }
+            await prisma.transaction.create({
+                data: {
+                    type: 'REWARD',
+                    currency: 'MC',
+                    amount: quest.reward_mc,
+                    recipient_id: userId,
+                    description: `Quest reward: ${quest.title}`
+                }
+            });
+        }
 
-            if (quest.reward_gmc > 0) {
-                await prisma.transaction.create({
-                    data: {
-                        type: 'REWARD',
-                        currency: 'GMC',
-                        amount: quest.reward_gmc,
-                        recipient_id: userId,
-                        description: `Quest reward: ${quest.title}`
-                    }
-                });
-            }
+        // GMC rewards are FORBIDDEN by canonical rules
+        // GMC cannot be earned automatically - it must be recognized by Heroes Fund Committee
+        if (quest.reward_gmc > 0) {
+            const { checkGMCCanon, CanonicalViolationError, CanonicalViolationLogger } = require('../core/canon');
+
+            const canonCheck = checkGMCCanon({
+                action: 'GMC_GRANT_AUTOMATIC',
+                source: 'API',
+                payload: {
+                    automatic: true,
+                    questId,
+                    userId,
+                    amount: quest.reward_gmc
+                }
+            });
+
+            // Log the violation
+            await CanonicalViolationLogger.log(
+                'GMC',
+                canonCheck.violation!,
+                'API',
+                'QUEST_COMPLETION_GMC_REWARD',
+                { questId, userId, amount: quest.reward_gmc },
+                userId
+            );
+
+            // Throw error - GMC cannot be granted automatically
+            throw new CanonicalViolationError(
+                'GMC',
+                canonCheck.violation!,
+                `${canonCheck.message} Quest GMC rewards violate canonical rules. GMC must be granted by Heroes Fund Committee, not automatically.`
+            );
         }
 
         return {
             message: 'Quest completed',
             rewards: {
                 mc: quest.reward_mc,
-                gmc: quest.reward_gmc
+                gmc: 0 // GMC rewards blocked by canonical guard
             }
         };
     }

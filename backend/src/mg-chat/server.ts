@@ -1,0 +1,43 @@
+/**
+ * MG Chat Server
+ * 
+ * Express server for Telegram webhook integration.
+ */
+
+import express from 'express';
+import dotenv from 'dotenv';
+import { handleTelegramWebhook } from './integration';
+import { initializeMGChat } from './index';
+
+// Load environment variables
+dotenv.config({ path: __dirname + '/.env' });
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+
+// Health check
+app.get('/health', (req, res) => {
+    res.json({ status: 'ok', service: 'mg-chat' });
+});
+
+// Telegram webhook
+app.post('/webhook/telegram', handleTelegramWebhook);
+
+// Initialize MG Chat contracts
+try {
+    initializeMGChat();
+    console.log('[MG Chat Server] ✅ Contracts initialized');
+} catch (error) {
+    console.error('[MG Chat Server] ❌ Failed to initialize contracts:', error);
+    process.exit(1);
+}
+
+// Start server
+app.listen(PORT, () => {
+    console.log(`[MG Chat Server] 🚀 Server running on port ${PORT}`);
+    console.log(`[MG Chat Server] 📡 Webhook endpoint: http://localhost:${PORT}/webhook/telegram`);
+    console.log(`[MG Chat Server] 🏥 Health check: http://localhost:${PORT}/health`);
+});

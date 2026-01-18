@@ -291,17 +291,38 @@ export class TrainerService {
             });
         }
 
-        // Update wallet
-        await prisma.wallet.update({
-            where: { user_id: trainer.user_id },
-            data: {
-                mc_balance: { increment: reward.mc },
-                gmc_balance: { increment: reward.gmc },
-            },
-        });
-
-        // Create transactions
+        // Award MC (via canonical registry)
         if (reward.mc > 0) {
+            const { checkCanon } = require('../core/canon');
+
+            // Validate via centralized registry
+            await checkCanon({
+                canon: 'MC',
+                action: 'MC_REWARD',
+                source: 'API',
+                payload: {
+                    trainerId,
+                    userId: trainer.user_id,
+                    amount: reward.mc,
+                    reason: reward.reason,
+                    // Trainer rewards are operational engagement - allowed
+                    monetaryEquivalent: false,
+                    kpiBased: false,
+                    creativeTask: false,
+                    noExpiration: false,
+                    unlimited: false
+                },
+                userId: trainer.user_id
+            });
+
+            // Registry handles validation, logging, and errors
+            await prisma.wallet.update({
+                where: { user_id: trainer.user_id },
+                data: {
+                    mc_balance: { increment: reward.mc },
+                },
+            });
+
             await prisma.transaction.create({
                 data: {
                     type: 'REWARD',
@@ -317,23 +338,30 @@ export class TrainerService {
             });
         }
 
+        // GMC rewards are FORBIDDEN by canonical rules
         if (reward.gmc > 0) {
-            await prisma.transaction.create({
-                data: {
-                    type: 'REWARD',
-                    currency: 'GMC',
+            const { checkCanon } = require('../core/canon');
+
+            // Validate via centralized registry
+            // This will throw CanonicalViolationError and log automatically
+            await checkCanon({
+                canon: 'GMC',
+                action: 'GMC_GRANT_AUTOMATIC',
+                source: 'API',
+                payload: {
+                    automatic: true,
+                    trainerId,
+                    userId: trainer.user_id,
                     amount: reward.gmc,
-                    recipient_id: trainer.user_id,
-                    description: `Trainer reward: ${reward.reason}`,
-                    metadata: {
-                        trainerId: trainer.id,
-                        type: 'trainer_reward',
-                    },
+                    reason: reward.reason
                 },
+                userId: trainer.user_id
             });
+
+            // Registry will block this operation
+            // This code should never execute
         }
     }
 }
 
 export const trainerService = new TrainerService();
-

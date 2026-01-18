@@ -1,0 +1,148 @@
+{
+    "version": "1.0",
+    "agent": "MatrixGinChat",
+    "platform": "telegram",
+    "principles": {
+        "no_shaming": true,
+        "no_moralizing": true,
+        "de_escalation_first": true,
+        "always_offer_exit": true,
+        "never_block_user": true
+    },
+    "error_intents": [
+        {
+            "id": "empty_message",
+            "trigger": "message.length == 0",
+            "severity": "low",
+            "response": {
+                "text": "Я не получил сообщение. Хочешь продолжить?",
+                "actions": [
+                    "main_entry",
+                    "cancel"
+                ]
+            }
+        },
+        {
+            "id": "unknown_intent",
+            "trigger": "intent_not_resolved",
+            "severity": "low",
+            "response": {
+                "text": "Я не понял запрос. Могу помочь с основными вещами:",
+                "actions": [
+                    "my_tasks",
+                    "my_shifts",
+                    "my_status"
+                ]
+            }
+        },
+        {
+            "id": "out_of_context",
+            "trigger": "missing_required_context",
+            "severity": "medium",
+            "response": {
+                "text": "Мне не хватает контекста. Давай уточним.",
+                "actions": [
+                    "go_back",
+                    "main_entry"
+                ]
+            }
+        },
+        {
+            "id": "spam_repetition",
+            "trigger": "same_message_repeated >= 3",
+            "severity": "medium",
+            "response": {
+                "text": "Кажется, мы зациклились. Как лучше продолжить?",
+                "actions": [
+                    "main_entry",
+                    "request_help"
+                ]
+            }
+        },
+        {
+            "id": "flooding",
+            "trigger": "messages_per_minute > threshold",
+            "severity": "medium",
+            "response": {
+                "text": "Давай чуть замедлимся. Я готов помочь.",
+                "actions": [
+                    "focus_mode",
+                    "main_entry"
+                ]
+            }
+        },
+        {
+            "id": "aggression_detected",
+            "trigger": "toxicity_score >= 0.7",
+            "severity": "high",
+            "response": {
+                "text": "Понимаю, что сейчас напряжённо. Давай попробуем спокойно разобраться.",
+                "actions": [
+                    "request_help",
+                    "focus_mode",
+                    "cancel"
+                ]
+            }
+        },
+        {
+            "id": "insult_or_abuse",
+            "trigger": "direct_insult_detected",
+            "severity": "high",
+            "response": {
+                "text": "Я здесь, чтобы помочь. Давай вернёмся к задаче.",
+                "actions": [
+                    "main_entry",
+                    "request_help"
+                ]
+            }
+        },
+        {
+            "id": "emotional_overload",
+            "trigger": "emotional_distress_score >= 0.8",
+            "severity": "high",
+            "response": {
+                "text": "Похоже, тебе сейчас тяжело. Хочешь выбрать вариант?",
+                "actions": [
+                    "focus_mode",
+                    "request_help",
+                    "take_break"
+                ]
+            }
+        },
+        {
+            "id": "contradictory_commands",
+            "trigger": "conflicting_intents_detected",
+            "severity": "medium",
+            "response": {
+                "text": "Я вижу несколько разных запросов. С чего начнём?",
+                "actions": [
+                    "my_tasks",
+                    "my_shifts",
+                    "my_status"
+                ]
+            }
+        },
+        {
+            "id": "forbidden_request",
+            "trigger": "request_outside_permissions",
+            "severity": "high",
+            "response": {
+                "text": "Я не могу помочь с этим запросом. Давай посмотрим, что доступно.",
+                "actions": [
+                    "main_entry"
+                ]
+            }
+        },
+        {
+            "id": "system_error",
+            "trigger": "internal_exception",
+            "severity": "critical",
+            "response": {
+                "text": "Возникла техническая ошибка. Я уже передал информацию.",
+                "actions": [
+                    "main_entry"
+                ]
+            }
+        }
+    ]
+}
