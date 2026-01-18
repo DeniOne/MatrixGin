@@ -112,7 +112,7 @@ Auth → Employees → Tasks → Economy → Analytics → ERP
 | Employee CRUD | Создание/редактирование сотрудников | ✅ Done |
 | Department CRUD | Управление отделами | ✅ Done |
 | Employee Registration | Онбординг сотрудников | ✅ Done |
-| Status System | Уровни (Universe → Photon) | ✅ Done |
+| Status System | Strategic Canon (см. STATUS-RANKS-CANON.md) | ✅ Canon |
 | Employee List UI | Страница списка сотрудников | ⏳ TODO |
 | Employee Profile UI | Профиль сотрудника | ⏳ TODO |
 | Department Tree UI | Дерево отделов | ⏳ TODO |
@@ -577,7 +577,10 @@ flowchart TD
 
 ### Приоритеты на ближайший спринт
 
-1. **Завершить Phase 1-3 UI:**
+3. **Статусы и Ранги:**
+   - Status & Ranks — зафиксированы на стратегическом уровне (CANON). Реализация отложена осознанно. См. [STATUS-RANKS-CANON.md](./00-strategic/STATUS-RANKS-CANON.md).
+
+4. **Завершить Phase 1-3 UI:**
    - [ ] Employee List/Profile UI
    - [ ] Analytics Dashboard UI
    - [ ] Economy/Wallet UI

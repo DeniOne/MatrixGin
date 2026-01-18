@@ -73,6 +73,9 @@
 | **AI/ML** | RAG, sentiment analysis, predictive analytics | Средний (MVP) |
 | **Интеграции** | Telegram, 1С, Evotor, Email, SMS | Высокий |
 
+### 1.5 Conceptual Boundaries & Governance
+- **Status & Ranks System**: Реализация данного модуля в коде временно ограничена. Детальная каноническая трактовка и правила игры зафиксированы в документе [STATUS-RANKS-CANON.md](./STATUS-RANKS-CANON.md). Данный документ является ограничивающим для архитектурных решений: реализация запрещена без отдельного стратегического решения.
+
 ---
 
 ## 2. MVP SCOPE & ROADMAP

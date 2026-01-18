@@ -27,6 +27,7 @@
 | 📷 **PSEE** | PhotoSession Economic Engine | ✅ Production |
 | 🏭 **Production** | Производственные сессии (read-only UI) | ✅ **NEW** |
 | 🧠 **AI Core** | Engines для KPI, Qualification, Reward, Ops | ✅ Production |
+| 🎖️ **Status & Ranks** | Статусы зафиксированы на стратегическом уровне | 📄 [STATUS-RANKS-CANON.md](./00-strategic/STATUS-RANKS-CANON.md) |
 
 ---
 

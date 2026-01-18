@@ -44,6 +44,7 @@
 | 22 | **Warehouse WMS** | ✅ | ❌ | ❌ | **0%** | 📄 Documented |
 | 23 | **OFS Organizational Structure** | ✅ | ✅ routes, controller, service (24KB) | ✅ OFSPage | **100%** | ✅ **CLOSED** |
 | 24 | **PhotoSession Economic Engine** | ✅ | ✅ PSEE (отдельный сервис) + integration | ❌ | **75%** | ✅ Production |
+| 25 | **Status & Ranks** | ✅ | ❌ | ❌ | **0%** | 📄 Strategic Canon (no implementation) |
 
 ---
 

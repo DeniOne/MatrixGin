@@ -172,9 +172,11 @@
 ---
 
 ## 6. STATUS & MULTIPLIERS
+> [!IMPORTANT]
+> Реализация отложена. Каноническое описание см. [STATUS-RANKS-CANON.md](../../00-strategic/STATUS-RANKS-CANON.md).
 
 ### 6.1 Backend
-- [ ] Status entity
+- [ ] CORE: Implement Status Ranks Logic (Photon -> Universe) <!-- id: 50 -->
 - [ ] Связь статуса с MC
 - [ ] Мультипликаторы начислений
 - [ ] Логика пересчёта
