@@ -6,11 +6,19 @@ import TasksPage from './pages/TasksPage';
 import TaskDetailsPage from './pages/TaskDetailsPage';
 import OFSPage from './pages/OFSPage';
 import ExecutiveOFSPage from './pages/ofs/ExecutiveOFSPage';
+import EmployeesPage from './pages/EmployeesPage';
+import EmployeeProfilePage from './pages/EmployeeProfilePage';
+import PersonalAnalyticsPage from './pages/analytics/PersonalAnalyticsPage';
+import ExecutiveAnalyticsPage from './pages/analytics/ExecutiveAnalyticsPage';
 import { UniversityPage } from './pages/UniversityPage';
 import { MyCoursesPage } from './pages/MyCoursesPage';
+// AI Module
+import PersonalAIRecommendationsPage from './pages/ai/PersonalAIRecommendationsPage';
+import ExecutiveAIRecommendationsPage from './pages/ai/ExecutiveAIRecommendationsPage';
 // Economy Module
 import StorePage from './pages/economy/StorePage';
 import WalletPage from './pages/economy/WalletPage';
+import TransactionsPage from './pages/economy/TransactionsPage';
 import EconomyDashboard from './pages/economy/EconomyDashboard';
 // Import gamification pages
 import LeaderboardPage from './pages/gamification/LeaderboardPage';
@@ -66,6 +74,9 @@ const AppRoutes: React.FC = () => {
                     <Routes>
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/" element={<DashboardPage />} />
+                        <Route path="/employees" element={<EmployeesPage />} />
+                        <Route path="/profile" element={<EmployeeProfilePage />} />
+                        <Route path="/departments" element={<OFSPage />} />
                         <Route path="/tasks" element={<TasksPage />} />
                         <Route path="/tasks/:id" element={<TaskDetailsPage />} />
                         <Route path="/ofs" element={<ExecutiveOFSPage />} />
@@ -78,11 +89,20 @@ const AppRoutes: React.FC = () => {
                         <Route path="/gamification/achievements" element={<AchievementsGallery />} />
                         <Route path="/gamification/status" element={<StatusProgressCard />} />
                         <Route path="/gamification/quests" element={<QuestTracker />} />
+                        {/* Analytics routes */}
+                        <Route path="/analytics/personal" element={<PersonalAnalyticsPage />} />
+                        <Route path="/analytics/executive" element={<ExecutiveAnalyticsPage />} />
+
+                        {/* AI Recommendations routes */}
+                        <Route path="/ai/recommendations/personal" element={<PersonalAIRecommendationsPage />} />
+                        <Route path="/ai/recommendations/executive" element={<ExecutiveAIRecommendationsPage />} />
+
                         {/* Production routes */}
                         <Route path="/production/sessions" element={<ProductionSessionsPage />} />
                         {/* Economy routes */}
-                        <Route path="/economy/store" element={<StorePage />} />
+                        <Route path="/store" element={<StorePage />} />
                         <Route path="/economy/wallet" element={<WalletPage />} />
+                        <Route path="/economy/transactions" element={<TransactionsPage />} />
                         <Route path="/economy/analytics" element={<EconomyDashboard />} />
                     </Routes>
                 </AppLayout>

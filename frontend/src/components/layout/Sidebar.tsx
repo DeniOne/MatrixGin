@@ -8,6 +8,7 @@ import {
     CheckSquare,
     Briefcase,
     BarChart2,
+    Brain,
     ShoppingBag,
     Trophy,
     Building2,
@@ -18,9 +19,11 @@ import {
     LogOut,
     Settings,
     User,
+    ShieldCheck,
     Factory,
     Camera,
-    History
+    History,
+    Wallet
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -53,7 +56,17 @@ const Sidebar: React.FC = () => {
 
     const navItems: NavItem[] = [
         { path: '/', label: 'Дашборд', icon: LayoutDashboard },
+        { path: '/profile', label: 'Мой профиль', icon: User },
         { path: '/tasks', label: 'Задачи', icon: CheckSquare },
+        {
+            path: '/economy/wallet',
+            label: 'Кошелек',
+            icon: Wallet,
+            subItems: [
+                { path: '/economy/wallet', label: 'Баланс', icon: Wallet },
+                { path: '/economy/transactions', label: 'История', icon: History },
+            ]
+        },
         { path: '/employees', label: 'Сотрудники', icon: Users },
         { path: '/departments', label: 'Отделы', icon: Briefcase },
         {
@@ -79,7 +92,24 @@ const Sidebar: React.FC = () => {
                 { path: '/trainers', label: 'Институт обучающих', icon: Users },
             ]
         },
-        { path: '/analytics', label: 'Аналитика', icon: BarChart2 },
+        {
+            path: '/analytics',
+            label: 'Аналитика',
+            icon: BarChart2,
+            subItems: [
+                { path: '/analytics/personal', label: 'Личная', icon: User },
+                { path: '/analytics/executive', label: 'Для руководства', icon: ShieldCheck },
+            ]
+        },
+        {
+            path: '/ai/recommendations',
+            label: 'AI Советник',
+            icon: Brain,
+            subItems: [
+                { path: '/ai/recommendations/personal', label: 'Персональный', icon: User },
+                { path: '/ai/recommendations/executive', label: 'Системный', icon: ShieldCheck },
+            ]
+        },
         { path: '/store', label: 'Магазин', icon: ShoppingBag },
         { path: '/gamification', label: 'Геймификация', icon: Trophy },
         {

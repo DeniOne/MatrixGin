@@ -67,7 +67,14 @@ const authLimiter = rateLimit({
     message: 'Too many authentication attempts, please try again later.'
 });
 
+const telegramLimiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 60, // 60 requests per minute
+    message: 'Too many Telegram updates from this IP.'
+});
+
 app.use(limiter);
+app.use('/api/telegram/webhook', telegramLimiter);
 app.use(auditLogMiddleware);
 
 // Middleware

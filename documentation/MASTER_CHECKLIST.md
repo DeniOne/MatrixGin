@@ -1,7 +1,7 @@
 # MatrixGin — MASTER CHECKLIST
 
 > **Версия:** 2.1  
-> **Дата обновления:** 2026-01-18  
+> **Дата обновления:** 2026-01-19  
 > **Легенда:** ✅ Done | 🔄 In Progress | ⏳ Planned | ❌ Blocked | 🏁 CLOSED
 ---
 
@@ -88,9 +88,9 @@ MODULE → PHASE → TRACK
 - [x] API endpoints
 
 ### Frontend
-- [ ] Employee list page ⏳
-- [ ] Employee profile page ⏳
-- [ ] Department tree view ⏳
+- [x] Employee list page
+- [x] Employee profile page
+- [x] Department tree view
 - [ ] Document management ⏳
 
 ---
@@ -190,10 +190,10 @@ MODULE → PHASE → TRACK
 - [x] API endpoints
 
 ### Frontend
-- [ ] Wallet page ⏳
-- [ ] Transaction history ⏳
-- [ ] Store page (partial)
-- [ ] Purchase flow ⏳
+- [x] Wallet page
+- [x] Transaction history
+- [x] Store page
+- [x] Purchase flow
 
 ---
 
@@ -207,10 +207,10 @@ MODULE → PHASE → TRACK
 - [x] API endpoints
 
 ### Frontend
-- [ ] Analytics dashboard ⏳
-- [ ] Personal metrics ⏳
-- [ ] Executive overview ⏳
-- [ ] Charts & graphs ⏳
+- [x] Analytics dashboard
+- [x] Personal metrics
+- [x] Executive overview
+- [x] Charts & graphs
 
 ---
 
@@ -269,7 +269,7 @@ MODULE → PHASE → TRACK
 
 ---
 
-## 🧠 12. AI Core — 80%
+## 🧠 12. AI Core — 85%
 
 ### Engines
 - [x] KPI Engine
@@ -283,6 +283,50 @@ MODULE → PHASE → TRACK
 - [x] System prompts
 - [x] Constitution
 - [x] Agent card
+- [x] **AI Recommendations UI** (Phase 4) ✅ **CLOSED**
+    > [!NOTE]
+    > AI Recommendations are advisory, read-only, and non-binding.
+
+### PHASE 4.5 — AI Feedback Loop ✅ **COMPLETED**
+> **Completed:** 2026-01-19 | **Status:** PRODUCTION READY
+
+**Purpose:** Human-in-the-Loop feedback collection without AI control transfer
+
+#### Phase 1 (MVP) ✅
+- [x] Backend: Prisma schema + migration (`AIFeedback` table)
+- [x] Backend: `ai-feedback.service.ts` with idempotency
+- [x] Backend: `POST /api/ai-ops/feedback` endpoint
+- [x] Frontend: `RecommendationFeedbackPanel.tsx` (3 buttons + textarea)
+- [x] Frontend: Toast notification ("Это не меняет систему автоматически")
+- [x] Integration: Feedback panel in `RecommendationDetailsDrawer`
+
+#### Phase 2 (Context Binding) ✅
+- [x] Backend: Snapshot ID generation (SHA256 hash)
+- [x] Backend: AI version + ruleset version tracking
+- [x] Backend: Context fields in feedback storage
+- [x] Frontend: Context props propagation
+
+#### Phase 3 (Ethics Guard) ✅
+- [x] Backend: `feedback-ethics.guard.ts`
+- [x] Validation: Person evaluations blocked
+- [x] Validation: Toxic language blocked
+- [x] Validation: Punishment demands blocked
+- [x] Error handling: 422 Unprocessable Entity
+
+#### Phase 4 (Analytics) ✅
+- [x] Backend: `getAnalytics()` aggregation method
+- [x] Backend: `GET /api/ai-ops/feedback/analytics` endpoint
+- [x] Frontend: `AIFeedbackAnalyticsPage.tsx`
+- [x] Privacy: No user-level breakdown
+- [x] Access: Restricted to AI_TEAM/ADMIN
+
+**Architectural Guarantees:**
+- ❌ No auto-learning / online learning
+- ❌ No AI control transfer
+- ❌ No personal evaluations
+- ✅ Immutable feedback storage
+- ✅ Full traceability (snapshot + versions)
+- ✅ Ethics compliance enforced
 
 ---
 
@@ -322,10 +366,10 @@ MODULE → PHASE → TRACK
 
 ## ⏳ TODO: Приоритетные задачи
 
-### 🔴 HIGH Priority (This Sprint)
-1. [ ] Employee list page
-2. [ ] Analytics dashboard
-3. [ ] Economy wallet page
+### 🔴 HIGH Priority (This Sprint - COMPLETED)
+1. [x] Employee list page
+2. [x] Analytics dashboard
+3. [x] Economy wallet page
 
 ### 🟡 MEDIUM Priority (Next Sprint)
 4. [ ] Kaizen module (routes + service + UI)
@@ -339,5 +383,6 @@ MODULE → PHASE → TRACK
 
 ---
 
-**Последнее обновление:** 2026-01-18  
+**Последнее обновление:** 2026-01-19  
 **Ответственный:** TECHLEAD
+

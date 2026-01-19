@@ -15,7 +15,7 @@
  * - ONLY call Core functions in order
  */
 
-import { NormalizedInput } from './telegram.types';
+import { NormalizedTextInput, NormalizedCallbackInput } from './telegram.types';
 import { detectError, ErrorContext, MGChatError } from '../errors';
 import { resolveIntent } from '../intent';
 import { dispatchAction } from '../dispatcher';
@@ -26,22 +26,16 @@ import { aclMiddleware, ACLForbiddenError, ACLOutOfScopeError, AccessContext } f
 /**
  * Process text message through Core pipeline.
  * 
- * FLOW:
- * 1. Error UX Interceptor
- * 2. Intent Resolver
- * 3. ACL Middleware
- * 4. Scenario Router
- * 5. Telegram UX Renderer
- * 
- * WHY: Text messages need intent resolution from user input.
+ * @param input - Normalized text input from Sandbox
+ * @param accessContext - Verified user context
  */
 export function processTextMessage(
-    text: string,
+    input: NormalizedTextInput,
     accessContext: AccessContext,
     context: ErrorContext = {}
 ): TelegramRenderedMessage {
     // Step 1: Error UX Interceptor
-    const errorResult = detectError(text, context);
+    const errorResult = detectError(input.text, context);
 
     if (errorResult.matched && errorResult.match) {
         // Error detected → render error UX
@@ -53,11 +47,10 @@ export function processTextMessage(
     }
 
     // Step 2: Intent Resolver
-    const intentResult = resolveIntent(text);
+    const intentResult = resolveIntent(input.text);
 
     if (!intentResult.resolved) {
         // Intent not resolved → fallback to unknown_intent
-        // WHY: This is still handled by Core (error_ux_map.json)
         const fallbackResponse: MGChatResponse = {
             text: "Я не понял запрос. Могу помочь с основными вещами:",
             actions: ['my_tasks', 'my_shifts', 'my_status']
@@ -79,7 +72,7 @@ export function processTextMessage(
         if (error instanceof ACLOutOfScopeError) {
             throw new MGChatError('ACL_OUT_OF_SCOPE');
         }
-        throw error;  // Unknown error → propagate
+        throw error;
     }
 
     // Step 4: Build response from intent via Scenario Router
@@ -92,21 +85,15 @@ export function processTextMessage(
 /**
  * Process callback query through Core pipeline.
  * 
- * FLOW:
- * 1. Action Dispatcher
- * 2. Intent Resolver
- * 3. ACL Middleware
- * 4. Scenario Router
- * 5. Telegram UX Renderer
- * 
- * WHY: Callbacks already have action_id, skip error detection.
+ * @param input - Normalized callback input from Sandbox
+ * @param accessContext - Verified user context
  */
 export function processCallback(
-    actionId: string,
+    input: NormalizedCallbackInput,
     accessContext: AccessContext
 ): TelegramRenderedMessage {
     // Step 1: Action Dispatcher
-    const dispatchResult = dispatchAction(actionId);
+    const dispatchResult = dispatchAction(input.actionId);
 
     if (dispatchResult.status === 'error') {
         // Unknown action → error UX

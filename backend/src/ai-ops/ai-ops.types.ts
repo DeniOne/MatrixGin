@@ -41,6 +41,10 @@ export interface AIOpsRecommendation {
         nodes?: string[];     // IDs of nodes involved (optional trace)
     };
     disclaimer: 'advisory-only';
+    // PHASE 4.5 - Context Binding
+    snapshotId?: string;
+    aiVersion?: string;
+    ruleSetVersion?: string;
 }
 
 export interface AIOpsResponse {
@@ -49,5 +53,9 @@ export interface AIOpsResponse {
         analyzedAt: string;
         model: string;
         determinism: boolean;
+        // PHASE 4.5 - Context Binding
+        aiVersion?: string;
+        ruleSetVersion?: string;
+        snapshotId?: string;
     };
 }

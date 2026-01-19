@@ -3,14 +3,21 @@
  * 
  * Aggregates Registry Projections -> Prompts LLM Stub -> Returns Advisory.
  * strictly Deterministic.
+ * 
+ * PHASE 4.5: Adds snapshot ID generation for feedback traceability
  */
 
+import { createHash } from 'crypto';
 import { graphService, GraphResponseDto, GraphNodeDto, GraphEdgeDto } from '../graph/graph.service';
 import { impactService, ImpactReportDto } from '../impact/impact.service';
 import { aiSandboxAdapter } from './ai-sandbox.adapter';
 import { aiOpsGuard } from './ai-ops.guard';
 import { AIOpsInput, AIOpsResponse } from './ai-ops.types';
 import { entityCardCache } from '../entity-cards/entity-card.cache'; // To validate entity existence
+
+// PHASE 4.5 - Version Constants
+const AI_VERSION = 'v1.0.0';
+const RULESET_VERSION = 'rules-2026-01';
 
 export class AIOpsService {
 
@@ -45,6 +52,9 @@ export class AIOpsService {
             impact
         };
 
+        // PHASE 4.5 - Generate deterministic snapshot ID
+        const snapshotId = this.generateSnapshotId(context);
+
         // 3. Prompt Assembly
         const prompt = this.constructPrompt(context);
 
@@ -61,11 +71,22 @@ export class AIOpsService {
         // 5. Guardrail Application
         const recommendations = aiOpsGuard.validateOutput(rawResult);
 
+        // PHASE 4.5 - Attach snapshot ID to each recommendation
+        const recommendationsWithSnapshot = recommendations.map(rec => ({
+            ...rec,
+            snapshotId,
+            aiVersion: AI_VERSION,
+            ruleSetVersion: RULESET_VERSION,
+        }));
+
         return {
-            recommendations,
+            recommendations: recommendationsWithSnapshot,
             metadata: {
                 analyzedAt: new Date().toISOString(),
                 model: 'matrix-gin-sandbox-v1',
+                aiVersion: AI_VERSION,
+                ruleSetVersion: RULESET_VERSION,
+                snapshotId,
                 determinism: true
             }
         };
@@ -80,6 +101,22 @@ export class AIOpsService {
         // Minimal Prompt Construction to fit context window
         // In production, this would be a sophisticated template.
         return JSON.stringify(context);
+    }
+
+    /**
+     * PHASE 4.5 - Generate deterministic snapshot ID
+     * Hash of graph + impact data for reproducibility
+     */
+    private generateSnapshotId(context: AIOpsInput): string {
+        const dataToHash = JSON.stringify({
+            graph: context.graph,
+            impact: context.impact,
+        });
+
+        return createHash('sha256')
+            .update(dataToHash)
+            .digest('hex')
+            .substring(0, 16); // 16 chars for readability
     }
 }
 

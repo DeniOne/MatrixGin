@@ -2,13 +2,26 @@ import { prisma } from '../../config/prisma';
 import { ProductionOrderStatus } from '@prisma/client';
 import { CreateProductionOrderDto, UpdateProductionOrderStatusDto } from '../dto/mes.dto';
 
+const PRODUCTION_ORDER_FSM: Record<ProductionOrderStatus, ProductionOrderStatus[]> = {
+    [ProductionOrderStatus.DRAFT]: [ProductionOrderStatus.PLANNED, ProductionOrderStatus.CANCELLED],
+    [ProductionOrderStatus.PLANNED]: [ProductionOrderStatus.IN_PROGRESS, ProductionOrderStatus.CANCELLED],
+    [ProductionOrderStatus.IN_PROGRESS]: [ProductionOrderStatus.ON_HOLD, ProductionOrderStatus.COMPLETED, ProductionOrderStatus.CANCELLED],
+    [ProductionOrderStatus.ON_HOLD]: [ProductionOrderStatus.IN_PROGRESS, ProductionOrderStatus.CANCELLED],
+    [ProductionOrderStatus.COMPLETED]: [], // Terminal
+    [ProductionOrderStatus.CANCELLED]: [], // Terminal
+};
+
+function validateStatusTransition(current: ProductionOrderStatus, next: ProductionOrderStatus) {
+    const allowed = PRODUCTION_ORDER_FSM[current];
+    if (!allowed || !allowed.includes(next)) {
+        throw new Error(`Invalid production order status transition: ${current} -> ${next}`);
+    }
+}
+
 export class ProductionOrderService {
 
     async create(data: CreateProductionOrderDto, userId: string) {
-        // 1. Log Audit (Pre-Action) - Optional, but canonical requires traceability.
-        // We'll rely on the transaction or post-action logging.
-
-        // 2. Create Order
+        // ... (remaining create code)
         const order = await prisma.productionOrder.create({
             data: {
                 source_type: data.source_type,
@@ -56,8 +69,8 @@ export class ProductionOrderService {
         const order = await prisma.productionOrder.findUnique({ where: { id } });
         if (!order) throw new Error('Order not found');
 
-        // 2. Transition Logic (Simple FSM for now)
-        // TODO: Add stricter FSM if needed.
+        // 2. Transition Logic (Strict FSM)
+        validateStatusTransition(order.status, status);
 
         const updated = await prisma.productionOrder.update({
             where: { id },

@@ -27,6 +27,7 @@ import { normalizeUpdate } from './telegram.normalizer';
 import { processTextMessage, processCallback } from './telegram.adapter';
 import { sendMessage, editMessage, answerCallbackQuery } from './telegram.sender';
 import { AccessContext } from '../../access/mg-chat-acl';
+import auditLogService from '../../services/audit-log.service';
 
 /**
  * TEMP: Demo user mapping for ACL integration.
@@ -56,36 +57,37 @@ function getDemoAccessContext(telegramUserId: number): AccessContext {
  */
 export async function handleTelegramWebhook(req: Request, res: Response): Promise<void> {
     try {
-        const update: TelegramUpdate = req.body;
+        // 0. Signature Verification (Security MUST)
+        const secretToken = req.headers['x-telegram-bot-api-secret-token'];
+        const expectedToken = process.env.TELEGRAM_WEBHOOK_SECRET;
 
-        console.log('[Telegram Webhook] Received update:', update.update_id);
+        if (expectedToken && secretToken !== expectedToken) {
+            console.warn('[Telegram Webhook] Unauthorized request blocked (Invalid Secret Token)');
+            res.status(403).send('Forbidden: Invalid secret token');
+            return;
+        }
 
-        // 1. Normalize input
-        const normalized = normalizeUpdate(update);
+        // 1. Normalize input (Strict Sandbox)
+        // Pass the raw body to let the normalizer handle validation
+        const normalized = normalizeUpdate(req.body);
 
         if (!normalized) {
-            console.log('[Telegram Webhook] Unsupported update type, ignoring');
+            console.log('[Telegram Webhook] Invalid update or unsupported type, ignoring');
             res.status(200).send('OK');
             return;
         }
 
-        // 2. Route to appropriate pipeline
+        console.log('[Telegram Webhook] Processing normalized input:', normalized.type);
+
+        // 2. Access Context (DMZ boundary)
+        const accessContext = getDemoAccessContext(normalized.userId);
+
+        // 3. Route to appropriate pipeline
         if (normalized.type === 'text') {
-            // Text message flow
-            console.log('[Telegram Webhook] Processing text message');
-
-            const telegramUserId = update.message?.from?.id || 0;
-            const accessContext = getDemoAccessContext(telegramUserId);
-            const rendered = processTextMessage(normalized.text, accessContext);
-
+            const rendered = processTextMessage(normalized, accessContext);
             await sendMessage(normalized.chatId, rendered);
         } else {
-            // Callback query flow
-            console.log('[Telegram Webhook] Processing callback query');
-
-            const telegramUserId = update.callback_query?.from?.id || 0;
-            const accessContext = getDemoAccessContext(telegramUserId);
-            const rendered = processCallback(normalized.actionId, accessContext);
+            const rendered = processCallback(normalized, accessContext);
 
             // Answer callback query (acknowledge)
             await answerCallbackQuery(normalized.callbackQueryId);
@@ -94,7 +96,19 @@ export async function handleTelegramWebhook(req: Request, res: Response): Promis
             await editMessage(normalized.chatId, normalized.messageId, rendered);
         }
 
-        // 3. Return HTTP 200 to Telegram
+        // 4. Audit Trail (Compliance)
+        await auditLogService.createLog({
+            userId: accessContext.userId,
+            action: `TELEGRAM_${normalized.type.toUpperCase()}`,
+            details: {
+                chatId: normalized.chatId,
+                messageId: normalized.messageId,
+                payload: normalized.type === 'text' ? normalized.text : normalized.actionId
+            },
+            ipAddress: req.ip
+        });
+
+        // 5. Return HTTP 200 to Telegram
         res.status(200).send('OK');
     } catch (error) {
         console.error('[Telegram Webhook] Error processing update:', error);

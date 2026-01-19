@@ -232,6 +232,9 @@ model User {
   erp_role            Role?              @relation(fields: [role_id], references: [id])
   qualification_level QualificationLevel? @relation(fields: [qualification_level_id], references: [id])
 
+  // Phase 4.5 - AI Feedback Loop
+  ai_feedback         AIFeedback[]
+
   @@map("users")
 }
 
@@ -1466,4 +1469,39 @@ model GovernanceFlag {
   @@index([status])
   @@index([review_level])
   @@map("economy_governance_flags")
+}
+
+// ============================================================================
+// PHASE 4.5 - AI FEEDBACK LOOP (Human-in-the-Loop)
+// Canon: Feedback ≠ Control, Feedback ≠ Learning
+// ============================================================================
+
+enum FeedbackType {
+  HELPFUL
+  NOT_APPLICABLE
+  UNSURE
+}
+
+model AIFeedback {
+  id                String       @id @default(uuid())
+  recommendationId  String
+  userId            String
+  feedbackType      FeedbackType
+  comment           String?      @db.VarChar(500)
+  
+  // Context Binding (Phase 2 - P45-PR-03)
+  basedOnSnapshotId String?
+  aiVersion         String?
+  ruleSetVersion    String?
+  
+  timestamp         DateTime     @default(now())
+  
+  user              User         @relation(fields: [userId], references: [id])
+  
+  // Idempotency: 1 feedback per user per recommendation
+  @@unique([userId, recommendationId])
+  @@index([recommendationId])
+  @@index([feedbackType])
+  @@index([timestamp])
+  @@map("ai_feedback")
 }

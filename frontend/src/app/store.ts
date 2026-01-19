@@ -5,6 +5,7 @@ import { ofsApi } from '../features/ofs/api/ofsApi';
 import { registrationApi } from '../features/ofs/api/registrationApi';
 import { universityApi } from '../features/university/api/universityApi';
 import { registryApi } from '../registry/api/registryApi';
+import { aiApi } from '../features/ai/aiApi';
 
 export const store = configureStore({
     reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
         [registrationApi.reducerPath]: registrationApi.reducer,
         [universityApi.reducerPath]: universityApi.reducer,
         [registryApi.reducerPath]: registryApi.reducer,
+        [aiApi.reducerPath]: aiApi.reducer,
         auth: authReducer,
     },
     middleware: (getDefaultMiddleware) =>
@@ -21,7 +23,8 @@ export const store = configureStore({
             .concat(ofsApi.middleware)
             .concat(registrationApi.middleware)
             .concat(universityApi.middleware)
-            .concat(registryApi.middleware),
+            .concat(registryApi.middleware)
+            .concat(aiApi.middleware),
 });
 
 export type AppDispatch = typeof store.dispatch;

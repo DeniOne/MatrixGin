@@ -8,6 +8,8 @@
 - **Модуль:** 06 — Production MES & Quality  
 - **Фаза:** Phase 5 — ERP Modules  
 - **Основание:** утверждённый MODULE-SPEC.md  
+- **Статус:** ❌ REJECTED (See [AUDIT-REMEDIATION.md](./AUDIT-REMEDIATION.md))
+- **Дата аудита:** 2026-01-19
 - **Scope:** строго ограничен данным чеклистом  
 - **AI:** advisory only / read-only  
 - **Контур:** Secure Core  

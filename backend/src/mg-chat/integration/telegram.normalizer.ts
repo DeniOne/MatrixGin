@@ -14,72 +14,81 @@
  * - ONLY data transformation
  */
 
-import { TelegramUpdate, NormalizedInput, NormalizedTextInput, NormalizedCallbackInput } from './telegram.types';
+import { NormalizedInput, NormalizedTextInput, NormalizedCallbackInput, TelegramUpdate } from './telegram.types';
+
+// Constants for Sandbox limits
+const MAX_PAYLOAD_SIZE = 1024 * 50; // 50KB limit to prevent flood
+const MAX_TEXT_LENGTH = 4096; // Telegram's own limit
+const MAX_ACTION_ID_LENGTH = 64;
 
 /**
- * Normalize Telegram update to Core input.
+ * Strict Sandbox Validator & Normalizer.
  * 
- * @param update - Telegram webhook update
- * @returns Normalized input or null if invalid
+ * WHY: This is the ONLY place where raw Telegram data is handled.
+ * It enforces hard bounds and cleans input before it touches Core.
  */
-export function normalizeUpdate(update: TelegramUpdate): NormalizedInput | null {
-    // Text message
+export function normalizeUpdate(rawUpdate: any): NormalizedInput | null {
+    // 1. Basic sanity check (Size/Type)
+    if (!rawUpdate || typeof rawUpdate !== 'object') return null;
+
+    // 2. Reject if too large (approximate size check)
+    if (JSON.stringify(rawUpdate).length > MAX_PAYLOAD_SIZE) {
+        console.warn('[Sandbox] Payload exceeded size limit');
+        return null;
+    }
+
+    const update = rawUpdate as TelegramUpdate;
+
+    // 3. Mandatory field validation
+    if (!update.update_id) return null;
+
+    // 4. Route to specific normalizers
     if (update.message?.text) {
         return normalizeTextMessage(update);
     }
 
-    // Callback query
     if (update.callback_query?.data) {
         return normalizeCallbackQuery(update);
     }
 
-    // Unsupported update type
     return null;
 }
 
-/**
- * Normalize text message.
- * 
- * WHY: Extract only what Core needs, discard Telegram metadata.
- */
 function normalizeTextMessage(update: TelegramUpdate): NormalizedTextInput | null {
-    const message = update.message!;
-    const text = message.text!;
+    const msg = update.message!;
 
-    // Validate required fields
-    if (!message.chat?.id || !message.message_id) {
-        return null;
-    }
+    // Strict field validation
+    if (!msg.chat?.id || !msg.message_id || !msg.from?.id) return null;
+    if (typeof msg.text !== 'string') return null;
+
+    // Enforcement: Trim and limit
+    const cleanText = msg.text.trim().substring(0, MAX_TEXT_LENGTH);
 
     return {
         type: 'text',
-        chatId: message.chat.id,
-        messageId: message.message_id,
-        userId: message.from?.id || 0,
-        text: text.trim() // Sanitize: trim whitespace
+        chatId: msg.chat.id,
+        messageId: msg.message_id,
+        userId: msg.from.id,
+        text: cleanText
     };
 }
 
-/**
- * Normalize callback query.
- * 
- * WHY: Extract action_id and metadata, discard Telegram specifics.
- */
 function normalizeCallbackQuery(update: TelegramUpdate): NormalizedCallbackInput | null {
-    const callback = update.callback_query!;
-    const actionId = callback.data!;
+    const cb = update.callback_query!;
 
-    // Validate required fields
-    if (!callback.message?.chat?.id || !callback.message.message_id || !callback.id) {
-        return null;
-    }
+    // Strict field validation
+    if (!cb.id || !cb.from?.id || !cb.message?.chat?.id || !cb.message.message_id) return null;
+    if (typeof cb.data !== 'string') return null;
+
+    // Enforcement: Trim and limit
+    const cleanActionId = cb.data.trim().substring(0, MAX_ACTION_ID_LENGTH);
 
     return {
         type: 'callback',
-        chatId: callback.message.chat.id,
-        messageId: callback.message.message_id,
-        userId: callback.from.id,
-        callbackQueryId: callback.id,
-        actionId: actionId.trim() // Sanitize: trim whitespace
+        chatId: cb.message.chat.id,
+        messageId: cb.message.message_id,
+        userId: cb.from.id,
+        callbackQueryId: cb.id,
+        actionId: cleanActionId
     };
 }

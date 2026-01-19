@@ -1,10 +1,13 @@
 # IMPLEMENTATION-CHECKLIST.md  
 ## MODULE 07 — TELEGRAM INTERFACE (MatrixGin)
 
-Статус: DRAFT → READY FOR IMPLEMENTATION  
-Версия: 1.0  
+Статус: ❌ REJECTED (Audit 2026-01-19)  
+Версия: 1.1 (Post-Audit)  
 Назначение: определить КОНКРЕТНЫЕ инженерные задачи  
 и критерии, при которых модуль считается ЗАКРЫТЫМ.
+
+> [!CAUTION]
+> Модуль отклонен из-за отсутствия Sandbox/DMZ и критических нарушений безопасности. См. [AUDIT-REPORT.md](./AUDIT-REPORT.md).
 
 ---
 

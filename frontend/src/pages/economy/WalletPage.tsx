@@ -1,108 +1,133 @@
 import React from 'react';
-import { TransactionDto } from '../../api/economy.types';
-
-// Mock data for skeleton phase
-const MOCK_TRANSACTIONS: TransactionDto[] = [
-    {
-        id: 'tx_1',
-        type: 'DEBIT',
-        currency: 'MC',
-        amount: 500,
-        purpose: 'Покупка: Дополнительный слот обучения',
-        timestamp: '2026-01-18T14:20:00Z'
-    },
-    {
-        id: 'tx_2',
-        type: 'CREDIT',
-        currency: 'MC',
-        amount: 1000,
-        purpose: 'Начисление: Завершение модуля 07',
-        timestamp: '2026-01-17T18:00:00Z'
-    },
-    {
-        id: 'tx_3',
-        type: 'CREDIT',
-        currency: 'GMC',
-        amount: 0.5,
-        purpose: 'Начисление: Вклад в развитие продукта',
-        timestamp: '2026-01-16T10:00:00Z'
-    }
-];
+import { useGetWalletQuery, useGetTransactionsQuery } from '../../features/economy/economyApi';
+import { Wallet, History, ArrowUpRight, ArrowDownLeft, ShieldCheck, Zap } from 'lucide-react';
 
 /**
  * WalletPage - Кошелек (Economy Module)
  */
 const WalletPage: React.FC = () => {
+    const { data: wallet, isLoading: isWalletLoading } = useGetWalletQuery();
+    const { data: transactionsData, isLoading: isTxLoading } = useGetTransactionsQuery({ limit: 5 });
+
+    if (isWalletLoading) return <div className="p-8 text-indigo-500 animate-pulse">Loading wallet context...</div>;
+
+    const transactions = transactionsData?.data || [];
+
     return (
-        <div className="space-y-8">
-            <header>
-                <h1 className="text-3xl font-bold text-white mb-2">Мой Кошелек (Wallet)</h1>
-                <p className="text-gray-400 font-light">Управление активами и история вашего участия в MatrixGin.</p>
+        <div className="space-y-8 max-w-7xl mx-auto p-4">
+            <header className="flex flex-col gap-2">
+                <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+                    <Wallet className="w-8 h-8 text-indigo-400" />
+                    Мой Кошелек
+                </h1>
+                <p className="text-gray-400 font-light max-w-2xl">
+                    Управление активами и прозрачная история вашего участия в экономике MatrixGin.
+                </p>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* MC Section */}
-                <div className="bg-gradient-to-br from-indigo-950/40 to-black border border-indigo-500/30 rounded-2xl p-8 shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <div className="text-6xl font-black">MC</div>
+                <div className="bg-gradient-to-br from-indigo-950/40 to-black border border-indigo-500/20 rounded-3xl p-8 shadow-2xl relative overflow-hidden group hover:border-indigo-500/40 transition-all duration-500">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <Zap className="w-32 h-32 text-indigo-400" />
                     </div>
-                    <div className="relative z-10">
-                        <h3 className="text-indigo-400 text-xs font-bold uppercase tracking-[0.2em] mb-4">Operational Assets</h3>
-                        <div className="flex items-baseline gap-2">
-                            <div className="text-5xl font-bold text-white tracking-tight">5,430</div>
-                            <div className="text-indigo-300 font-medium text-lg">MC</div>
+                    <div className="relative z-10 space-y-6">
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                            <h3 className="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.2em]">Operational Assets</h3>
                         </div>
-                        <div className="text-indigo-500/70 text-sm mt-4 font-light">
-                            Используется для взаимодействия с инструментами и ресурсами системы.
+                        <div className="flex items-baseline gap-3">
+                            <div className="text-6xl font-black text-white tracking-tighter">
+                                {wallet?.mcBalance.toLocaleString() || '0'}
+                            </div>
+                            <div className="text-indigo-300 font-medium text-xl">MC</div>
+                        </div>
+                        <div className="space-y-2">
+                            <p className="text-indigo-500/70 text-xs font-light leading-relaxed max-w-xs">
+                                Ликвидные средства для активации инструментов, ресурсов и участия в аукционах.
+                            </p>
+                            {wallet?.mcFrozen ? (
+                                <div className="flex items-center gap-2 text-[10px] text-amber-500 bg-amber-500/10 w-fit px-2 py-1 rounded border border-amber-500/20">
+                                    <ShieldCheck className="w-3 h-3" />
+                                    Заблокировано: {wallet.mcFrozen} MC
+                                </div>
+                            ) : null}
                         </div>
                     </div>
                 </div>
 
                 {/* GMC Section */}
-                <div className="bg-gradient-to-br from-amber-950/30 to-black border border-amber-500/20 rounded-2xl p-8 shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <div className="text-6xl font-black">GMC</div>
+                <div className="bg-gradient-to-br from-amber-950/30 to-black border border-amber-500/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden group hover:border-amber-500/30 transition-all duration-500">
+                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <ShieldCheck className="w-32 h-32 text-amber-400" />
                     </div>
-                    <div className="relative z-10">
-                        <h3 className="text-amber-400 text-xs font-bold uppercase tracking-[0.2em] mb-4">Strategic Capital</h3>
-                        <div className="flex items-baseline gap-2">
-                            <div className="text-5xl font-bold text-white tracking-tight">12.50</div>
-                            <div className="text-amber-300 font-medium text-lg">GMC</div>
+                    <div className="relative z-10 space-y-6">
+                        <div className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                            <h3 className="text-amber-400 text-[10px] font-bold uppercase tracking-[0.2em]">Strategic Capital</h3>
                         </div>
-                        <div className="text-amber-500/70 text-sm mt-4 font-light">
-                            Представляет вашу долю влияния и стратегический вклад в проект.
+                        <div className="flex items-baseline gap-3">
+                            <div className="text-6xl font-black text-white tracking-tighter">
+                                {wallet?.gmcBalance.toLocaleString() || '0'}
+                            </div>
+                            <div className="text-amber-300 font-medium text-xl">GMC</div>
+                        </div>
+                        <div className="text-amber-500/70 text-xs font-light leading-relaxed max-w-xs">
+                            Ваша доля влияния и стратегический вклад. Определяет вес вашего голоса в системе.
                         </div>
                     </div>
                 </div>
             </div>
 
-            <section>
-                <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                    История транзакций
-                    <span className="text-xs font-normal bg-gray-800 text-gray-400 px-2 py-1 rounded">Последние 3</span>
-                </h2>
+            <section className="bg-gray-900/30 border border-gray-800/50 rounded-3xl p-8 backdrop-blur-md">
+                <div className="flex justify-between items-center mb-8">
+                    <h2 className="text-xl font-bold text-white flex items-center gap-3">
+                        <History className="w-6 h-6 text-gray-400" />
+                        Последние операции
+                    </h2>
+                    <a href="/economy/transactions" className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest">
+                        Смотреть все
+                    </a>
+                </div>
 
-                <div className="bg-gray-900/50 border border-gray-800/50 rounded-2xl overflow-hidden backdrop-blur-sm">
-                    <table className="w-full text-left border-collapse">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
                         <thead>
-                            <tr className="bg-gray-800/30">
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Дата</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Назначение</th>
-                                <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Сумма</th>
+                            <tr className="border-b border-gray-800">
+                                <th className="pb-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Дата</th>
+                                <th className="pb-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Тип</th>
+                                <th className="pb-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Описание</th>
+                                <th className="pb-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider text-right">Сумма</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-800/50">
-                            {MOCK_TRANSACTIONS.map(tx => (
-                                <tr key={tx.id} className="hover:bg-white/5 transition-colors">
-                                    <td className="px-6 py-4 text-sm text-gray-500 font-mono">
-                                        {new Date(tx.timestamp).toLocaleDateString('ru-RU')}
+                        <tbody className="divide-y divide-gray-800/30">
+                            {isTxLoading ? (
+                                <tr><td colSpan={4} className="py-8 text-center text-gray-600 italic">Загрузка транзакций...</td></tr>
+                            ) : transactions.length === 0 ? (
+                                <tr><td colSpan={4} className="py-8 text-center text-gray-600 italic">Операций пока не совершалось</td></tr>
+                            ) : transactions.map(tx => (
+                                <tr key={tx.id} className="group hover:bg-white/[0.02] transition-colors">
+                                    <td className="py-5 text-xs text-gray-500 font-mono">
+                                        {new Date(tx.createdAt).toLocaleDateString('ru-RU')}
                                     </td>
-                                    <td className="px-6 py-4">
-                                        <div className="text-sm text-gray-200">{tx.purpose}</div>
+                                    <td className="py-5">
+                                        <div className="flex items-center gap-2">
+                                            {tx.amount > 0 ? (
+                                                <ArrowDownLeft className="w-3 h-3 text-emerald-500" />
+                                            ) : (
+                                                <ArrowUpRight className="w-3 h-3 text-red-500" />
+                                            )}
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter bg-gray-800 px-2 py-0.5 rounded">
+                                                {tx.type}
+                                            </span>
+                                        </div>
                                     </td>
-                                    <td className="px-6 py-4 text-right">
-                                        <div className={`text-sm font-bold ${tx.type === 'DEBIT' ? 'text-red-400' : 'text-emerald-400'}`}>
-                                            {tx.type === 'DEBIT' ? '-' : '+'}{tx.amount} {tx.currency}
+                                    <td className="py-5">
+                                        <div className="text-sm text-gray-300 line-clamp-1">{tx.description || 'Без описания'}</div>
+                                    </td>
+                                    <td className="py-5 text-right">
+                                        <div className={`text-sm font-black tracking-tight ${tx.amount > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                            {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString()} {tx.currency}
                                         </div>
                                     </td>
                                 </tr>

@@ -4,9 +4,9 @@ import { FileText, Users, BarChart3, Download } from 'lucide-react';
 const MgmtPeoplePage: React.FC = () => {
     const tools = [
         { id: '1', title: 'Шаблон 1:1 встречи', type: 'template', icon: <FileText className="w-5 h-5" /> },
-        { id: '2', title: 'Матрица грейдов', type: 'guide', icon: <BarChart3 className="w-5 h-5" /> },
-        { id: '3', title: 'Процесс оценки 360°', type: 'process', icon: <Users className="w-5 h-5" /> },
-        { id: '4', title: 'План развития сотрудника', type: 'template', icon: <FileText className="w-5 h-5" /> }
+        { id: '2', title: 'Карточка Роли (OFS)', type: 'guide', icon: <BarChart3 className="w-5 h-5" /> },
+        { id: '3', title: 'Принципы Взаимозависимости', type: 'process', icon: <Users className="w-5 h-5" /> },
+        { id: '4', title: 'Соглашение об Уровне Сервиса (SLA)', type: 'template', icon: <FileText className="w-5 h-5" /> }
     ];
 
     return (

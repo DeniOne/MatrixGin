@@ -15,6 +15,10 @@ export enum UserRole {
     DEPARTMENT_HEAD = 'department_head',
     /** Управляющий филиалом */
     BRANCH_MANAGER = 'branch_manager',
+    /** Менеджер (общий) */
+    MANAGER = 'manager',
+    /** Менеджер производства */
+    PRODUCTION_MANAGER = 'production_manager',
     /** Сотрудник */
     EMPLOYEE = 'employee',
 }
