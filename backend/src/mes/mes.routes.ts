@@ -17,5 +17,12 @@ router.get('/production-orders/:id', mesController.getProductionOrder);
 router.post('/quality-checks', requireProductionWrite, mesController.createQualityCheck);
 router.post('/defects', requireProductionWrite, mesController.createDefect);
 
+// ==========================================
+// MOTIVATIONAL ORGANISM ENDPOINTS (Sprint 5-6)
+// Personal endpoints for employee shift progress
+// ==========================================
+router.get('/my-shift', mesController.getMyShift);
+router.get('/earnings-forecast', mesController.getMyEarningsForecast);
+
 export const mesRouter = router;
 export default router;

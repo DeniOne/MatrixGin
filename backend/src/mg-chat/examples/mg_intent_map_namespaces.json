@@ -86,6 +86,211 @@
             "confirmation_required": false
         },
         {
+            "id": "employee.morning_greeting",
+            "examples": [
+                "доброе утро",
+                "начать день",
+                "мой ЦКП",
+                "привет",
+                "с добрым утром"
+            ],
+            "response": {
+                "text": "Доброе утро!",
+                "actions": [
+                    "employee.show_my_shift",
+                    "employee.daily_challenge"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.show_my_earnings",
+            "examples": [
+                "сколько заработаю",
+                "мой заработок",
+                "расчёт зарплаты",
+                "прогноз дохода",
+                "сколько получу"
+            ],
+            "response": {
+                "text": "Прогноз заработка:",
+                "actions": [
+                    "employee.show_my_kpi",
+                    "employee.show_my_shift"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.show_my_status_path",
+            "examples": [
+                "мой статус",
+                "путь роста",
+                "как повыситься",
+                "следующий статус",
+                "как стать кремень"
+            ],
+            "response": {
+                "text": "Твой путь роста:",
+                "actions": [
+                    "employee.show_my_training",
+                    "employee.growth_matrix"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.show_mc_balance",
+            "examples": [
+                "мои коины",
+                "баланс MC",
+                "сколько MC",
+                "магазин",
+                "матрикс коины"
+            ],
+            "response": {
+                "text": "Твои MatrixCoin:",
+                "actions": [
+                    "employee.show_achievements"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.show_my_training",
+            "examples": [
+                "моё обучение",
+                "мои курсы",
+                "квалификация",
+                "что изучить",
+                "университет"
+            ],
+            "response": {
+                "text": "Твоё обучение:",
+                "actions": [
+                    "employee.show_my_status_path"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.daily_challenge",
+            "examples": [
+                "челлендж",
+                "вызов дня",
+                "микро-задание",
+                "что сделать сегодня",
+                "челендж дня"
+            ],
+            "response": {
+                "text": "Твой вызов на сегодня:",
+                "actions": [
+                    "employee.morning_greeting"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.show_my_shift",
+            "examples": [
+                "моя смена сейчас",
+                "прогресс смены",
+                "сколько компаний",
+                "как идёт день",
+                "статус смены"
+            ],
+            "response": {
+                "text": "Прогресс твоей смены:",
+                "actions": [
+                    "employee.show_my_earnings",
+                    "employee.show_my_kpi"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.need_help",
+            "examples": [
+                "помощь",
+                "нужна помощь",
+                "не знаю что делать",
+                "проблема",
+                "помоги"
+            ],
+            "response": {
+                "text": "Чем могу помочь?",
+                "actions": [
+                    "employee.guide_next_step"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.show_achievements",
+            "examples": [
+                "мои достижения",
+                "за что отметили",
+                "признание",
+                "мои успехи",
+                "что я заработал"
+            ],
+            "response": {
+                "text": "Твои достижения:",
+                "actions": [
+                    "employee.show_mc_balance"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.focus_mode",
+            "examples": [
+                "не беспокоить",
+                "режим фокуса",
+                "тихий режим",
+                "отключить уведомления",
+                "фокус"
+            ],
+            "response": {
+                "text": "Режим фокуса:",
+                "actions": []
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.suggest_improvement",
+            "examples": [
+                "у меня идея",
+                "предложить улучшение",
+                "кайдзен",
+                "рацпредложение",
+                "хочу предложить"
+            ],
+            "response": {
+                "text": "Отлично! Опиши свою идею:",
+                "actions": []
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "employee.growth_matrix",
+            "examples": [
+                "моя матрица",
+                "паутина роста",
+                "моё развитие",
+                "где я",
+                "матрица роста"
+            ],
+            "response": {
+                "text": "Твоя Матрица Роста:",
+                "actions": [
+                    "employee.show_my_status_path",
+                    "employee.show_my_training"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
             "id": "manager.show_shift_status",
             "examples": [
                 "статус смены",
