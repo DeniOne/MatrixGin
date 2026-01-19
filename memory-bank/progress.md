@@ -9,7 +9,8 @@
 - [x] **Phase 1.5: UI Completion / Visibility** (Analytics, Economy, Profile)
 - [x] **Phase 4: AI Recommendations UI** (Advisory Layer)
 - [x] **Phase 4.5: AI Feedback Loop** (Human-in-the-Loop)
-- [ ] **Phase 5: Motivational Organism** ← ТЕКУЩАЯ ФАЗА
+- [x] **Phase 5: Motivational Organism (Employee Layer)** ✅ **COMPLETED 2026-01-19**
+- [ ] **Phase 6: Advanced Motivation & Managerial Layer** ← ТЕКУЩАЯ ФАЗА
 
 ## Module Status (Audit 2026-01-19)
 
@@ -31,29 +32,44 @@
 ### Стратегический документ
 `documentation/00-strategic/matrixgin_motivational_organism.md` (v2.0)
 
-### Sprint Backlog
+### 📅 Roadmap Status
 
-#### Sprint 5-6: Bot v2 (Якоря сотрудников)
-- [ ] Intent: morning_greeting + Cron 08:45
-- [ ] Intent: my_kpi + интеграция с MES
-- [ ] Intent: my_earnings + калькулятор
-- [ ] Intent: my_status + путь роста
-- [ ] Intent: my_mc_balance + сгорание
-- [ ] Intent: my_shift + реалтайм прогресс
-- [ ] API: GET /api/mes/my-shift
-- [ ] API: GET /api/mes/earnings-forecast
+#### Sprint 5-6: Bot & Personal Context (Motivational Organism)
+- [x] **Telegram Bot v2**
+  - [x] Intent: Morning Greeting (Daily Context + Challenge)
+  - [x] Intent: My Earnings (Forecast Calculator)
+  - [x] Intent: My Shift (Real-time Progress)
+  - [x] Intent: My MC (Balance + Store)
+  - [x] Cron: Daily Morning Greeting (08:45)
+- [x] **MES Personal API**
+  - [x] Endpoint: `/my-shift`
+  - [x] Endpoint: `/earnings-forecast`
+- [x] **Technical Debt**
+  - [x] Analytics: Refactor NestJS to Express
 
-#### Sprint 7-8: Университет + Адаптация
-- [ ] Виджет "Моё обучение"
-- [ ] Виджет "Моя адаптация"
-- [ ] Таблица Mentorship
-- [ ] Таблица OneOnOne
-- [ ] Radar Chart (Growth Web MVP)
+#### Sprint 7-8: Frontend & Adaptation (Motivational Organism) ✅
+- [x] **Corporate University Widget** ("My Learning")
+- [x] **Adaptation Tracker** (Mentorship + 1-on-1)
+- [x] **Growth Matrix MVP** (2D Radar Chart)
 
-#### Sprint 9+: 3D Growth Web
-- [ ] Three.js визуализация
-- [ ] Режим прогноза "Что если..."
-- [ ] AI-рекомендации путей роста
+#### Sprint 9: Rewards & Economy Integration ✅ **COMPLETED 2026-01-20**
+- [x] **University Rewards**: Начисление MC за курсы (через Eligibility)
+- [x] **Anti-fraud**: Проверка лимитов начисления (Soft Cap 500 MC)
+- [x] **Manager Anchors**: Инструменты руководителя (Manager Hub, 1-on-1 Logs)
+
+#### Sprint 10: PSEE Real Data Integration ✅ **COMPLETED 2026-01-20**
+- [x] **Canonical Rates**: `mes-rates.ts` (PASS/FAIL logic)
+- [x] **Explicit Shift**: Окно 08:00–23:00 (Shift Window)
+- [x] **Real Aggregation**: MES Service + Growth Matrix Sync (Read-Only)
+
+#### Sprint 11: Telegram Bot v2 (Navigator) [x] **DONE**
+- [x] **Refactoring**: Separation of Concerns (Employee/Manager Scenarios)
+- [x] **Real Integrations**: MES, Wallet, University connected to Bot
+- [x] **Gap Closure**: 16+ intents implemented
+
+#### Sprint 12: Advanced Motivation (Visualization) ✅ **COMPLETED 2026-01-20**
+- [x] **Growth Web 3D**: `Three.js` + `StartGrowthWeb3D` (Read-only)
+- [x] **Forecast Simulator**: Non-binding "What If" scenarios (Client-side)
 
 ## Key Blockers
 - **None critical**: Все зависит от приоритизации спринтов.

@@ -3,6 +3,7 @@ import { productionOrderService } from '../services/production-order.service';
 import { qualityService } from '../services/quality.service';
 import { defectService } from '../services/defect.service';
 import { CreateProductionOrderDto, CreateQualityCheckDto, CreateDefectDto } from '../dto/mes.dto';
+import { mesService } from '../services/mes.service';
 
 export class MesController {
 
@@ -59,7 +60,7 @@ export class MesController {
     }
 
     // ==========================================
-    // MOTIVATIONAL ORGANISM ENDPOINTS (Sprint 5-6)
+    // MOTIVATIONAL ORGANISM ENDPOINTS (Sprint 5-8)
     // ==========================================
 
     /**
@@ -69,21 +70,7 @@ export class MesController {
     async getMyShift(req: Request, res: Response) {
         try {
             const user = req.user as any;
-            // TODO: Integrate with PSEE to get real data
-            // For now, return demo data
-            const shiftProgress = {
-                employeeId: user.id,
-                shiftDate: new Date().toISOString().split('T')[0],
-                companiesCreated: 18,
-                retouchReady: 12,
-                retouchPending: 4,
-                retouchWaiting: 2,
-                companiesSold: 9,
-                companiesRejected: 3,
-                conversion: 75, // %
-                averageValue: 1350, // in rubles
-                forecastEarnings: 5800 // in rubles
-            };
+            const shiftProgress = await mesService.getMyShiftProgress(user.id);
             res.json(shiftProgress);
         } catch (error: any) {
             res.status(500).json({ message: error.message });
@@ -97,26 +84,7 @@ export class MesController {
     async getMyEarningsForecast(req: Request, res: Response) {
         try {
             const user = req.user as any;
-            // TODO: Integrate with PSEE and motivation rules
-            // For now, return demo calculation
-            const forecast = {
-                employeeId: user.id,
-                baseSalary: 2500,
-                okkBonus: 1610, // companiesCreated * ratePerCompany
-                ckBonus: 0, // averageValue bonus (below threshold)
-                mcEquivalent: 340, // MC value in rubles
-                totalCurrent: 4450,
-                // Projection if +3 companies and +20 averageValue
-                projectedTotal: 6200,
-                projectedIncrease: 39, // %
-                breakdown: {
-                    companiesCreated: 23,
-                    ratePerCompany: 70,
-                    averageValue: 1180,
-                    averageValueThreshold: 1200,
-                    mcBalance: 34
-                }
-            };
+            const forecast = await mesService.getEarningsForecast(user.id);
             res.json(forecast);
         } catch (error: any) {
             res.status(500).json({ message: error.message });

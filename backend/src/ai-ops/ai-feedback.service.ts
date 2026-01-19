@@ -6,18 +6,32 @@
  * Purpose: Collect user feedback on AI recommendations (read-only, immutable)
  */
 
-import { Injectable, ConflictException, UnprocessableEntityException, Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { SubmitFeedbackDto, FeedbackType } from './dto/submit-feedback.dto';
 import { FeedbackResponseDto } from './dto/feedback-response.dto';
 import { feedbackEthicsGuard } from './feedback-ethics.guard';
+import { logger } from '../config/logger';
 
 const prisma = new PrismaClient();
 
-@Injectable()
-export class AIFeedbackService {
-    private readonly logger = new Logger(AIFeedbackService.name);
+// Custom error classes for Express
+export class ConflictException extends Error {
+    status = 409;
+    constructor(message: string) {
+        super(message);
+        this.name = 'ConflictException';
+    }
+}
 
+export class UnprocessableEntityException extends Error {
+    status = 422;
+    constructor(message: string) {
+        super(message);
+        this.name = 'UnprocessableEntityException';
+    }
+}
+
+export class AIFeedbackService {
     /**
      * Submit user feedback on AI recommendation
      * 
@@ -35,10 +49,10 @@ export class AIFeedbackService {
         if (sanitizedComment) {
             const ethicsResult = feedbackEthicsGuard.validate(sanitizedComment);
             if (!ethicsResult.valid) {
-                this.logger.warn(
-                    `Ethics violation in feedback: ${ethicsResult.violationType} - user ${userId}`
+                logger.warn(
+                    `[AIFeedbackService] Ethics violation: ${ethicsResult.violationType} - user ${userId}`
                 );
-                throw new UnprocessableEntityException(ethicsResult.reason);
+                throw new UnprocessableEntityException(ethicsResult.reason || 'Ethics violation');
             }
         }
 
@@ -57,8 +71,8 @@ export class AIFeedbackService {
                 },
             });
 
-            this.logger.log(
-                `Feedback submitted: ${feedback.id} by user ${userId} on recommendation ${dto.recommendationId}`
+            logger.info(
+                `[AIFeedbackService] Feedback submitted: ${feedback.id} by user ${userId} on recommendation ${dto.recommendationId}`
             );
 
             return {
@@ -70,8 +84,8 @@ export class AIFeedbackService {
         } catch (error: any) {
             // Prisma P2002 = unique constraint violation (duplicate feedback)
             if (error.code === 'P2002') {
-                this.logger.warn(
-                    `Duplicate feedback attempt: user ${userId} on recommendation ${dto.recommendationId}`
+                logger.warn(
+                    `[AIFeedbackService] Duplicate feedback attempt: user ${userId} on recommendation ${dto.recommendationId}`
                 );
                 throw new ConflictException(
                     'You have already submitted feedback for this recommendation'
@@ -79,7 +93,7 @@ export class AIFeedbackService {
             }
 
             // Re-throw other errors
-            this.logger.error('Error submitting feedback', error);
+            logger.error('[AIFeedbackService] Error submitting feedback', error);
             throw error;
         }
     }
@@ -104,9 +118,9 @@ export class AIFeedbackService {
 
         // Count by type
         const byType = {
-            HELPFUL: allFeedback.filter(f => f.feedbackType === 'HELPFUL').length,
-            NOT_APPLICABLE: allFeedback.filter(f => f.feedbackType === 'NOT_APPLICABLE').length,
-            UNSURE: allFeedback.filter(f => f.feedbackType === 'UNSURE').length,
+            HELPFUL: allFeedback.filter((f: any) => f.feedbackType === 'HELPFUL').length,
+            NOT_APPLICABLE: allFeedback.filter((f: any) => f.feedbackType === 'NOT_APPLICABLE').length,
+            UNSURE: allFeedback.filter((f: any) => f.feedbackType === 'UNSURE').length,
         };
 
         // Calculate percentages
@@ -117,15 +131,15 @@ export class AIFeedbackService {
         };
 
         // Get period range
-        const timestamps = allFeedback.map(f => f.timestamp);
+        const timestamps = allFeedback.map((f: any) => f.timestamp);
         const periodStart = timestamps.length > 0
-            ? new Date(Math.min(...timestamps.map(t => t.getTime()))).toISOString()
+            ? new Date(Math.min(...timestamps.map((t: Date) => t.getTime()))).toISOString()
             : new Date().toISOString();
         const periodEnd = timestamps.length > 0
-            ? new Date(Math.max(...timestamps.map(t => t.getTime()))).toISOString()
+            ? new Date(Math.max(...timestamps.map((t: Date) => t.getTime()))).toISOString()
             : new Date().toISOString();
 
-        this.logger.log(`Analytics generated: ${total} total feedback entries`);
+        logger.info(`[AIFeedbackService] Analytics generated: ${total} total feedback entries`);
 
         return {
             totalFeedback: total,

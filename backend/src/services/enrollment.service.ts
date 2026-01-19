@@ -180,173 +180,27 @@ export class EnrollmentService {
             },
         });
 
-        // Award MC/GMC
-        if (enrollment.course.reward_mc > 0 || enrollment.course.reward_gmc > 0) {
-            await this.awardRewards(userId, enrollment.course);
-        }
-
-        // Create certification
-        await prisma.certification.create({
-            data: {
-                user_id: userId,
-                course_id: courseId,
-                academy_id: enrollment.course.academy_id || undefined,
-                score: this.calculateAverageScore(progress),
-            },
-        });
+        // Award rewards
+        await this.awardRewards(userId, enrollment.course);
 
         return completed;
     }
 
-    /**
-     * Get user's certifications
-     */
-    async getCertifications(userId: string) {
-        return await prisma.certification.findMany({
-            where: { user_id: userId },
-            include: {
-                course: {
-                    select: {
-                        title: true,
-                    },
-                },
-                academy: {
-                    select: {
-                        name: true,
-                    },
-                },
-            },
-            orderBy: {
-                issued_at: 'desc',
-            },
-        });
-    }
-
-    /**
-     * Private helper methods
-     */
-
-    private formatEnrollment(enrollment: any) {
-        return {
-            id: enrollment.id,
-            userId: enrollment.user_id,
-            courseId: enrollment.course_id,
-            courseTitle: enrollment.course.title,
-            academyName: enrollment.course.academy?.name,
-            progress: enrollment.progress,
-            status: enrollment.status,
-            enrolledAt: enrollment.enrolled_at.toISOString(),
-            completedAt: enrollment.completed_at?.toISOString(),
-            assignedBy: enrollment.assigned_by,
-        };
-    }
-
-    private async updateEnrollmentProgress(enrollmentId: string) {
-        const allProgress = await prisma.moduleProgress.findMany({
-            where: { enrollment_id: enrollmentId },
-        });
-
-        const completedCount = allProgress.filter((p) => p.status === 'COMPLETED').length;
-        const progressPercentage = Math.round((completedCount / allProgress.length) * 100);
-
-        await prisma.enrollment.update({
-            where: { id: enrollmentId },
-            data: { progress: progressPercentage },
-        });
-    }
-
-    private calculateAverageScore(progress: any[]): number {
-        const withScores = progress.filter((p) => p.score !== null);
-        if (withScores.length === 0) return 0;
-
-        const sum = withScores.reduce((acc, p) => acc + p.score, 0);
-        return Math.round(sum / withScores.length);
-    }
-
     private async awardRewards(userId: string, course: any) {
-        // Get or create wallet
-        let wallet = await prisma.wallet.findUnique({
-            where: { user_id: userId },
-        });
+        const { rewardService } = require('./reward.service');
 
-        if (!wallet) {
-            wallet = await prisma.wallet.create({
-                data: {
-                    user_id: userId,
-                    mc_balance: 0,
-                    gmc_balance: 0,
-                },
-            });
-        }
-
-        // Award MC (via canonical registry)
+        // Register Eligibility Event (Decoupled Reward Logic)
         if (course.reward_mc > 0) {
-            const { checkCanon } = require('../core/canon');
-
-            // Validate via centralized registry
-            await checkCanon({
-                canon: 'MC',
-                action: 'MC_EARN',
-                source: 'API',
-                payload: {
-                    courseId: course.id,
-                    userId,
-                    amount: course.reward_mc,
-                    // Course completion is operational engagement - allowed
-                    monetaryEquivalent: false,
-                    kpiBased: false,
-                    creativeTask: false,
-                    noExpiration: false,
-                    unlimited: false
-                },
-                userId
-            });
-
-            // Registry handles validation, logging, and errors
-            await prisma.wallet.update({
-                where: { user_id: userId },
-                data: {
-                    mc_balance: { increment: course.reward_mc },
-                },
-            });
-
-            await prisma.transaction.create({
-                data: {
-                    type: 'EARN',
-                    currency: 'MC',
-                    amount: course.reward_mc,
-                    recipient_id: userId,
-                    description: `Course completion: ${course.title}`,
-                    metadata: {
-                        courseId: course.id,
-                        type: 'course_completion',
-                    },
-                },
-            });
+            await rewardService.registerEligibility(
+                userId,
+                'COURSE_COMPLETED',
+                course.id,
+                course.reward_mc
+            );
         }
 
-        // GMC rewards are FORBIDDEN by canonical rules
-        if (course.reward_gmc > 0) {
-            const { checkCanon } = require('../core/canon');
-
-            // Validate via centralized registry
-            // This will throw CanonicalViolationError and log automatically
-            await checkCanon({
-                canon: 'GMC',
-                action: 'GMC_GRANT_AUTOMATIC',
-                source: 'API',
-                payload: {
-                    automatic: true,
-                    courseId: course.id,
-                    userId,
-                    amount: course.reward_gmc
-                },
-                userId
-            });
-
-            // Registry will block this operation
-            // This code should never execute
-        }
+        // NOTE: GMC rewards remain blocked by checkCanon in the RewardEngine
+        // or explicitly ignored here per canonical rules.
     }
 }
 

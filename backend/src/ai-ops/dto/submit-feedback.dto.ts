@@ -23,4 +23,17 @@ export class SubmitFeedbackDto {
   @IsString()
   @MaxLength(500, { message: 'Comment must not exceed 500 characters' })
   comment?: string;
+
+  // PHASE 4.5 - Context Binding (P45-PR-03)
+  @IsOptional()
+  @IsString()
+  basedOnSnapshotId?: string;
+
+  @IsOptional()
+  @IsString()
+  aiVersion?: string;
+
+  @IsOptional()
+  @IsString()
+  ruleSetVersion?: string;
 }

@@ -210,6 +210,7 @@ model User {
   purchases      Purchase[]
   statuses       UserGamificationStatus[]
   achievements   UserAchievement[]
+  reward_eligibilities RewardEligibility[]
 
   // OFS Relations
   employee_roles          EmployeeRole[]
@@ -235,7 +236,46 @@ model User {
   // Phase 4.5 - AI Feedback Loop
   ai_feedback         AIFeedback[]
 
+  // Sprint 7-8 - Adaptation & Mentorship
+  mentorship_as_mentor Mentorship[] @relation("MentorUser")
+  mentorship_as_mentee Mentorship?   @relation("MenteeUser")
+  one_on_ones_managed  OneOnOne[]   @relation("Manager1on1")
+  one_on_ones_attended OneOnOne[]   @relation("Employee1on1")
+
   @@map("users")
+}
+
+model Mentorship {
+  id          String   @id @default(uuid())
+  mentor_id   String
+  mentee_id   String   @unique
+  status      String   @default("ACTIVE") // ACTIVE, COMPLETED, SUSPENDED
+  goals       Json?    // Array of goals
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  mentor User @relation("MentorUser", fields: [mentor_id], references: [id])
+  mentee User @relation("MenteeUser", fields: [mentee_id], references: [id])
+
+  @@map("mentorships")
+}
+
+model OneOnOne {
+  id             String   @id @default(uuid())
+  manager_id     String
+  employee_id    String
+  scheduled_at   DateTime
+  completed_at   DateTime?
+  summary        String?
+  action_items   Json?    // Array of items
+  emotional_tone Int?     // 1-10
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  manager  User @relation("Manager1on1", fields: [manager_id], references: [id])
+  employee User @relation("Employee1on1", fields: [employee_id], references: [id])
+
+  @@map("one_on_ones")
 }
 
 enum EmployeeStatus {
@@ -1412,6 +1452,26 @@ model EconomyAuditLog {
   @@index([event_type])
   @@index([context_id])
   @@map("economy_audit_logs")
+}
+
+// REWARD ELIGIBILITY (STAGING AREA FOR ANTI-FRAUD & CANONICAL CHECKS)
+model RewardEligibility {
+  id              String   @id @default(uuid())
+  user_id         String
+  event_type      String   // e.g., 'COURSE_COMPLETED'
+  event_ref_id    String   // Enrollment ID or Task ID
+  mc_amount       Int
+  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED, PROCESSED
+  processed_at    DateTime?
+  audit_flag      String?  // e.g., 'REWARD_LIMIT_REACHED'
+  
+  user            User     @relation(fields: [user_id], references: [id])
+  created_at      DateTime @default(now())
+
+  @@unique([user_id, event_type, event_ref_id])
+  @@index([status])
+  @@index([created_at])
+  @@map("economy_reward_eligibility")
 }
 
 // MC SNAPSHOT (IMMUTABLE STATE HISTORY)

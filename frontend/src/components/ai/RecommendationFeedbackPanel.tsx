@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSubmitFeedbackMutation, FeedbackType } from '../../features/ai/aiApi';
 import { ThumbsUp, ThumbsDown, HelpCircle, Loader2 } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { message } from 'antd';
 
 interface RecommendationFeedbackPanelProps {
     recommendationId: string;
@@ -38,20 +38,25 @@ const RecommendationFeedbackPanel: React.FC<RecommendationFeedbackPanelProps> = 
             }).unwrap();
 
             // PHASE 4.5 - Critical UX message
-            toast.success('Спасибо. Это не меняет систему автоматически.', {
-                duration: 5000,
+            message.success({
+                content: 'Спасибо. Это не меняет систему автоматически.',
+                duration: 5,
                 icon: '✓',
             });
 
             onSubmitSuccess?.();
         } catch (error: any) {
-            if (error.status === 409) {
-                toast.info('Вы уже оставили отзыв на эту рекомендацию');
-            } else if (error.status === 422) {
+            // RTK Query error handling
+            const status = error?.status || error?.originalStatus;
+            const errorMessage = error?.data?.error || error?.data?.message || error?.message;
+
+            if (status === 409) {
+                message.info('Вы уже оставили отзыв на эту рекомендацию');
+            } else if (status === 422) {
                 // PHASE 4.5 - Ethics violation
-                toast.error(error.data?.error || 'Пожалуйста, используйте конструктивные формулировки');
+                message.error(errorMessage || 'Пожалуйста, используйте конструктивные формулировки');
             } else {
-                toast.error('Ошибка отправки отзыва');
+                message.error('Ошибка отправки отзыва');
             }
         }
     };

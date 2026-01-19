@@ -9,6 +9,9 @@ export interface ResolvedIntent {
     intentId: string;
     confidence: number; // 0..1
     matchedExample?: string;
+    // Context Fields (Sprint 11)
+    userId: string;
+    slots: Record<string, any>;
 }
 
 export interface IntentResolveResult {

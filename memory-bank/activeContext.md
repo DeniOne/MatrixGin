@@ -32,15 +32,39 @@ MatrixGin должен трансформироваться из **систем�
 - **Сравнение только с "собой вчера"**
 - **Прозрачность алгоритмов**
 
-## Recent Changes
-- **2026-01-19**: Создан стратегический документ MatrixGin Motivational Organism v2.0
-- **2026-01-19**: GAP-анализ модулей 1-8
-- **2026-01-19**: Добавлена концепция "Матрица Роста" (Growth Web)
+## ⚔️ Active Changes
+- **Motivational Organism (Sprint 5-8 Completion):**
+  - **Employee Layer:** Bot intents (12), Morning Cron, Dashboard Widgets (Learning, Adaptation, Growth Matrix).
+  - **Adaptation:** Mentorship and 1-on-1 tracking core implemented (DB + API).
+  - **Visuals:** Custom SVG Radar Chart for personal progress (non-evaluative).
+  - **Refactoring:** Analytics and MES Personal API converted to Express conventions.
 
-## Next Steps
-1. [ ] **Sprint 5-6**: Bot v2 — 12 интентов для сотрудников
-2. [ ] **Sprint 7-8**: Виджеты "Моё обучение", "Моя адаптация", Radar Chart
-3. [ ] **Sprint 9+**: 3D Growth Web, AI-рекомендации путей
+## 🛑 Blockers & Risks
+- **Frontend Modules:** Widgets for "My Learning", "Growth Matrix" are planned for Sprints 7-9.
+- **PSEE Integration:** MES endpoints return demo data; need real integration with Production Session Execution Engine.
+- **Telegram Binding:** Cron job simulates logic; requires actual Telegram User mapping and bot instance injection.
+
+## ⚔️ Recent Changes
+- **Sprint 9 Completed**: Implemented decoupled Reward Engine, Manager Hub, and Anti-Fraud limits.
+- **Sprint 10 Completed**: PSEE Real Data Integration.
+    - **Canonical Rates**: `mes-rates.ts` created.
+    - **Shift Logic**: 08:00-23:00 explicit window in MesService.
+    - **Quality**: Binary modifiers (PASS/FAIL) integrated.
+    - **Growth Matrix**: Connected to real aggregated monthly earnings (Read-Only).
+
+## Current Focus
+- **Verification**: ✅ Sprint 10 automated tests passed (Quality Penalty, Shift Scope, Deterministic Forecast).
+- **Next Steps**: Preparing for Sprint 11 (Telegram Bot v2 - Navigator).
+
+## Active Files
+- `backend/src/mes/services/mes.service.ts`: Core aggregation logic.
+- `backend/src/mes/config/mes-rates.ts`: Canonical rates.
+- `backend/src/services/growth-matrix.service.ts`: Read-only sync.
+
+## 🔮 Next Steps
+1. **PSEE Real Data**: Replace demo calculations in `/my-shift` and `/earnings-forecast` with real Production Engine logic.
+2. **Growth Matrix Forecast**: Implementation of "What if?" mode in the Radar chart.
+3. **Telegram Bot v2**: Closure of the 16+ intents GAP (Navigator expansion).
 
 ## GAP-анализ модулей
 

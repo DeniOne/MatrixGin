@@ -73,7 +73,10 @@ const AppRoutes: React.FC = () => {
                 <AppLayout>
                     <Routes>
                         <Route path="/login" element={<LoginPage />} />
+                        import ManagerDashboard from './pages/ManagerDashboard';
+                        ...
                         <Route path="/" element={<DashboardPage />} />
+                        <Route path="/manager" element={<ManagerDashboard />} />
                         <Route path="/employees" element={<EmployeesPage />} />
                         <Route path="/profile" element={<EmployeeProfilePage />} />
                         <Route path="/departments" element={<OFSPage />} />

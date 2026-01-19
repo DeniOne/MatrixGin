@@ -33,6 +33,7 @@ import { entityCardService, entityCardRoutes } from './entity-cards';
 import graphRoutes from './graph/graph.routes';
 import impactRoutes from './impact/impact.routes';
 import aiOpsRoutes from './ai-ops/ai-ops.routes';
+import adaptationRoutes from './routes/adaptation.routes';
 
 
 // Handle BigInt serialization
@@ -110,6 +111,7 @@ app.use('/api/entity-cards', entityCardRoutes);
 app.use('/api/graph', graphRoutes);
 app.use('/api/impact', impactRoutes);
 app.use('/api/ai-ops', aiOpsRoutes);
+app.use('/api/adaptation', adaptationRoutes);
 
 app.get('/', (req, res) => {
     res.send('MatrixGin v2.0 API');

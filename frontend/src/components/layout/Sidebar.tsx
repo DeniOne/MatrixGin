@@ -56,6 +56,7 @@ const Sidebar: React.FC = () => {
 
     const navItems: NavItem[] = [
         { path: '/', label: 'Дашборд', icon: LayoutDashboard },
+        { path: '/manager', label: 'Manager Hub', icon: Briefcase },
         { path: '/profile', label: 'Мой профиль', icon: User },
         { path: '/tasks', label: 'Задачи', icon: CheckSquare },
         {
