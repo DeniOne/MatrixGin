@@ -1,10 +1,10 @@
 /**
  * Economy Analytics Service
  * PHASE 4 — Analytics, Observability & Governance
+ * Refactored to Express (no NestJS)
  */
 
-import { Injectable } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '../../config/prisma';
 import {
     EconomyOverviewDto,
     StoreActivityDto,
@@ -12,16 +12,14 @@ import {
     AuditLogEntryDto
 } from '../dto/analytics.dto';
 
-@Injectable()
 export class EconomyAnalyticsService {
-    constructor(private readonly prisma: PrismaClient) { }
 
     /**
      * Глобальная аналитика системы (Overview)
      */
     async getGlobalOverview(): Promise<EconomyOverviewDto> {
         // @ts-ignore
-        const issued = await this.prisma.transaction.aggregate({
+        const issued = await prisma.transaction.aggregate({
             _sum: { amount: true },
             where: {
                 currency: 'MC',
@@ -30,7 +28,7 @@ export class EconomyAnalyticsService {
         });
 
         // @ts-ignore
-        const spent = await this.prisma.transaction.aggregate({
+        const spent = await prisma.transaction.aggregate({
             _sum: { amount: true },
             where: {
                 currency: 'MC',
@@ -39,7 +37,7 @@ export class EconomyAnalyticsService {
         });
 
         // @ts-ignore
-        const burned = await this.prisma.transaction.aggregate({
+        const burned = await prisma.transaction.aggregate({
             _sum: { amount: true },
             where: {
                 currency: 'MC',
@@ -47,7 +45,7 @@ export class EconomyAnalyticsService {
             }
         });
 
-        const activeWallets = await this.prisma.wallet.count({
+        const activeWallets = await prisma.wallet.count({
             where: { mc_balance: { gt: 0 } }
         });
 
@@ -65,7 +63,7 @@ export class EconomyAnalyticsService {
      */
     async getStoreActivity(): Promise<StoreActivityDto[]> {
         // @ts-ignore
-        const activities = await this.prisma.purchase.groupBy({
+        const activities = await prisma.purchase.groupBy({
             by: ['itemId'],
             _count: { id: true },
             _sum: { priceMC: true },
@@ -77,7 +75,7 @@ export class EconomyAnalyticsService {
         // Map with item titles
         const result: StoreActivityDto[] = [];
         for (const act of activities) {
-            const item = await this.prisma.storeItem.findUnique({
+            const item = await prisma.storeItem.findUnique({
                 where: { id: act.itemId },
                 select: { title: true }
             });
@@ -101,7 +99,7 @@ export class EconomyAnalyticsService {
         // Для MVP Phase 4 возьмем транзакции и построим кумулятивную сумму.
 
         // @ts-ignore
-        const txs = await this.prisma.transaction.findMany({
+        const txs = await prisma.transaction.findMany({
             where: { recipient_id: userId, currency: 'MC' },
             orderBy: { created_at: 'asc' }
         });
@@ -123,7 +121,7 @@ export class EconomyAnalyticsService {
     async getAuditTrail(userId?: string): Promise<AuditLogEntryDto[]> {
         const where = userId ? { userId } : {};
         // @ts-ignore
-        const purchases = await this.prisma.purchase.findMany({
+        const purchases = await prisma.purchase.findMany({
             where,
             include: { item: { select: { title: true } } },
             orderBy: { createdAt: 'desc' },
@@ -139,3 +137,5 @@ export class EconomyAnalyticsService {
         }));
     }
 }
+
+export const economyAnalyticsService = new EconomyAnalyticsService();
