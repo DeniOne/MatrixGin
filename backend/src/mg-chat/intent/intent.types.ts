@@ -12,6 +12,7 @@ export interface ResolvedIntent {
     // Context Fields (Sprint 11)
     userId: string;
     slots: Record<string, any>;
+    payload?: any; // For dynamic data passing
 }
 
 export interface IntentResolveResult {

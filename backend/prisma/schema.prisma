@@ -222,6 +222,7 @@ model User {
   raci_entries            RaciMatrix[]
   submitted_ideas         IdeaChannel[]
   hybrid_interactions     HybridTeamInteraction[]
+  kaizen_suggestions      Kaizen[]
 
   // MES Module Relations
   mes_created_orders      ProductionOrder[]
@@ -241,6 +242,11 @@ model User {
   mentorship_as_mentee Mentorship?   @relation("MenteeUser")
   one_on_ones_managed  OneOnOne[]   @relation("Manager1on1")
   one_on_ones_attended OneOnOne[]   @relation("Employee1on1")
+
+  // Module 09 - Participation Status & Ranks
+  current_participation_status   UserParticipationStatus?
+  participation_status_history   ParticipationStatusHistory[]
+  current_participation_rank     UserParticipationRank?
 
   @@map("users")
 }
@@ -266,9 +272,9 @@ model OneOnOne {
   employee_id    String
   scheduled_at   DateTime
   completed_at   DateTime?
-  summary        String?
+  notes          String?  @db.Text // Private to manager
   action_items   Json?    // Array of items
-  emotional_tone Int?     // 1-10
+  mood           Int?     // 1-5 (Soft signal, NOT a KPI)
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
@@ -276,6 +282,21 @@ model OneOnOne {
   employee User @relation("Employee1on1", fields: [employee_id], references: [id])
 
   @@map("one_on_ones")
+}
+
+model Kaizen {
+  id               String   @id @default(uuid())
+  author_id        String
+  text             String   @db.Text
+  status           String   @default("NEW") // NEW, APPROVED, REJECTED
+  manager_comment  String?  @db.Text // Mandatory for REJECTED
+  history          Json     @default("[]") // [{status: string, actorId: string, timestamp: Date, comment: string}]
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  author User @relation(fields: [author_id], references: [id])
+
+  @@map("kaizen")
 }
 
 enum EmployeeStatus {
@@ -1564,4 +1585,87 @@ model AIFeedback {
   @@index([feedbackType])
   @@index([timestamp])
   @@map("ai_feedback")
+}
+
+// ============================================================================
+// MODULE 09 - PARTICIPATION STATUS & RANKS
+// Canon: Status = Governance influence, Rank = GMC-based calculation
+// NO multipliers, NO automatic income bonuses, NO KPI usage
+// ============================================================================
+
+// ParticipationStatus - Reference data for statuses (PHOTON, TOPCHIK, STAR, UNIVERSE)
+model ParticipationStatus {
+  code              String   @id // PHOTON, TOPCHIK, STAR, UNIVERSE
+  description       String
+  governance_flags  Json?    // { can_mentor: true, vote_weight: 2 }
+  is_active         Boolean  @default(true)
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  user_statuses     UserParticipationStatus[]
+
+  @@map("participation_statuses")
+}
+
+// UserParticipationStatus - Current status assignment (one per user)
+model UserParticipationStatus {
+  id          String   @id @default(uuid())
+  user_id     String   @unique
+  status_code String
+  assigned_at DateTime @default(now())
+  assigned_by String
+  reason      String
+  
+  user        User                 @relation(fields: [user_id], references: [id])
+  status      ParticipationStatus  @relation(fields: [status_code], references: [code])
+
+  @@index([status_code])
+  @@index([assigned_at])
+  @@map("user_participation_statuses")
+}
+
+// ParticipationStatusHistory - Audit trail for status changes (append-only)
+model ParticipationStatusHistory {
+  id          String   @id @default(uuid())
+  user_id     String
+  old_status  String?
+  new_status  String
+  reason      String
+  changed_at  DateTime @default(now())
+  changed_by  String
+  
+  user        User     @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([changed_at])
+  @@map("participation_status_history")
+}
+
+// ParticipationRank - Reference data for ranks (COLLECTOR, INVESTOR, MAGNATE, DIAMOND_HAND)
+model ParticipationRank {
+  code        String   @id // COLLECTOR, INVESTOR, MAGNATE, DIAMOND_HAND
+  conditions  Json     // { min_gmc: 10, min_duration_days: 30 }
+  description String
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  user_ranks  UserParticipationRank[]
+
+  @@map("participation_ranks")
+}
+
+// UserParticipationRank - Calculated rank position (one per user, auto-calculated)
+model UserParticipationRank {
+  id            String   @id @default(uuid())
+  user_id       String   @unique
+  rank_code     String
+  calculated_at DateTime @default(now())
+  
+  user          User               @relation(fields: [user_id], references: [id])
+  rank          ParticipationRank  @relation(fields: [rank_code], references: [code])
+
+  @@index([rank_code])
+  @@index([calculated_at])
+  @@map("user_participation_ranks")
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGetTransactionsQuery, Currency, TransactionType } from '../../features/economy/economyApi';
-import { History, Search, Filter, ArrowUpRight, ArrowDownLeft } from 'lucide-react';
+import { History, Search } from 'lucide-react';
 
 const TransactionsPage: React.FC = () => {
     const [page, setPage] = useState(1);
@@ -84,8 +84,8 @@ const TransactionsPage: React.FC = () => {
                                 <td className="px-6 py-5">
                                     <div className="flex items-center gap-2">
                                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${tx.type === 'REWARD' ? 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' :
-                                                tx.type === 'PURCHASE' ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' :
-                                                    'bg-indigo-500/10 text-indigo-500 border-indigo-500/20'
+                                            tx.type === 'PURCHASE' ? 'bg-rose-500/10 text-rose-500 border-rose-500/20' :
+                                                'bg-indigo-500/10 text-indigo-500 border-indigo-500/20'
                                             }`}>
                                             {tx.type}
                                         </span>

@@ -5,9 +5,11 @@
  * <RegistryForm entityType="user_account" viewName="form.create" />
  */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useEntityCard } from '../../entity-form/hooks/useEntityCard';
-import { FormProvider } from './FormContext';
+import { RegistryFormProvider } from './FormContext';
+import { useEntityPermissions } from '../hooks/useEntityPermissions';
+import { useEntityLifecycle } from '../hooks/useEntityLifecycle';
 import { FormViewRenderer } from './FormViewRenderer';
 import { Alert, Spin } from 'antd';
 import { EntityCardFormDefinition } from '../types/entity-card.types';
@@ -45,7 +47,11 @@ export const RegistryForm: React.FC<RegistryFormProps> = ({
 
     const formViewDef = viewDef as EntityCardFormDefinition;
 
-    // 4. Handle Submit
+    // 4. Load Contexts
+    const permissions = useEntityPermissions(card);
+    const lifecycle = useEntityLifecycle(card);
+
+    // 5. Handle Submit
     const handleSubmit = async (values: any) => {
         // Construct endpoint from submit definition or conventio
         // For Step 9 MVP, we can simulate or use a generic "submit to registry" api?
@@ -64,11 +70,16 @@ export const RegistryForm: React.FC<RegistryFormProps> = ({
     };
 
     return (
-        <FormProvider>
+        <RegistryFormProvider
+            entityCard={card}
+            mode={formViewDef.mode}
+            permissions={permissions}
+            lifecycle={lifecycle}
+        >
             <FormViewRenderer
                 viewDef={formViewDef}
                 onSubmit={handleSubmit}
             />
-        </FormProvider>
+        </RegistryFormProvider>
     );
 };

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Card, Descriptions, Tabs, Steps, List, Tag, Button, Modal, Form, Select, Radio, Input, message } from 'antd';
+import { Card, Descriptions, Tabs, List, Tag, Button, Modal, Form, Select, Radio, Input, message } from 'antd';
 import { mesApi, ProductionOrder } from '../../api/mes.api';
 
-const { Step } = Steps;
 const { TabPane } = Tabs;
 
 const ProductionOrderDetailPage: React.FC = () => {

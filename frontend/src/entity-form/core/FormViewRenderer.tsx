@@ -17,7 +17,7 @@ interface FormViewRendererProps {
 }
 
 export const FormViewRenderer: React.FC<FormViewRendererProps> = ({ viewDef, onSubmit }) => {
-    const { formData, setFormData, errors, submitting } = useFormContext();
+    const { formData, submitting, getAttribute } = useFormContext();
     const [form] = Form.useForm();
 
     // Group fields by group name (if any)
@@ -43,25 +43,20 @@ export const FormViewRenderer: React.FC<FormViewRendererProps> = ({ viewDef, onS
     };
 
     const renderField = (fieldDef: EntityCardFormField) => {
-        // Map EntityCardFormField to FieldRenderer props
-        // FieldRenderer expects "field" which is the attribute definition.
-        // But here we have field definition from View.
-        // We need to resolve the attribute definition from the EntityCard context?
-        // Actually, FieldFactory uses "widget" type. 
-        // We should pass the View Field Def to FieldRenderer.
+        const attribute = getAttribute(fieldDef.field);
+
+        if (!attribute) {
+            return (
+                <div key={fieldDef.field} className="text-red-500 text-xs p-2 border border-dashed border-red-300 rounded">
+                    Field "{fieldDef.field}" not found in entity card
+                </div>
+            );
+        }
 
         return (
             <FieldRenderer
                 key={fieldDef.field}
-                field={{
-                    name: fieldDef.field,
-                    label: fieldDef.ui?.label || fieldDef.field,
-                    required: fieldDef.required,
-                    readonly: fieldDef.readonly,
-                    widget: fieldDef.ui?.widget || 'text', // Fallback
-                    type: fieldDef.dataType,
-                    ui: fieldDef.ui as any // Cast to match expected structure if needed
-                }}
+                attribute={attribute}
             />
         );
     };

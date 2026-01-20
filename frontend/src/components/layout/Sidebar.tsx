@@ -32,6 +32,7 @@ interface NavItem {
     label: string;
     icon: LucideIcon;
     subItems?: NavItem[];
+    adminOnly?: boolean;
 }
 
 const Sidebar: React.FC = () => {
@@ -123,6 +124,14 @@ const Sidebar: React.FC = () => {
         },
         // BLOCKER REQUIREMENT: SYSTEM REGISTRY
         { path: '/registry', label: 'Системный реестр', icon: Settings },
+        // Participation Status (Admin only link logic handled in render filters)
+        {
+            path: '/admin/status-management',
+            label: 'Статусы участия',
+            icon: ShieldCheck,
+            // Custom field to allow filtering by role in this component
+            adminOnly: true
+        },
     ];
 
     const renderNavItem = (item: NavItem, depth = 0) => {
@@ -201,7 +210,10 @@ const Sidebar: React.FC = () => {
             )}
 
             <nav className="flex-1 px-4 py-6 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
-                {navItems.map(item => renderNavItem(item))}
+                {navItems
+                    .filter(item => !(item as any).adminOnly || user?.role === 'ADMIN')
+                    .map(item => renderNavItem(item))
+                }
             </nav>
 
             {/* Footer with Settings and Logout */}

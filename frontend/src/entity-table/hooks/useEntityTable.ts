@@ -40,7 +40,7 @@ export const useEntityTable = ({ entityType, viewName }: UseEntityTableProps) =>
     });
 
     // 3. Resolve View Definition
-    const viewDef: EntityCardTableDefinition | undefined = entityCard?.views?.[viewName];
+    const viewDef: EntityCardTableDefinition | undefined = entityCard?.views?.[viewName] as any;
 
     // 4. Set Defaults from Registry (Initial Load Only)
     useEffect(() => {

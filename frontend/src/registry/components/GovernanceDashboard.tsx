@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Tabs, Table, Card, Select, Button, Tag, Badge } from 'antd';
+import { Tabs, Table, Card, Select, Button, Tag } from 'antd';
 
 export const GovernanceDashboard: React.FC = () => {
     const [rules, setRules] = useState<any[]>([]);

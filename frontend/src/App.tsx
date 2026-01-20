@@ -12,6 +12,8 @@ import PersonalAnalyticsPage from './pages/analytics/PersonalAnalyticsPage';
 import ExecutiveAnalyticsPage from './pages/analytics/ExecutiveAnalyticsPage';
 import { UniversityPage } from './pages/UniversityPage';
 import { MyCoursesPage } from './pages/MyCoursesPage';
+import ManagerDashboard from './pages/ManagerDashboard';
+
 // AI Module
 import PersonalAIRecommendationsPage from './pages/ai/PersonalAIRecommendationsPage';
 import ExecutiveAIRecommendationsPage from './pages/ai/ExecutiveAIRecommendationsPage';
@@ -27,6 +29,8 @@ import StatusProgressCard from './components/gamification/StatusProgressCard';
 import QuestTracker from './components/gamification/QuestTracker';
 // Import production pages
 import ProductionSessionsPage from './pages/production/ProductionSessionsPage';
+// Admin participation status
+import StatusManagement from './pages/admin/StatusManagement';
 // Import layout
 import Sidebar from './components/layout/Sidebar';
 
@@ -73,8 +77,6 @@ const AppRoutes: React.FC = () => {
                 <AppLayout>
                     <Routes>
                         <Route path="/login" element={<LoginPage />} />
-                        import ManagerDashboard from './pages/ManagerDashboard';
-                        ...
                         <Route path="/" element={<DashboardPage />} />
                         <Route path="/manager" element={<ManagerDashboard />} />
                         <Route path="/employees" element={<EmployeesPage />} />
@@ -107,6 +109,7 @@ const AppRoutes: React.FC = () => {
                         <Route path="/economy/wallet" element={<WalletPage />} />
                         <Route path="/economy/transactions" element={<TransactionsPage />} />
                         <Route path="/economy/analytics" element={<EconomyDashboard />} />
+                        <Route path="/admin/status-management" element={<StatusManagement />} />
                     </Routes>
                 </AppLayout>
             } />

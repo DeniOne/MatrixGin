@@ -716,6 +716,190 @@ async function main() {
         console.log('✅ Registry Entity Types already exist');
     }
 
+    // ==========================================================================
+    // MODULE 09 - PARTICIPATION STATUS & RANKS
+    // Canon: Status = Governance influence, Rank = GMC-based calculation
+    // ==========================================================================
+
+    const existingStatuses = await prisma.participationStatus.count();
+
+    if (existingStatuses === 0) {
+        console.log('\n📋 Creating Participation Statuses (Module 09)...');
+
+        // Status 1: PHOTON (Entry level)
+        await prisma.participationStatus.create({
+            data: {
+                code: 'PHOTON',
+                description: 'Начальный статус участия — новичок в системе',
+                governance_flags: {
+                    can_mentor: false,
+                    vote_weight: 1,
+                    can_propose_ideas: true,
+                    can_vote_on_ideas: false
+                },
+                is_active: true
+            }
+        });
+
+        // Status 2: TOPCHIK (Active participant)
+        await prisma.participationStatus.create({
+            data: {
+                code: 'TOPCHIK',
+                description: 'Активный участник — вовлечён в процессы',
+                governance_flags: {
+                    can_mentor: true,
+                    vote_weight: 2,
+                    can_propose_ideas: true,
+                    can_vote_on_ideas: true
+                },
+                is_active: true
+            }
+        });
+
+        // Status 3: STAR (Recognized contributor)
+        await prisma.participationStatus.create({
+            data: {
+                code: 'STAR',
+                description: 'Признанный участник — значимый вклад',
+                governance_flags: {
+                    can_mentor: true,
+                    vote_weight: 3,
+                    can_propose_ideas: true,
+                    can_vote_on_ideas: true,
+                    can_review_proposals: true
+                },
+                is_active: true
+            }
+        });
+
+        // Status 4: UNIVERSE (Top contributor)
+        await prisma.participationStatus.create({
+            data: {
+                code: 'UNIVERSE',
+                description: 'Высший статус участия — лидер сообщества',
+                governance_flags: {
+                    can_mentor: true,
+                    vote_weight: 5,
+                    can_propose_ideas: true,
+                    can_vote_on_ideas: true,
+                    can_review_proposals: true,
+                    can_approve_governance: true
+                },
+                is_active: true
+            }
+        });
+
+        console.log('  ✅ Created 4 Participation Statuses');
+    } else {
+        console.log('✅ Participation Statuses already exist');
+    }
+
+    const existingRanks = await prisma.participationRank.count();
+
+    if (existingRanks === 0) {
+        console.log('\n📋 Creating Participation Ranks (Module 09)...');
+
+        // Rank 1: COLLECTOR (Entry level)
+        await prisma.participationRank.create({
+            data: {
+                code: 'COLLECTOR',
+                description: 'Начальный ранг — собиратель GMC',
+                conditions: {
+                    min_gmc: 0,
+                    min_duration_days: 0
+                },
+                is_active: true
+            }
+        });
+
+        // Rank 2: INVESTOR (Mid level)
+        await prisma.participationRank.create({
+            data: {
+                code: 'INVESTOR',
+                description: 'Инвестор — накопил значимый GMC',
+                conditions: {
+                    min_gmc: 10,
+                    min_duration_days: 30
+                },
+                is_active: true
+            }
+        });
+
+        // Rank 3: MAGNATE (High level)
+        await prisma.participationRank.create({
+            data: {
+                code: 'MAGNATE',
+                description: 'Магнат — крупный держатель GMC',
+                conditions: {
+                    min_gmc: 100,
+                    min_duration_days: 90
+                },
+                is_active: true
+            }
+        });
+
+        // Rank 4: DIAMOND_HAND (Top level)
+        await prisma.participationRank.create({
+            data: {
+                code: 'DIAMOND_HAND',
+                description: 'Алмазные руки — долгосрочный держатель',
+                conditions: {
+                    min_gmc: 500,
+                    min_duration_days: 180
+                },
+                is_active: true
+            }
+        });
+
+        console.log('  ✅ Created 4 Participation Ranks');
+    } else {
+        console.log('✅ Participation Ranks already exist');
+    }
+
+    // Assign default PHOTON status to all existing users without participation status
+    const usersWithoutStatus = await prisma.user.findMany({
+        where: {
+            current_participation_status: null
+        },
+        select: { id: true }
+    });
+
+    if (usersWithoutStatus.length > 0) {
+        console.log(`\n📋 Assigning default PHOTON status to ${usersWithoutStatus.length} users...`);
+
+        const adminUser = await prisma.user.findFirst({
+            where: { email: 'admin@photomatrix.ru' }
+        });
+
+        if (adminUser) {
+            for (const user of usersWithoutStatus) {
+                await prisma.userParticipationStatus.create({
+                    data: {
+                        user_id: user.id,
+                        status_code: 'PHOTON',
+                        assigned_by: adminUser.id,
+                        reason: 'Initial system assignment',
+                        assigned_at: new Date()
+                    }
+                });
+
+                // Log to history
+                await prisma.participationStatusHistory.create({
+                    data: {
+                        user_id: user.id,
+                        old_status: null,
+                        new_status: 'PHOTON',
+                        reason: 'Initial system assignment',
+                        changed_by: adminUser.id,
+                        changed_at: new Date()
+                    }
+                });
+            }
+
+            console.log(`  ✅ Assigned PHOTON status to ${usersWithoutStatus.length} users`);
+        }
+    }
+
     console.log('\n🎉 Seeding completed successfully!');
     console.log('\nAdmin credentials:');
     console.log('Email: admin@photomatrix.ru');

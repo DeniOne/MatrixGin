@@ -186,6 +186,75 @@ export class EnrollmentService {
         return completed;
     }
 
+    /**
+     * Get user's certifications (completed courses)
+     */
+    async getCertifications(userId: string) {
+        const completed = await prisma.enrollment.findMany({
+            where: {
+                user_id: userId,
+                status: 'COMPLETED',
+            },
+            include: {
+                course: {
+                    include: {
+                        academy: true,
+                    },
+                },
+            },
+            orderBy: {
+                completed_at: 'desc',
+            },
+        });
+
+        return completed.map((c) => ({
+            id: c.id,
+            courseName: c.course.title,
+            academyName: c.course.academy?.name || 'Unknown Academy',
+            completedAt: c.completed_at,
+            rewardMc: c.course.reward_mc,
+        }));
+    }
+
+    /**
+     * Update enrollment overall progress based on module progress
+     */
+    private async updateEnrollmentProgress(enrollmentId: string) {
+        const allModules = await prisma.moduleProgress.findMany({
+            where: { enrollment_id: enrollmentId },
+        });
+
+        if (allModules.length === 0) return;
+
+        const completed = allModules.filter((m) => m.status === 'COMPLETED').length;
+        const progress = Math.round((completed / allModules.length) * 100);
+
+        await prisma.enrollment.update({
+            where: { id: enrollmentId },
+            data: {
+                progress,
+                status: progress === 100 ? 'COMPLETED' : 'ACTIVE',
+                completed_at: progress === 100 ? new Date() : null,
+            },
+        });
+    }
+
+    /**
+     * Format enrollment for API response
+     */
+    private formatEnrollment(e: any) {
+        return {
+            id: e.id,
+            courseId: e.course_id,
+            courseTitle: e.course.title,
+            academyName: e.course.academy.name,
+            progress: e.progress,
+            status: e.status,
+            enrolledAt: e.enrolled_at,
+            completedAt: e.completed_at,
+        };
+    }
+
     private async awardRewards(userId: string, course: any) {
         const { rewardService } = require('./reward.service');
 

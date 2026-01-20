@@ -1,21 +1,34 @@
 import React from 'react';
 import {
-    useGetTeamStatusQuery
-} from '../features/gamification/growthApi';
-import {
-    Users,
+    Smile,
     Calendar,
     TrendingUp,
-    Smile,
-    ExternalLink,
-    ChevronRight,
-    MessageSquare
+    CheckCircle,
+    XCircle,
+    MessageSquare,
+    Lightbulb
 } from 'lucide-react';
+import {
+    useGetTeamStatusQuery,
+    useGetKaizenFeedQuery,
+    useReviewKaizenMutation
+} from '../features/gamification/growthApi';
 
 const ManagerDashboard: React.FC = () => {
-    const { data: teamStatus, isLoading } = useGetTeamStatusQuery();
+    const { data: teamStatus, isLoading: isTeamLoading } = useGetTeamStatusQuery();
+    const { data: kaizenFeed, isLoading: isKaizenLoading } = useGetKaizenFeedQuery({ status: 'NEW' });
+    const [reviewKaizen] = useReviewKaizenMutation();
 
-    if (isLoading) return <div className="p-8 text-white/50">Loading manager hub...</div>;
+    if (isTeamLoading || isKaizenLoading) return <div className="p-8 text-white/50">Loading manager hub...</div>;
+
+    const handleKaizen = async (id: string, status: 'APPROVED' | 'REJECTED') => {
+        let comment = 'Approved for implementation.';
+        if (status === 'REJECTED') {
+            comment = window.prompt('Please provide a mandatory rejection comment:') || '';
+            if (!comment) return;
+        }
+        await reviewKaizen({ id, status, comment });
+    };
 
     return (
         <div className="p-6 md:p-8 space-y-8 animate-in fade-in duration-500">
@@ -30,67 +43,95 @@ const ManagerDashboard: React.FC = () => {
                 <div className="md:col-span-8 space-y-8">
                     {/* Team Pulse Section */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden">
+                            <div className="absolute top-0 right-0 p-2 opacity-20">
+                                <Smile className="w-12 h-12" />
+                            </div>
                             <div className="flex items-center gap-3 mb-4 text-white/70">
                                 <Smile className="w-5 h-5 text-amber-400" />
-                                <span className="font-medium">Team Happiness Pulse</span>
+                                <span className="font-medium text-amber-200">Team Happiness Pulse</span>
                             </div>
                             <div className="text-4xl font-bold text-white">
-                                {teamStatus?.teamHappinessTrend === 'NO_DATA' ? '—' : teamStatus?.teamHappinessTrend}
+                                {teamStatus?.teamHappiness.average || '—'}
                                 <span className="text-sm text-white/30 font-normal ml-2">/ 10</span>
                             </div>
-                            <p className="text-xs text-white/40 mt-3">
-                                Soft signal based on average emotional tone from 1-on-1s.
-                            </p>
+                            <div className="mt-3 flex items-center justify-between">
+                                <p className="text-xs text-white/40">
+                                    Based on {teamStatus?.teamHappiness.sessionCount} sessions.
+                                </p>
+                                <span className="text-[10px] font-bold text-amber-400/60 uppercase tracking-widest bg-amber-400/10 px-2 py-0.5 rounded">
+                                    {teamStatus?.teamHappiness.label}
+                                </span>
+                            </div>
                         </div>
 
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
                             <div className="flex items-center gap-3 mb-4 text-white/70">
                                 <Calendar className="w-5 h-5 text-blue-400" />
-                                <span className="font-medium">Rhythm Velocity</span>
+                                <span className="font-medium text-blue-200">Rhythm Velocity</span>
                             </div>
                             <div className="text-4xl font-bold text-white">
-                                {teamStatus?.sessionCount30d}
+                                {teamStatus?.teamHappiness.sessionCount}
                                 <span className="text-sm text-white/30 font-normal ml-2">sessions / month</span>
                             </div>
-                            <p className="text-xs text-white/40 mt-3">
-                                Target: Minimum 1 session per mentee monthly.
+                            <p className="text-xs text-white/40 mt-3 italic">
+                                Target: Active listening once per month per mentee.
                             </p>
                         </div>
                     </div>
 
-                    {/* Mentees List */}
-                    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md">
-                        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+                    {/* Kaizen Feed Section */}
+                    <div className="bg-white/5 border border-emerald-500/20 rounded-2xl overflow-hidden backdrop-blur-md">
+                        <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between bg-emerald-500/10">
                             <div className="flex items-center gap-2 font-semibold text-white">
-                                <Users className="w-5 h-5 text-indigo-400" />
-                                <span>Direct Reports & Mentees</span>
+                                <Lightbulb className="w-5 h-5 text-emerald-400" />
+                                <span>Kaizen Feed (Continuous Improvement)</span>
                             </div>
-                            <span className="text-xs bg-white/10 text-white/70 px-2 py-1 rounded-full">
-                                {teamStatus?.mentees.length || 0} People
+                            <span className="text-xs bg-emerald-500/20 text-emerald-300 px-2 py-1 rounded-full border border-emerald-500/30">
+                                {kaizenFeed?.length || 0} New Ideas
                             </span>
                         </div>
                         <div className="divide-y divide-white/10">
-                            {teamStatus?.mentees.map((mentee) => (
-                                <div key={mentee.id} className="p-4 flex items-center justify-between hover:bg-white/10 transition-colors group">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 rounded-full bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30 overflow-hidden">
-                                            {mentee.avatar ? (
-                                                <img src={mentee.avatar} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <Users className="w-5 h-5 text-indigo-400" />
-                                            )}
+                            {kaizenFeed?.map((item) => (
+                                <div key={item.id} className="p-6 space-y-4 hover:bg-white/5 transition-colors">
+                                    <div className="flex items-start justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-xs text-white/50">
+                                                {item.author.first_name[0]}{item.author.last_name[0]}
+                                            </div>
+                                            <div>
+                                                <div className="text-sm font-medium text-white">{item.author.first_name} {item.author.last_name}</div>
+                                                <div className="text-[10px] text-white/30 truncate max-w-[150px] uppercase tracking-tighter">{item.author.erp_role.name}</div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div className="text-white font-medium">{mentee.first_name} {mentee.last_name}</div>
-                                            <div className="text-xs text-white/40">{mentee.role?.name || 'Team Member'}</div>
+                                        <div className="text-[10px] text-white/20 uppercase">
+                                            {new Date(item.created_at).toLocaleDateString()}
                                         </div>
                                     </div>
-                                    <button className="p-2 text-white/30 group-hover:text-white transition-colors">
-                                        <ChevronRight className="w-5 h-5" />
-                                    </button>
+                                    <div className="text-sm text-white/70 leading-relaxed bg-white/5 p-3 rounded-lg border border-white/5">
+                                        "{item.text}"
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => handleKaizen(item.id, 'APPROVED')}
+                                            className="flex-1 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 rounded-lg text-xs font-bold text-emerald-200 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <CheckCircle className="w-3 h-3" /> Approve
+                                        </button>
+                                        <button
+                                            onClick={() => handleKaizen(item.id, 'REJECTED')}
+                                            className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 rounded-lg text-xs font-bold text-red-300 transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <XCircle className="w-3 h-3" /> Reject
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
+                            {kaizenFeed?.length === 0 && (
+                                <div className="p-12 text-center text-white/20 text-sm italic">
+                                    No new improvement suggestions at the moment.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

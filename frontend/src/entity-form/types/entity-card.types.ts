@@ -22,6 +22,7 @@ export type EntityCardWidget =
     | 'datetime'
     | 'select'
     | 'relation'
+    | 'json'
 // =============================================================================
 // TABLE VIEW TYPES (Step 8)
 // =============================================================================
@@ -32,7 +33,7 @@ export type EntityCardDataType = 'string' | 'number' | 'date' | 'datetime' | 'en
 export type EntityCardRendererType = 'text' | 'badge' | 'date' | 'datetime' | 'link' | 'actions' | 'progress';
 
 // Form Widgets (Step 9)
-export type EntityCardWidgetType = 'text' | 'textarea' | 'number' | 'decimal' | 'date' | 'datetime' | 'select' | 'relation';
+export type EntityCardWidgetType = 'text' | 'textarea' | 'number' | 'decimal' | 'date' | 'datetime' | 'select' | 'relation' | 'json';
 
 export interface EntityCardTableColumn {
     /** Field name from attribute or relation */

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGetExecutiveAnalyticsQuery } from '../../features/analytics/analyticsApi';
-import { ShieldCheck, BarChart3, Users, Briefcase } from 'lucide-react';
+import { ShieldCheck, Briefcase } from 'lucide-react';
 
 const ExecutiveAnalyticsPage: React.FC = () => {
     const { data, isLoading, error } = useGetExecutiveAnalyticsQuery();

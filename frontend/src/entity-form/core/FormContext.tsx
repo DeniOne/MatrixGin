@@ -123,6 +123,14 @@ export interface EntityFormContextValue {
 
     /** Get attribute definition for field */
     getAttribute: (fieldName: string) => EntityCardAttribute | undefined;
+
+    // =========================================================================
+    // COMPATIBILITY ALIASES
+    // =========================================================================
+    formData: Record<string, unknown>;
+    setFormData: (values: Record<string, unknown>) => void;
+    submitting: boolean;
+    setIsSubmitting: (submitting: boolean) => void;
 }
 
 // =============================================================================
@@ -142,6 +150,9 @@ export const useEntityFormContext = (): EntityFormContextValue => {
     }
     return context;
 };
+
+// Aliases for compatibility
+export const useFormContext = useEntityFormContext;
 
 // =============================================================================
 // PROVIDER PROPS
@@ -177,6 +188,7 @@ export const EntityFormProvider: React.FC<EntityFormProviderProps> = ({
     const [values, setValuesState] = useState<Record<string, unknown>>(initialValues);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [touched, setTouchedState] = useState<Record<string, boolean>>({});
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     // =========================================================================
     // Actions
@@ -322,11 +334,18 @@ export const EntityFormProvider: React.FC<EntityFormProviderProps> = ({
         isFieldVisible,
         isFieldRequired,
         getAttribute,
+
+        // Compatibility
+        formData: values,
+        setFormData: setValues,
+        submitting: isSubmitting,
+        setIsSubmitting,
     }), [
         entityCard, mode, permissions, lifecycle,
         values, errors, touched,
         setValue, setError, clearError, setTouched, setValues, resetForm,
         getFieldState, isFieldDisabled, isFieldVisible, isFieldRequired, getAttribute,
+        isSubmitting
     ]);
 
     return (
@@ -335,3 +354,5 @@ export const EntityFormProvider: React.FC<EntityFormProviderProps> = ({
         </EntityFormContext.Provider>
     );
 };
+
+export const RegistryFormProvider = EntityFormProvider;

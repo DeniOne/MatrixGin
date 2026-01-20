@@ -36,7 +36,9 @@ export function matchIntent(
                 bestMatch = {
                     intentId: intent.id,
                     confidence: score,
-                    matchedExample: example
+                    matchedExample: example,
+                    userId: '', // Will be filled by resolver/adapter
+                    slots: {}   // Will be filled by slot extractor
                 };
             }
         }

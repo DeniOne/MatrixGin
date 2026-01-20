@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useEntitySchema } from '../hooks/useEntitySchema';
 import { FieldRenderer } from './FieldRenderer';
 import { FsmBar } from './FsmBar';
-import { ImpactPreviewPanel } from './ImpactPreviewPanel';
 import { registrySchemaApi } from '../api/schema.api';
 import { RelationshipBlock } from './RelationshipBlock';
-import { ImpactReport } from '../types/schema';
 import { translateEntityType } from '../utils/translations';
 
 interface EntityCardRendererProps {
@@ -14,22 +12,22 @@ interface EntityCardRendererProps {
     onClose?: () => void;
 }
 
-export const EntityCardRenderer: React.FC<EntityCardRendererProps> = ({ entityTypeUrn, entityId, onClose }) => {
+export const EntityCardRenderer: React.FC<EntityCardRendererProps> = ({ entityTypeUrn, entityId }) => {
     // 1. Schema State
     const { schema, isLoading: isSchemaLoading, error: schemaError } = useEntitySchema(entityTypeUrn);
 
     // 2. Data State
     const [entity, setEntity] = useState<any>(null); // Full entity object
     const [formData, setFormData] = useState<any>({});
-    const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
-    const [dataError, setDataError] = useState<string | null>(null);
+    // const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
+    // const [dataError, setDataError] = useState<string | null>(null);
     const [mode, setMode] = useState<'view' | 'edit' | 'create'>('view');
     const [currentFsmState, setCurrentFsmState] = useState<string>('draft');
 
     // Fetch Data if ID present
     useEffect(() => {
         if (entityId) {
-            setIsLoadingData(true);
+            // setIsLoadingData(true);
             setMode('view');
             // Use existing schema API which has getEntity
             registrySchemaApi.getEntity(entityId)
@@ -38,8 +36,8 @@ export const EntityCardRenderer: React.FC<EntityCardRendererProps> = ({ entityTy
                     setFormData(data.attributes || {});
                     setCurrentFsmState(data.fsm_state || 'draft');
                 })
-                .catch(err => setDataError(err.message))
-                .finally(() => setIsLoadingData(false));
+            // .catch(err => setDataError(err.message))
+            // .finally(() => setIsLoadingData(false));
         } else {
             setMode('create');
             setFormData({});
@@ -58,12 +56,12 @@ export const EntityCardRenderer: React.FC<EntityCardRendererProps> = ({ entityTy
                     {mode === 'create' ? `Новая запись: ${translateEntityType(schema.entity_type?.label || entityTypeUrn)}` : entity?.name || translateEntityType(schema.entity_type?.label || '')}
                 </h3>
                 <p className="mt-1 max-w-2xl text-sm text-gray-400">
-                    {schema.entity_type?.description || schema.description}
+                    {schema.entity_type?.description || ''}
                 </p>
                 {/* FSM Status Bar */}
                 <FsmBar
                     currentState={currentFsmState}
-                    schema={schema}
+                    fsm={schema.fsm}
                     onTransition={(action) => console.log('Transition', action)}
                 />
             </div>
@@ -71,14 +69,18 @@ export const EntityCardRenderer: React.FC<EntityCardRendererProps> = ({ entityTy
             <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
                 <dl className="sm:divide-y sm:divide-gray-200">
                     {/* Render Fields */}
-                    {Object.entries(schema.attributes || {}).map(([key, attrDef]) => (
+                    {schema.attributes?.map((attrDef) => (
                         <FieldRenderer
-                            key={key}
-                            fieldKey={key}
-                            definition={attrDef}
-                            value={formData[key]}
-                            onChange={(val) => setFormData({ ...formData, [key]: val })}
-                            mode={mode === 'view' ? 'read' : 'edit'}
+                            key={attrDef.code}
+                            definition={{
+                                widget: attrDef.ui_component || 'INPUT_TEXT',
+                                code: attrDef.code,
+                                label: attrDef.label,
+                                config: { required: attrDef.is_required }
+                            }}
+                            value={formData[attrDef.code]}
+                            onChange={(val) => setFormData({ ...formData, [attrDef.code]: val })}
+                            disabled={mode === 'view'}
                         />
                     ))}
                 </dl>

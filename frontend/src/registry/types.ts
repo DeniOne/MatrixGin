@@ -25,6 +25,7 @@ export interface EntityFilter {
     search?: string;
     status?: LifecycleStatus;
     page?: number;
+    offset?: number;
     limit?: number;
 }
 

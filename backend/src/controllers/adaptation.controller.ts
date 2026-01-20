@@ -33,10 +33,10 @@ export class AdaptationController {
 
     async complete1on1(req: Request, res: Response) {
         try {
-            const { summary, actionItems, emotionalTone } = req.body;
+            const { notes, actionItems, mood } = req.body;
             const { id } = req.params;
 
-            const session = await adaptationService.complete1on1(id, summary, actionItems, emotionalTone);
+            const session = await adaptationService.complete1on1(id, notes, actionItems, mood);
             res.json(session);
         } catch (error: any) {
             res.status(500).json({ message: error.message });

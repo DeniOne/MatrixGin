@@ -6,11 +6,11 @@
  */
 
 import React, { useEffect, useState } from 'react';
-import { Alert, Spin, Card, List, Tag, Badge, Typography, Collapse, Tooltip } from 'antd';
+import { Alert, Spin, Card, List, Tag, Typography, Collapse } from 'antd';
 import { RobotOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
-const { Text, Paragraph } = Typography;
+const { Paragraph } = Typography;
 const { Panel } = Collapse;
 
 interface AIOpsRecommendation {
@@ -42,7 +42,7 @@ interface RegistryAIOpsViewerProps {
 }
 
 export const RegistryAIOpsViewer: React.FC<RegistryAIOpsViewerProps> = ({ entityType, entityId }) => {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [data, setData] = useState<AIOpsResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

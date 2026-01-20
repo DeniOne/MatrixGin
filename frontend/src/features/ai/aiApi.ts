@@ -96,7 +96,7 @@ export const aiApi = createApi({
     endpoints: (builder) => ({
         analyzeEntity: builder.query<AIOpsResponse, { entityType: string; id: string }>({
             query: ({ entityType, id }) => `/${entityType}/${id}/analyze`,
-            providesTags: (result, error, { entityType, id }) =>
+            providesTags: (_result, _error, { entityType, id }) =>
                 [{ type: 'Recommendations', id: `${entityType}-${id}` }],
         }),
         // PHASE 4.5 - Submit Feedback

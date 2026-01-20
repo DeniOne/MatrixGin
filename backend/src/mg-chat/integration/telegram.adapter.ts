@@ -29,11 +29,11 @@ import { aclMiddleware, ACLForbiddenError, ACLOutOfScopeError, AccessContext } f
  * @param input - Normalized text input from Sandbox
  * @param accessContext - Verified user context
  */
-export function processTextMessage(
+export async function processTextMessage(
     input: NormalizedTextInput,
     accessContext: AccessContext,
     context: ErrorContext = {}
-): TelegramRenderedMessage {
+): Promise<TelegramRenderedMessage> {
     // Step 1: Error UX Interceptor
     const errorResult = detectError(input.text, context);
 
@@ -76,7 +76,10 @@ export function processTextMessage(
     }
 
     // Step 4: Build response from intent via Scenario Router
-    const response = routeScenario(intentResult.intent!);
+    const response = await routeScenario({
+        ...intentResult.intent!,
+        userId: accessContext.userId // Fill real userId from access context
+    });
 
     // Step 5: Telegram UX Renderer
     return renderTelegramMessage(response);
@@ -88,10 +91,10 @@ export function processTextMessage(
  * @param input - Normalized callback input from Sandbox
  * @param accessContext - Verified user context
  */
-export function processCallback(
+export async function processCallback(
     input: NormalizedCallbackInput,
     accessContext: AccessContext
-): TelegramRenderedMessage {
+): Promise<TelegramRenderedMessage> {
     // Step 1: Action Dispatcher
     const dispatchResult = dispatchAction(input.actionId);
 
@@ -134,7 +137,10 @@ export function processCallback(
     }
 
     // Step 4: Build response from intent via Scenario Router
-    const response = routeScenario(intentResult.intent!);
+    const response = await routeScenario({
+        ...intentResult.intent!,
+        userId: accessContext.userId // Fill real userId
+    });
 
     // Step 5: Telegram UX Renderer
     return renderTelegramMessage(response);

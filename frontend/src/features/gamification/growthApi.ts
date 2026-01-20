@@ -28,17 +28,41 @@ export interface TeamStatus {
         avatar?: string;
         role: { name: string };
     }[];
-    teamHappinessTrend: number | 'NO_DATA';
+    teamHappiness: {
+        average: number | null;
+        label: string;
+        sessionCount: number;
+    };
     pendingMeetings: {
         id: string;
         employeeName: string;
         scheduledAt: string;
     }[];
-    sessionCount30d: number;
+}
+
+export interface KaizenSuggestion {
+    id: string;
+    author: {
+        first_name: string;
+        last_name: string;
+        avatar?: string;
+        erp_role: { name: string };
+    };
+    text: string;
+    status: 'NEW' | 'APPROVED' | 'REJECTED';
+    manager_comment?: string;
+    history: {
+        status: string;
+        actorId: string;
+        timestamp: string;
+        comment: string;
+    }[];
+    created_at: string;
 }
 
 export const growthApi = createApi({
     reducerPath: 'growthApi',
+    tagTypes: ['TeamStatus', 'Kaizen'],
     baseQuery: fetchBaseQuery({
         baseUrl: '/api',
         prepareHeaders: (headers) => {
@@ -56,6 +80,30 @@ export const growthApi = createApi({
         }),
         getTeamStatus: builder.query<TeamStatus, void>({
             query: () => 'adaptation/team-status',
+            providesTags: ['TeamStatus'],
+        }),
+        getKaizenFeed: builder.query<KaizenSuggestion[], { status?: string }>({
+            query: (params) => ({
+                url: 'manager/kaizen/feed',
+                params
+            }),
+            providesTags: ['Kaizen'],
+        }),
+        reviewKaizen: builder.mutation<void, { id: string, status: 'APPROVED' | 'REJECTED', comment: string }>({
+            query: ({ id, ...body }) => ({
+                url: `manager/kaizen/${id}/review`,
+                method: 'PATCH',
+                body
+            }),
+            invalidatesTags: ['Kaizen'],
+        }),
+        submitKaizen: builder.mutation<void, { text: string }>({
+            query: (body) => ({
+                url: 'manager/kaizen',
+                method: 'POST',
+                body
+            }),
+            invalidatesTags: ['Kaizen'],
         }),
     }),
 });
@@ -63,5 +111,8 @@ export const growthApi = createApi({
 export const {
     useGetGrowthPulseQuery,
     useGetAdaptationStatusQuery,
-    useGetTeamStatusQuery
+    useGetTeamStatusQuery,
+    useGetKaizenFeedQuery,
+    useReviewKaizenMutation,
+    useSubmitKaizenMutation
 } = growthApi;

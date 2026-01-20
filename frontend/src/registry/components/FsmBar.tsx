@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { FsmDefinitionDto } from '../types/schema';
-import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 interface FsmBarProps {

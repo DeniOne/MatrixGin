@@ -3,6 +3,7 @@ import { MGChatResponse } from '../telegram';
 import { mesService } from '../../mes/services/mes.service';
 import { prisma } from '../../config/prisma';
 import { growthMatrixService } from '../../services/growth-matrix.service';
+import { managerToolsService } from '../../services/manager-tools.service';
 
 /**
  * Handle Employee scenarios (Execution contour)
@@ -125,10 +126,28 @@ export async function handleEmployeeScenario(action: string, intent: ResolvedInt
             };
 
         case 'suggest_improvement':
-            return {
-                text: '💡 ПРЕДЛОЖИТЬ ИДЕЮ\n\n(Заглушка)...',
-                actions: []
-            };
+            // If text is provided in payload (e.g. from a prompt or specific command)
+            const suggestionText = intent.payload?.text;
+
+            if (!suggestionText) {
+                return {
+                    text: '💡 ПРЕДЛОЖИТЬ ИДЕЮ\n\nПожалуйста, опишите ваше предложение прямо в чате. Это может быть связано с процессами, качеством или комфортом работы.',
+                    actions: ['employee.guide_next_step']
+                };
+            }
+
+            try {
+                await managerToolsService.submitKaizen(intent.userId, suggestionText);
+                return {
+                    text: '✅ Идея принята! Ваше предложение будет рассмотрено руководством. Спасибо за вклад в развитие MatrixGin! 🚀',
+                    actions: ['employee.show_my_shift']
+                };
+            } catch (error: any) {
+                return {
+                    text: `❌ Ошибка при сохранении: ${error.message}`,
+                    actions: ['employee.suggest_improvement']
+                };
+            }
 
         default:
             return {

@@ -131,7 +131,7 @@ export const ENTITY_TYPE_TRANSLATIONS: Record<string, string> = {
     'Username': 'Имя пользователя',
     'Email': 'Email',
     'Is Locked': 'Заблокирован',
-    'Status': 'Статус',
+    // 'Status': 'Статус', // Duplicate
 
     // Structure fields
     'Parent': 'Родитель',

@@ -84,10 +84,10 @@ export async function handleTelegramWebhook(req: Request, res: Response): Promis
 
         // 3. Route to appropriate pipeline
         if (normalized.type === 'text') {
-            const rendered = processTextMessage(normalized, accessContext);
+            const rendered = await processTextMessage(normalized, accessContext);
             await sendMessage(normalized.chatId, rendered);
-        } else {
-            const rendered = processCallback(normalized, accessContext);
+        } else if (normalized.type === 'callback') {
+            const rendered = await processCallback(normalized, accessContext);
 
             // Answer callback query (acknowledge)
             await answerCallbackQuery(normalized.callbackQueryId);

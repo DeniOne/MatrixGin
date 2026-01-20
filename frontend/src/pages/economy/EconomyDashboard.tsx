@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 /**
  * EconomyDashboard - Панель аналитики и прозрачности
@@ -96,7 +96,7 @@ const HeatmapRow: React.FC<{ label: string, value: number }> = ({ label, value }
             <span className="text-indigo-400 font-bold">{value}%</span>
         </div>
         <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
-            <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${value}%` }}></div>
+            <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${value}% ` }}></div>
         </div>
     </div>
 );

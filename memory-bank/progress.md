@@ -24,7 +24,7 @@
 | 06 | Corporate University | ✅ 85% | ⚠️ Виджет "Моё обучение" |
 | 07 | Telegram Bot | ✅ CLOSED | 🔴 **16+ новых интентов** |
 | 08 | MatrixCoin Economy | 🔒 CANONICAL | ❌ НЕ ТРОГАТЬ |
-| 09 | Status & Ranks | 📅 PLANNED | — |
+| 09 | Status & Ranks | ✅ CLOSED | ❌ Не требует |
 | 10 | Analytics | ✅ CLOSED | ❌ Не требует |
 
 ## 🌱 Phase 5: Motivational Organism
@@ -70,6 +70,13 @@
 #### Sprint 12: Advanced Motivation (Visualization) ✅ **COMPLETED 2026-01-20**
 - [x] **Growth Web 3D**: `Three.js` + `StartGrowthWeb3D` (Read-only)
 - [x] **Forecast Simulator**: Non-binding "What If" scenarios (Client-side)
+
+#### Sprint 14: Status & Ranks (Module 09) ✅ **COMPLETED 2026-01-20**
+- [x] **Backend Core**: Status/Rank models & migrations (Prisma)
+- [x] **Governance**: StatusAssignmentService with Mandatory Reason
+- [x] **Automation**: Rank recalculation Daily Cron (GMC-based)
+- [x] **Frontend**: Status Management Admin Page & Profile badges
+- [x] **CANON**: Full compliance verified (no MC writes)
 
 ## Key Blockers
 - **None critical**: Все зависит от приоритизации спринтов.

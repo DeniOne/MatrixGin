@@ -10,13 +10,13 @@ import {
     TrendingUp,
     BookOpen,
     Award,
-
+    Building2
 } from 'lucide-react';
 
 interface AcademyCardProps {
     title: string;
     description: string;
-    icon: React.ElementType;
+    icon: any;
     path: string;
     coursesCount: number;
     skillsCount: number;
@@ -178,7 +178,5 @@ const UniversityDashboardPage: React.FC = () => {
     );
 };
 
-// Helper icon component since Building2 was used but not imported in the main component body
-import { Building2 } from 'lucide-react';
 
 export default UniversityDashboardPage;

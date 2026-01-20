@@ -1,7 +1,6 @@
 import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Text, Html } from '@react-three/drei';
-import { Vector3, Color } from 'three';
+import { OrbitControls, Html } from '@react-three/drei';
 
 // --- TYPES ---
 interface GrowthNode {
@@ -20,7 +19,6 @@ interface StartGrowthWeb3DProps {
 }
 
 // --- CONSTANTS ---
-const NODE_COLOR_BASE = '#4F46E5'; // Indigo-600
 const NODE_COLOR_ACTIVE = '#10B981'; // Emerald-500
 const CONNECTION_COLOR = '#9CA3AF'; // Gray-400
 
@@ -56,24 +54,16 @@ function SkillNode({ node }: { node: GrowthNode }) {
 
 /* Connects nodes to center to form a web */
 function WebConnections({ nodes }: { nodes: GrowthNode[] }) {
-    const points = useMemo(() => {
-        return nodes.flatMap(node => [
-            new Vector3(0, 0, 0), // Center
-            new Vector3(...node.position)
-        ]);
-    }, [nodes]);
-
     // Create a line segment for each connection
     return (
         <group>
             {nodes.map((node, i) => (
                 <line key={i}>
+                    {/* @ts-ignore */}
                     <bufferGeometry>
                         <float32BufferAttribute
                             attach="attributes-position"
-                            count={2}
-                            array={new Float32Array([0, 0, 0, ...node.position])}
-                            itemSize={3}
+                            args={[new Float32Array([0, 0, 0, ...node.position]), 3]}
                         />
                     </bufferGeometry>
                     <lineBasicMaterial color={CONNECTION_COLOR} transparent opacity={0.3} />
@@ -106,9 +96,7 @@ function WebPolygons({ nodes }: { nodes: GrowthNode[] }) {
             <bufferGeometry>
                 <float32BufferAttribute
                     attach="attributes-position"
-                    count={nodes.length * 2}
-                    array={positions}
-                    itemSize={3}
+                    args={[positions, 3]}
                 />
             </bufferGeometry>
             <lineBasicMaterial color={NODE_COLOR_ACTIVE} transparent opacity={0.6} />

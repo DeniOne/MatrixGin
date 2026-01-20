@@ -14,11 +14,24 @@ import {
     Clock
 } from 'lucide-react';
 
+import {
+    useGetUserStatusQuery,
+    useGetUserRankQuery,
+    useGetStatusHistoryQuery
+} from '../features/participation/participationApi';
+import { StatusBadge } from '../components/status/StatusBadge';
+import { RankBadge } from '../components/status/RankBadge';
+import { StatusHistory } from '../components/status/StatusHistory';
+
 const EmployeeProfilePage: React.FC = () => {
     const { user } = useAuth();
     const { data: wallet } = useGetWalletQuery();
     const { data: tasksData } = useGetTasksQuery({ assigneeId: user?.id, limit: 10 });
     const { data: universityData } = useGetMyCoursesQuery();
+
+    // Status and Rank data
+    const { data: statusData } = useGetUserStatusQuery(user?.id || '', { skip: !user?.id });
+    const { data: rankData } = useGetUserRankQuery(user?.id || '', { skip: !user?.id });
 
     const activeTasks = tasksData?.data.filter(t => t.status !== TaskStatus.DONE && t.status !== TaskStatus.ARCHIVED) || [];
     const activeCourses = universityData?.data.active || [];
@@ -136,6 +149,42 @@ const EmployeeProfilePage: React.FC = () => {
                             </div>
                         ))}
                     </div>
+                </section>
+            </div>
+
+            {/* Participation Status & Rank Section */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <section className="lg:col-span-1 bg-gray-900/30 border border-gray-800/50 rounded-3xl p-6 backdrop-blur-md">
+                    <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <ShieldCheck className="w-5 h-5 text-indigo-400" />
+                        Статус и Ранг
+                    </h2>
+                    <div className="space-y-6">
+                        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2">Текущий статус</p>
+                            {statusData ? (
+                                <StatusBadge code={statusData.statusCode} description={statusData.statusDescription} />
+                            ) : (
+                                <p className="text-gray-600 italic text-sm">Статус не назначен</p>
+                            )}
+                        </div>
+                        <div className="bg-gray-900 border border-gray-800 rounded-2xl p-4">
+                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-2">Текущий ранг</p>
+                            {rankData ? (
+                                <RankBadge code={rankData.rankCode} description={rankData.rankDescription} gmcBalance={rankData.gmcBalance} />
+                            ) : (
+                                <p className="text-gray-600 italic text-sm">Ранг не определён</p>
+                            )}
+                        </div>
+                    </div>
+                </section>
+
+                <section className="lg:col-span-2 bg-gray-900/30 border border-gray-800/50 rounded-3xl p-6 backdrop-blur-md">
+                    <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
+                        <Clock className="w-5 h-5 text-indigo-400" />
+                        История статусов
+                    </h2>
+                    <StatusHistory userId={user?.id || ''} />
                 </section>
             </div>
         </div>

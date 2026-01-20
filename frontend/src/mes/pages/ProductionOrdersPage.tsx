@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Card, Tag, Button, Space, message } from 'antd';
+import { Table, Tag, Button, Card, message } from 'antd';
 import { mesApi, ProductionOrder } from '../../api/mes.api';
 import { Link } from 'react-router-dom';
 
@@ -12,7 +12,7 @@ const ProductionOrdersPage: React.FC = () => {
         try {
             const data = await mesApi.getOrders();
             setOrders(data);
-        } catch (error) {
+        } catch (err) {
             message.error('Failed to load orders');
         } finally {
             setLoading(false);

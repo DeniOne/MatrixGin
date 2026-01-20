@@ -1,4 +1,3 @@
-import React from 'react';
 import { ShieldCheck, Zap, Activity, Brain } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -14,7 +13,7 @@ interface IndicatorProps {
     title: string;
     description: string;
     status: Status;
-    icon: React.ElementType;
+    icon: any;
 }
 
 function Indicator({ title, description, status, icon: Icon }: IndicatorProps) {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, CheckCircle2, Clock } from 'lucide-react';
+import { BookOpen, CheckCircle2 } from 'lucide-react';
 
 interface CourseProgress {
     id: string;

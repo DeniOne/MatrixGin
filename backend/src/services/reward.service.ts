@@ -66,7 +66,7 @@ export class RewardService {
 
             try {
                 // Canonical Check
-                const canonResult = await checkCanon({
+                await checkCanon({
                     canon: 'MC',
                     action: 'MC_EARN',
                     source: 'API',
@@ -84,47 +84,47 @@ export class RewardService {
                     userId
                 });
 
-                if (canonResult.allowed) {
-                    // Transactional update for Wallet & Eligibility
-                    await prisma.$transaction(async (tx) => {
-                        // 1. Update Wallet
-                        await tx.wallet.update({
-                            where: { user_id: userId },
-                            data: {
-                                mc_balance: { increment: eligibility.mc_amount }
-                            }
-                        });
-
-                        // 2. Create Transaction Log
-                        await tx.transaction.create({
-                            data: {
-                                type: 'EARN',
-                                currency: 'MC',
-                                amount: eligibility.mc_amount,
-                                recipient_id: userId,
-                                description: `Reward processed: ${eligibility.event_type}`,
-                                metadata: {
-                                    eligibilityId: eligibility.id,
-                                    refId: eligibility.event_ref_id,
-                                    auditFlag
-                                }
-                            }
-                        });
-
-                        // 3. Update Eligibility status
-                        await tx.rewardEligibility.update({
-                            where: { id: eligibility.id },
-                            data: {
-                                status: RewardStatus.PROCESSED,
-                                processed_at: new Date(),
-                                audit_flag: auditFlag
-                            }
-                        });
+                // Transactional update for Wallet & Eligibility
+                await prisma.$transaction(async (tx) => {
+                    // 1. Update Wallet
+                    await tx.wallet.update({
+                        where: { user_id: userId },
+                        data: {
+                            mc_balance: { increment: eligibility.mc_amount }
+                        }
                     });
 
-                    currentDailyTotal += eligibility.mc_amount;
-                    processedCount++;
-                } else {
+                    // 2. Create Transaction Log
+                    await tx.transaction.create({
+                        data: {
+                            type: 'EARN',
+                            currency: 'MC',
+                            amount: eligibility.mc_amount,
+                            recipient_id: userId,
+                            description: `Reward processed: ${eligibility.event_type}`,
+                            metadata: {
+                                eligibilityId: eligibility.id,
+                                refId: eligibility.event_ref_id,
+                                auditFlag
+                            }
+                        }
+                    });
+
+                    // 3. Update Eligibility status
+                    await tx.rewardEligibility.update({
+                        where: { id: eligibility.id },
+                        data: {
+                            status: RewardStatus.PROCESSED,
+                            processed_at: new Date(),
+                            audit_flag: auditFlag
+                        }
+                    });
+                });
+
+                currentDailyTotal += eligibility.mc_amount;
+                processedCount++;
+            } catch (error: any) {
+                if (error.code === 'CANONICAL_VIOLATION') {
                     // Record violation or reject
                     await prisma.rewardEligibility.update({
                         where: { id: eligibility.id },
@@ -133,10 +133,10 @@ export class RewardService {
                             audit_flag: 'CANON_VIOLATION'
                         }
                     });
+                } else {
+                    console.error(`Failed to process reward ${eligibility.id}:`, error);
+                    // Leave PENDING for retry if it's transient, or flag as ERROR
                 }
-            } catch (error) {
-                console.error(`Failed to process reward ${eligibility.id}:`, error);
-                // Leave PENDING for retry if it's transient, or flag as ERROR
             }
         }
 

@@ -1,0 +1,69 @@
+﻿src/ai-ops/RegistryAIOpsViewer.tsx(9,40): error TS6133: 'Badge' is declared but its value is never read.
+src/ai-ops/RegistryAIOpsViewer.tsx(9,69): error TS6133: 'Tooltip' is declared but its value is never read.
+src/ai-ops/RegistryAIOpsViewer.tsx(13,9): error TS6133: 'Text' is declared but its value is never read.
+src/ai-ops/RegistryAIOpsViewer.tsx(45,11): error TS6133: 'navigate' is declared but its value is never read.
+src/App.tsx(79,58): error TS2304: Cannot find name 'ManagerDashboard'.
+src/components/ai/AIAdvisoryBanner.tsx(2,10): error TS6133: 'Info' is declared but its value is never read.
+src/components/ai/AISnapshotViewer.tsx(2,20): error TS6133: 'FileText' is declared but its value is never read.
+src/components/ai/AISnapshotViewer.tsx(2,30): error TS6133: 'Share2' is declared but its value is never read.
+src/components/common/ErrorBoundary.tsx(1,8): error TS6133: 'React' is declared but its value is never read.
+src/components/dash/LearningWidget.tsx(2,34): error TS6133: 'Clock' is declared but its value is never read.
+src/entity-form/core/FormViewRenderer.tsx(12,10): error TS2305: Module '"./FormContext"' has no exported member 'useFormContext'.
+src/entity-form/core/FormViewRenderer.tsx(20,23): error TS6133: 'setFormData' is declared but its value is never read.
+src/entity-form/core/FormViewRenderer.tsx(20,36): error TS6133: 'errors' is declared but its value is never read.
+src/entity-form/core/FormViewRenderer.tsx(56,17): error TS2322: Type '{ key: string; field: { name: string; label: string; required: boolean | undefined; readonly: boolean | undefined; widget: EntityCardWidgetType; type: EntityCardDataType; ui: any; }; }' is not assignable to type 'IntrinsicAttributes & FieldRendererProps'.
+  Property 'field' does not exist on type 'IntrinsicAttributes & FieldRendererProps'.
+src/entity-form/core/RegistryForm.tsx(8,17): error TS6133: 'useEffect' is declared but its value is never read.
+src/entity-form/core/RegistryForm.tsx(10,10): error TS2305: Module '"./FormContext"' has no exported member 'FormProvider'.
+src/entity-form/fields/index.ts(55,9): error TS2353: Object literal may only specify known properties, and ''json'' does not exist in type 'Partial<Record<EntityCardWidget, FieldComponent>>'.
+src/entity-form/fields/index.ts(73,5): error TS2353: Object literal may only specify known properties, and ''json'' does not exist in type 'Record<EntityCardWidget, FieldComponent>'.
+src/entity-impact/RegistryImpactViewer.tsx(12,9): error TS6133: 'Title' is declared but its value is never read.
+src/entity-table/hooks/useEntityTable.ts(43,11): error TS2322: Type 'EntityCardView | undefined' is not assignable to type 'EntityCardTableDefinition | undefined'.
+  Property 'columns' is missing in type 'EntityCardFormDefinition' but required in type 'EntityCardTableDefinition'.
+src/features/ai/aiApi.ts(99,28): error TS6133: 'result' is declared but its value is never read.
+src/features/ai/aiApi.ts(99,36): error TS6133: 'error' is declared but its value is never read.
+src/features/motivation/StartGrowthWeb3D.tsx(3,25): error TS6133: 'Text' is declared but its value is never read.
+src/features/motivation/StartGrowthWeb3D.tsx(4,19): error TS6133: 'Color' is declared but its value is never read.
+src/features/motivation/StartGrowthWeb3D.tsx(23,7): error TS6133: 'NODE_COLOR_BASE' is declared but its value is never read.
+src/features/motivation/StartGrowthWeb3D.tsx(59,11): error TS6133: 'points' is declared but its value is never read.
+src/features/motivation/StartGrowthWeb3D.tsx(72,26): error TS2741: Property 'args' is missing in type '{ attach: string; count: number; array: Float32Array<ArrayBuffer>; itemSize: number; }' but required in type 'Mutable<Overwrite<Partial<Overwrite<Float32BufferAttribute, MathProps<Float32BufferAttribute> & ReactProps<Float32BufferAttribute>>>, Omit<...>>>'.
+src/features/motivation/StartGrowthWeb3D.tsx(107,18): error TS2741: Property 'args' is missing in type '{ attach: string; count: number; array: Float32Array<ArrayBuffer>; itemSize: number; }' but required in type 'Mutable<Overwrite<Partial<Overwrite<Float32BufferAttribute, MathProps<Float32BufferAttribute> & ReactProps<Float32BufferAttribute>>>, Omit<...>>>'.
+src/features/ofs/components/executive/OFSSystemSnapshot.tsx(45,23): error TS2322: Type 'string' is not assignable to type 'never'.
+src/mes/pages/ProductionOrderDetailPage.tsx(6,7): error TS6133: 'Step' is declared but its value is never read.
+src/mes/pages/ProductionOrderDetailPage.tsx(6,9): error TS2339: Property 'Step' does not exist on type '{ (props: StepsProps): Element; displayName: string; }'.
+src/mes/pages/ProductionOrdersPage.tsx(2,36): error TS6133: 'Space' is declared but its value is never read.
+src/pages/ai/ExecutiveAIRecommendationsPage.tsx(7,5): error TS6133: 'LayoutDashboard' is declared but its value is never read.
+src/pages/ai/ExecutiveAIRecommendationsPage.tsx(10,5): error TS6133: 'ChevronDown' is declared but its value is never read.
+src/pages/ai/ExecutiveAIRecommendationsPage.tsx(18,30): error TS6133: 'error' is declared but its value is never read.
+src/pages/analytics/ExecutiveAnalyticsPage.tsx(3,23): error TS6133: 'BarChart3' is declared but its value is never read.
+src/pages/analytics/ExecutiveAnalyticsPage.tsx(3,34): error TS6133: 'Users' is declared but its value is never read.
+src/pages/economy/EconomyDashboard.tsx(1,27): error TS6133: 'useEffect' is declared but its value is never read.
+src/pages/economy/StorePage.tsx(3,29): error TS2305: Module '"../../features/economy/economyApi"' has no exported member 'useGetStoreItemsQuery'.
+src/pages/economy/TransactionsPage.tsx(3,27): error TS6133: 'Filter' is declared but its value is never read.
+src/pages/economy/TransactionsPage.tsx(3,35): error TS6133: 'ArrowUpRight' is declared but its value is never read.
+src/pages/economy/TransactionsPage.tsx(3,49): error TS6133: 'ArrowDownLeft' is declared but its value is never read.
+src/pages/university/UniversityDashboardPage.tsx(40,19): error TS2322: Type 'string' is not assignable to type 'never'.
+src/registry/components/BulkOperationModal.tsx(2,19): error TS2307: Cannot find module 'axios' or its corresponding type declarations.
+src/registry/components/EntityCardRenderer.tsx(5,1): error TS6133: 'ImpactPreviewPanel' is declared but its value is never read.
+src/registry/components/EntityCardRenderer.tsx(8,1): error TS6133: 'ImpactReport' is declared but its value is never read.
+src/registry/components/EntityCardRenderer.tsx(17,98): error TS6133: 'onClose' is declared but its value is never read.
+src/registry/components/EntityCardRenderer.tsx(24,12): error TS6133: 'isLoadingData' is declared but its value is never read.
+src/registry/components/EntityCardRenderer.tsx(25,12): error TS6133: 'dataError' is declared but its value is never read.
+src/registry/components/EntityCardRenderer.tsx(61,64): error TS2339: Property 'description' does not exist on type 'EntitySchemaDto'.
+src/registry/components/EntityCardRenderer.tsx(66,21): error TS2322: Type '{ currentState: string; schema: EntitySchemaDto; onTransition: (action: string) => void; }' is not assignable to type 'IntrinsicAttributes & FsmBarProps'.
+  Property 'schema' does not exist on type 'IntrinsicAttributes & FsmBarProps'.
+src/registry/components/EntityCardRenderer.tsx(78,29): error TS2741: Property 'widget' is missing in type 'AttributeDefinitionDto' but required in type '{ widget: string; code: string; label: string; config?: any; }'.
+src/registry/components/EntityCardRenderer.tsx(94,25): error TS2741: Property 'source_entity_type_urn' is missing in type 'import("F:/Matrix_Gin/frontend/src/registry/types/schema").RelationshipDefinitionDto' but required in type 'import("F:/Matrix_Gin/frontend/src/api/types").RelationshipDefinitionDto'.
+src/registry/components/EntityGraphViewer.tsx(1,38): error TS6133: 'useRef' is declared but its value is never read.
+src/registry/components/EntityGraphViewer.tsx(2,19): error TS2307: Cannot find module 'axios' or its corresponding type declarations.
+src/registry/components/EntityGraphViewer.tsx(39,19): error TS7006: Parameter 'res' implicitly has an 'any' type.
+src/registry/components/FsmBar.tsx(4,1): error TS6133: 'clsx' is declared but its value is never read.
+src/registry/components/GovernanceDashboard.tsx(2,19): error TS2307: Cannot find module 'axios' or its corresponding type declarations.
+src/registry/components/GovernanceDashboard.tsx(3,50): error TS6133: 'Badge' is declared but its value is never read.
+src/registry/components/HistoryTimeline.tsx(4,19): error TS2307: Cannot find module 'axios' or its corresponding type declarations.
+src/registry/components/HistoryTimeline.tsx(19,19): error TS7006: Parameter 'res' implicitly has an 'any' type.
+src/registry/components/ReadOnlyEntityCard.tsx(3,1): error TS6133: 'RelationshipBlock' is declared but its value is never read.
+src/registry/components/ReadOnlyEntityCard.tsx(34,25): error TS2741: Property 'widget' is missing in type 'AttributeDefinitionDto' but required in type '{ widget: string; code: string; label: string; config?: any; }'.
+src/registry/components/UniversalEntityForm.tsx(2,19): error TS2307: Cannot find module 'axios' or its corresponding type declarations.
+src/registry/components/UniversalEntityForm.tsx(4,10): error TS6133: 'useParams' is declared but its value is never read.
+src/registry/utils/translations.ts(134,5): error TS1117: An object literal cannot have multiple properties with the same name.

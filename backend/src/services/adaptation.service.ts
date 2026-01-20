@@ -67,15 +67,15 @@ export class AdaptationService {
     }
 
     /**
-     * Complete a 1-on-1 meeting with summary
+     * Complete a 1-on-1 meeting with private notes and soft-signal mood
      */
-    async complete1on1(id: string, summary: string, actionItems: string[], emotionalTone: number) {
+    async complete1on1(id: string, notes: string, actionItems: any, mood: number) {
         return await prisma.oneOnOne.update({
             where: { id },
             data: {
-                summary,
+                notes, // Private to manager
                 action_items: actionItems,
-                emotional_tone: emotionalTone,
+                mood, // Soft signal, NOT a KPI
                 completed_at: new Date()
             }
         });
@@ -83,6 +83,7 @@ export class AdaptationService {
 
     /**
      * Get management dashboard stats for a manager
+     * CRITICAL: Anonymized aggregation only! No individual ranks.
      */
     async getTeamStatus(managerId: string) {
         // 1. Find all mentees
@@ -101,7 +102,7 @@ export class AdaptationService {
             }
         });
 
-        // 2. Aggregate emotional tone from last 30 days of 1-on-1s
+        // 2. Aggregate team happiness (Trend/Average only)
         const thirtyDaysAgo = new Date();
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -109,37 +110,34 @@ export class AdaptationService {
             where: {
                 manager_id: managerId,
                 completed_at: { gte: thirtyDaysAgo, not: null },
-                emotional_tone: { not: null }
+                mood: { not: null }
             },
-            select: { emotional_tone: true }
+            select: { mood: true, completed_at: true }
         });
 
-        const avgTone = recentSessions.length > 0
-            ? recentSessions.reduce((acc: number, s: { emotional_tone: number | null }) => acc + (s.emotional_tone || 0), 0) / recentSessions.length
+        const avgMood = recentSessions.length > 0
+            ? recentSessions.reduce((acc, s) => acc + (s.mood || 0), 0) / recentSessions.length
             : null;
 
-        // 3. Find pending 1-on-1s
-        const pendingMeetings = await prisma.oneOnOne.findMany({
-            where: {
-                manager_id: managerId,
-                completed_at: null,
-                scheduled_at: { gte: new Date() }
-            },
-            include: {
-                employee: { select: { first_name: true, last_name: true } }
-            },
-            orderBy: { scheduled_at: 'asc' }
-        });
-
+        // Anonymized result for dashboard
         return {
             mentees: mentees.map((m: any) => m.mentee),
-            teamHappinessTrend: avgTone ? Math.round(avgTone * 10) / 10 : 'NO_DATA',
-            pendingMeetings: pendingMeetings.map((m: any) => ({
-                id: m.id,
-                employeeName: `${m.employee.first_name} ${m.employee.last_name}`,
-                scheduledAt: m.scheduled_at
-            })),
-            sessionCount30d: recentSessions.length
+            teamHappiness: {
+                average: avgMood ? Math.round(avgMood * 10) / 10 : null,
+                label: "Advisory Metric - Not a KPI",
+                sessionCount: recentSessions.length
+            },
+            pendingMeetings: await prisma.oneOnOne.findMany({
+                where: {
+                    manager_id: managerId,
+                    completed_at: null,
+                    scheduled_at: { gte: new Date() }
+                },
+                include: {
+                    employee: { select: { first_name: true, last_name: true } }
+                },
+                orderBy: { scheduled_at: 'asc' }
+            })
         };
     }
 }

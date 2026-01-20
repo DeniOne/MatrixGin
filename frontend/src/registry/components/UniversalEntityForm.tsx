@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, Button, Form, notification, Spin } from 'antd';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FieldRenderer } from './FieldRenderer'; // Updating this next
 // import { FormProjectionDto } from ... (Using Any for speed in demo, strictly types in real)
 
@@ -92,7 +92,15 @@ export const UniversalEntityForm: React.FC<Props> = ({ entityType, entityUrn, mo
                                     tooltip={field.description}
                                 >
                                     {/* Delegate to FieldRenderer which now handles Static Text too */}
-                                    <FieldRenderer definition={field} />
+                                    <FieldRenderer
+                                        definition={{
+                                            widget: field.widget || 'INPUT_TEXT',
+                                            code: field.code,
+                                            label: field.label,
+                                            config: { required: field.required }
+                                        }}
+                                        value={field.val}
+                                    />
                                 </Form.Item>
                             ))}
                         </div>

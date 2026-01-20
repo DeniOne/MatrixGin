@@ -1,5 +1,5 @@
 import React from 'react';
-import { Info, ShieldAlert } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 
 const AIAdvisoryBanner: React.FC = () => {
     return (

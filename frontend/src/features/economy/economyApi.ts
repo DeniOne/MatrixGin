@@ -1,4 +1,5 @@
 import { api } from '../../app/api';
+import { StoreItemDto } from '../../api/economy.types';
 
 // Enums
 export enum Currency {
@@ -80,6 +81,10 @@ export const economyApi = api.injectEndpoints({
             },
             providesTags: ['Transaction'],
         }),
+        getStoreItems: builder.query<StoreItemDto[], void>({
+            query: () => '/economy/store/items',
+            providesTags: ['StoreItem'],
+        }),
         createTransfer: builder.mutation<Transaction, CreateTransferRequest>({
             query: (transfer) => ({
                 url: '/economy/transfer',
@@ -94,5 +99,6 @@ export const economyApi = api.injectEndpoints({
 export const {
     useGetWalletQuery,
     useGetTransactionsQuery,
+    useGetStoreItemsQuery,
     useCreateTransferMutation,
 } = economyApi;

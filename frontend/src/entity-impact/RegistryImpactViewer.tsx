@@ -9,7 +9,7 @@ import { Alert, Spin, Card, List, Tag, Badge, Typography } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRightOutlined } from '@ant-design/icons';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface ImpactReportDto {
     root: { entityType: string; id: string; label: string };

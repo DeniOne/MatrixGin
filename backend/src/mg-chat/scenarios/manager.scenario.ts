@@ -21,7 +21,7 @@ export async function handleManagerScenario(action: string, intent: ResolvedInte
             // For managers, we likely want "My scheduled meetings as Manager"
             // adaptationService.getTeamStatus gives pendingMeetings
             const teamStatus = await adaptationService.getTeamStatus(managerId);
-            const meetings = teamStatus.pendingMeetings.slice(0, 3).map(m => `- ${m.employeeName} (${m.scheduledAt.toLocaleDateString()})`).join('\n') || 'Нет запланированных встреч';
+            const meetings = teamStatus.pendingMeetings.slice(0, 3).map(m => `- ${m.employee.first_name} ${m.employee.last_name} (${m.scheduled_at.toLocaleDateString()})`).join('\n') || 'Нет запланированных встреч';
 
             return {
                 text: `🤝 Ближайшие 1-on-1:\n\n${meetings}`,
@@ -29,11 +29,13 @@ export async function handleManagerScenario(action: string, intent: ResolvedInte
             };
 
         case 'team_happiness':
-            const happiness = await adaptationService.getTeamStatus(managerId);
-            const trend = happiness.teamHappinessTrend === 'NO_DATA' ? 'Недостаточно данных' : `${happiness.teamHappinessTrend}/10`;
+            const happinessData = await adaptationService.getTeamStatus(managerId);
+            const score = happinessData.teamHappiness.average;
+            const trendText = score ? `${score}/10` : 'Недостаточно данных';
+            const sessionCount = happinessData.teamHappiness.sessionCount;
 
             return {
-                text: `❤️ Пульс команды:\n\nИндекс счастья: ${trend}\n(На основе последних 30 дней)`,
+                text: `❤️ Пульс команды:\n\nИндекс счастья: ${trendText}\n(На основе ${sessionCount} встреч)\n\n📍 _${happinessData.teamHappiness.label}_`,
                 actions: ['manager.show_shift_status']
             };
 

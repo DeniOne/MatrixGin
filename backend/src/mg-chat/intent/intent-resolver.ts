@@ -58,6 +58,10 @@ export function resolveIntent(message: string): IntentResolveResult {
     // 5. Return resolved intent
     return {
         resolved: true,
-        intent: match
+        intent: {
+            ...match,
+            userId: '', // Still empty, filled by adapter
+            slots: {}
+        }
     };
 }

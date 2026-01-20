@@ -1,5 +1,5 @@
 import React from 'react';
-import { Database, FileText, Share2 } from 'lucide-react';
+import { Database } from 'lucide-react';
 
 interface AISnapshotViewerProps {
     data: any;

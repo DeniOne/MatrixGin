@@ -4,10 +4,8 @@ import AIAdvisoryBanner from '../../components/ai/AIAdvisoryBanner';
 import {
     Zap,
     ShieldAlert,
-    LayoutDashboard,
     TrendingUp,
     Layers,
-    ChevronDown,
     Activity,
     Loader2
 } from 'lucide-react';
@@ -15,7 +13,7 @@ import RecommendationDetailsDrawer from '../../components/ai/RecommendationDetai
 
 const ExecutiveAIRecommendationsPage: React.FC = () => {
     // Analyzing 'system' (global) or a major department
-    const { data, isLoading, error } = useAnalyzeEntityQuery({ entityType: 'department', id: 'system-global' });
+    const { data, isLoading } = useAnalyzeEntityQuery({ entityType: 'department', id: 'system-global' });
     const [selectedRecommendation, setSelectedRecommendation] = useState<any>(null);
 
     return (

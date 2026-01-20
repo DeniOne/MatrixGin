@@ -1,6 +1,5 @@
 import React from 'react';
 import { FieldRenderer } from './FieldRenderer';
-import { RelationshipBlock } from './RelationshipBlock'; // We might need a ReadOnly version or prop
 import { useEntitySchema } from '../hooks/useEntitySchema';
 
 interface ReadOnlyEntityCardProps {
@@ -31,7 +30,12 @@ export const ReadOnlyEntityCard: React.FC<ReadOnlyEntityCardProps> = ({ entity, 
                 {schema.attributes.map(attr => (
                     <FieldRenderer
                         key={attr.urn}
-                        definition={attr}
+                        definition={{
+                            widget: attr.ui_component || 'INPUT_TEXT',
+                            code: attr.code,
+                            label: attr.label,
+                            config: { required: attr.is_required }
+                        }}
                         value={entity.attributes?.[attr.code]}
                         onChange={() => { }} // No-op
                         disabled={true}

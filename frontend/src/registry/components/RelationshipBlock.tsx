@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RelationshipDefinitionDto } from '../../api/types';
+import { RelationshipDefinitionDto } from '../types/schema';
 import { useRegistryImpact } from '../hooks/useRegistryImpact';
 import { RelationshipSelector } from './RelationshipSelector';
 import { Plus, Trash2, ArrowLeftRight, AlertTriangle, AlertOctagon } from 'lucide-react';

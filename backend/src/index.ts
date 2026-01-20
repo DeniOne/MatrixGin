@@ -34,6 +34,8 @@ import graphRoutes from './graph/graph.routes';
 import impactRoutes from './impact/impact.routes';
 import aiOpsRoutes from './ai-ops/ai-ops.routes';
 import adaptationRoutes from './routes/adaptation.routes';
+import managerToolsRoutes from './routes/manager-tools.routes';
+import statusRoutes from './routes/status.routes';
 
 
 // Handle BigInt serialization
@@ -112,6 +114,8 @@ app.use('/api/graph', graphRoutes);
 app.use('/api/impact', impactRoutes);
 app.use('/api/ai-ops', aiOpsRoutes);
 app.use('/api/adaptation', adaptationRoutes);
+app.use('/api/manager', managerToolsRoutes);
+app.use('/api/status', statusRoutes);
 
 app.get('/', (req, res) => {
     res.send('MatrixGin v2.0 API');
