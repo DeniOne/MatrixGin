@@ -1,60 +1,265 @@
-# Чеклист разработки: Corporate University
+# Development Checklist: Corporate University
 
-**Модуль:** 06-Corporate-University  
-**Статус:** 🟡 В разработке  
-**Прогресс:** 75/100
+**Модуль:** 13-Corporate-University  
+**Статус:** 🟡 Ready for Implementation  
+**Версия:** 1.0 PRODUCTION
 
----
-
-## ✅ ЧЕКЛИСТ
-
-### Database 🟢 COMPLETE
-- [x] academies table
-- [x] skills table
-- [x] materials table
-- [x] courses table
-- [x] course_modules table
-- [x] user_skills table
-- [x] user_grades table
-- [x] enrollments table
-- [x] module_progress table
-- [x] certifications table
-- [x] learning_paths table
-- [x] trainers table
-- [x] trainer_assignments table
-- [x] training_results table
-- [x] Seed data: 7 academies created
-
-### Backend 🟢 COMPLETE
-- [x] University service (academies, courses)
-- [x] Enrollment service (enrollments, progress tracking)
-- [x] Trainer service (trainer institute)
-- [x] MC/GMC rewards integration
-- [x] University controller
-- [x] API routes configuration
-- [x] Auth & Role middleware
-- [x] DTO models for all entities
-
-### Frontend 🟡 IN PROGRESS (75%)
-- [x] RTK Query API slice (universityApi)
-- [x] AcademyCard component
-- [x] CourseCard component
-- [x] UniversityPage (главная страница с академиями)
-- [x] MyCoursesPage (мои курсы с прогрессом)
-- [x] Redux store integration
-- [x] App routing configuration
-- [ ] CourseDetailsPage (детали курса с enrollment)
-- [ ] CourseLearningPage (интерфейс обучения)
-- [ ] TrainersPage (список наставников)
-- [ ] Progress tracking visualization
-
-### Testing 🔴 NOT STARTED
-- [ ] Enrollment tests
-- [ ] Progress tracking tests
-- [ ] Certification issuance tests
-- [ ] Trainer assignment tests
-- [ ] MC/GMC reward tests
+> [!NOTE]
+> Чеклист соответствует [implementation_plan.md](file:///C:/Users/DeniOne/.gemini/antigravity/brain/d119139d-6a71-4d50-89ff-9f1c906ac0e0/implementation_plan.md) и [MODULE-SPEC.md](./MODULE-SPEC.md)
 
 ---
 
-**Прогресс:** 75% (Backend Complete + Frontend Core Pages)
+## Component 1: Database Schema
+
+### Schema Updates
+- [ ] Добавить enum `TargetMetric` (OKK, CK, CONVERSION, QUALITY, RETOUCH_TIME, AVG_CHECK, ANOMALIES)
+- [ ] Добавить enum `CourseScope` (PHOTOGRAPHER, SALES, RETOUCH, GENERAL)
+- [ ] Обновить модель `Course`:
+  - [ ] Добавить `target_metric: TargetMetric`
+  - [ ] Добавить `expected_effect: String`
+  - [ ] Добавить `scope: CourseScope`
+  - [ ] Переименовать `reward_mc` → `recognition_mc`
+- [ ] Создать модель `QualificationSnapshot`
+  - [ ] **Immutable** (no UPDATE operations)
+  - [ ] **Append-only** history
+  - [ ] Created ONLY via approved upgrade
+  - [ ] Snapshot ≠ current state
+- [ ] Создать миграцию `add_course_photocompany_fields`
+- [ ] Обновить существующие курсы (добавить обязательные поля)
+
+### Existing Tables (Already Complete)
+- [x] academies
+- [x] skills
+- [x] materials
+- [x] courses (требует обновление)
+- [x] course_modules
+- [x] user_skills
+- [x] user_grades
+- [x] enrollments
+- [x] module_progress
+- [x] certifications
+- [x] learning_paths
+- [x] trainers
+- [x] trainer_assignments
+- [x] training_results
+
+---
+
+## Component 2: Backend Services
+
+### University Service
+- [x] Basic CRUD (academies, courses) — существует
+- [ ] Добавить `getStudentDashboard(userId)`
+- [ ] Добавить `getVisibilityLevel(grade)`
+- [ ] Добавить `getRecommendedCourses(userId)`
+  - [ ] **Source:** PhotoCompany metrics (last N shifts)
+  - [ ] **NOT:** grades, test scores, wishes
+  - [ ] Identify weak metrics
+  - [ ] Match courses by target_metric
+- [ ] Добавить `calculateProgressToNext(userId)`
+
+### Enrollment Service
+- [x] Basic enrollment — существует
+- [ ] Обновить `completeCourse()`:
+  - [ ] Убрать прямое начисление MC
+  - [ ] Заменить на `registerRecognition()`
+  - [ ] Убрать прямое изменение квалификации
+
+### Qualification Service (NEW)
+- [ ] Создать `qualification.service.ts`
+- [ ] Реализовать `proposeQualificationUpgrade(userId, photocompanyMetrics)`
+- [ ] Реализовать `applyApprovedUpgrade(proposalId, approvedBy)`
+- [ ] Реализовать `checkMetrics(metrics, requirements)`
+- [ ] Реализовать `getGradeRequirements(grade)`
+
+### Trainer Service
+- [x] Basic trainer management — существует
+- [ ] Добавить RBAC проверки (нет write-прав на деньги/KPI)
+
+---
+
+## Component 3: Event Flow
+
+### Event Handlers
+- [ ] Создать `events/course-completed.handler.ts`
+  - [ ] Символическое признание (MC)
+  - [ ] Уведомление пользователя
+  - [ ] Логирование события
+- [ ] Создать `events/photocompany-result.handler.ts`
+  - [ ] Проверка стабильности метрик (6 смен)
+  - [ ] Создание qualification proposal
+  - [ ] Отправка на Approval Workflow
+
+### Event Subscriptions
+- [ ] Подписать `CourseCompletedHandler` на `COURSE_COMPLETED`
+- [ ] Подписать `PhotoCompanyResultHandler` на `PHOTOCOMPANY_RESULT`
+- [ ] Подписать `RewardService` на `COURSE_COMPLETED`
+- [ ] Подписать `NotificationService` на `COURSE_COMPLETED`
+
+---
+
+## Component 4: Telegram Bot Integration
+
+### Employee Scenario
+- [ ] Добавить интент `my_training`
+  - [ ] Показать dashboard с учётом visibility level
+  - [ ] Показать активные курсы
+  - [ ] Показать прогресс до следующего уровня
+- [ ] Добавить интент `recommend_course`
+  - [ ] Показать рекомендации на основе target_metric
+  - [ ] Показать expected_effect
+- [ ] Добавить интент `quick_quiz`
+  - [ ] Простой тест для самопроверки
+  - [ ] Без влияния на деньги
+
+### Bot Commands
+- [ ] `/my_training` — мой путь обучения
+- [ ] `/recommend` — рекомендации курсов
+- [ ] `/quiz` — быстрый тест
+
+---
+
+## Component 5: Anti-Fraud Mechanisms
+
+### Fraud Detector
+- [ ] Создать `anti-fraud/university-fraud-detector.ts`
+- [ ] Реализовать флаг: `NO_RESULT_IMPROVEMENT`
+- [ ] Реализовать флаг: `NO_PRODUCTION_ACTIVITY`
+- [ ] Реализовать флаг: `EXCESSIVE_RETESTS`
+- [ ] Реализовать флаг: `ROLE_METRIC_MISMATCH`
+- [ ] Реализовать `logFraudFlags(userId, courseId, flags)`
+- [ ] **КРИТИЧЕСКОЕ:** Определить severity для каждого флага
+  - [ ] INFO — только логируем
+  - [ ] WARNING — добавляем в review queue
+  - [ ] CRITICAL — требует manual approval для qualification
+- [ ] **КАНОН:** Флаги = ADVISORY ONLY (не блокируют, только влияют на Approval)
+
+### Integration
+- [ ] Подключить детектор к `completeCourse()`
+- [ ] Подключить детектор к `proposeQualificationUpgrade()`
+
+---
+
+## Component 6: RBAC Enforcement
+
+### Middleware
+- [ ] Обновить `middleware/rbac.middleware.ts`
+- [ ] Добавить `trainerPermissions` объект
+- [ ] Реализовать `checkTrainerPermissions(action, userId, targetUserId)`
+- [ ] Добавить проверку trainer assignment
+
+### Permissions Matrix
+- [ ] Trainer: `course:read` ✅
+- [ ] Trainer: `material:create` ✅
+- [ ] Trainer: `enrollment:read` ✅
+- [ ] Trainer: `module:update_progress` ✅ (только свои стажёры)
+- [ ] Trainer: `user_grade:update` ❌
+- [ ] Trainer: `wallet:update` ❌
+- [ ] Trainer: `kpi:write` ❌
+- [ ] Trainer: `qualification:approve` ❌
+- [ ] Trainer: `qualification:propose` ❌ **КРИТИЧЕСКОЕ**
+  - [ ] Qualification proposal создаётся ТОЛЬКО системой
+  - [ ] На основе PhotoCompany metrics, НЕ по инициативе Trainer
+
+---
+
+## Testing
+
+### Unit Tests
+- [ ] `university.service.spec.ts`
+  - [ ] `getStudentDashboard()` возвращает корректные данные
+  - [ ] `getVisibilityLevel()` работает для всех грейдов
+  - [ ] `getRecommendedCourses()` учитывает target_metric
+- [ ] `qualification.service.spec.ts`
+  - [ ] `proposeQualificationUpgrade()` требует PhotoCompany metrics
+  - [ ] `applyApprovedUpgrade()` создаёт snapshot
+  - [ ] Нельзя применить неодобренный proposal
+- [ ] `enrollment.service.spec.ts`
+  - [ ] `completeCourse()` НЕ меняет квалификацию напрямую
+  - [ ] `completeCourse()` вызывает `registerRecognition()`
+- [ ] `university-fraud-detector.spec.ts`
+  - [ ] Детектор выявляет рост без результата
+  - [ ] Детектор выявляет частые ретесты
+  - [ ] Детектор выявляет несоответствие роли
+
+### Integration Tests
+- [ ] `events/course-completed.spec.ts`
+  - [ ] Event вызывает правильные handlers
+  - [ ] MC начисляется корректно
+- [ ] `events/photocompany-result.spec.ts`
+  - [ ] Проверка стабильности работает
+  - [ ] Proposal создаётся при достижении порога
+
+### E2E Tests
+- [ ] Полный цикл: Enrollment → Course → Practice → Result → Qualification
+- [ ] RBAC: Trainer не может обновить user_grade
+- [ ] Anti-Fraud: Флаги появляются при подозрительной активности
+
+---
+
+## Manual Verification
+
+### Учебный процесс
+- [ ] Записаться на курс через Telegram
+- [ ] Пройти модуль
+- [ ] Проверить начисление recognition_mc
+- [ ] Убедиться, что квалификация НЕ изменилась сразу
+
+### Квалификационный процесс
+- [ ] Завершить курс
+- [ ] Работать в production (PhotoCompany)
+- [ ] Достичь стабильных метрик (6 смен)
+- [ ] Проверить появление proposal в Approval Workflow
+- [ ] Одобрить proposal (Admin)
+- [ ] Проверить изменение квалификации
+
+### RBAC проверки
+- [ ] Войти как Trainer
+- [ ] Попытка обновить user_grade → 403 Forbidden
+- [ ] Попытка обновить wallet → 403 Forbidden
+- [ ] Обновить progress своего стажёра → Success
+
+### Anti-Fraud
+- [ ] Завершить курс без практики → флаг `NO_PRODUCTION_ACTIVITY`
+- [ ] Пересдать тест 4 раза → флаг `EXCESSIVE_RETESTS`
+
+### Dashboard Visibility
+- [ ] Стажёр: видит только "что делать дальше"
+- [ ] Специалист: видит свои метрики
+- [ ] Эксперт: видит сравнительные данные
+
+### Негативный сценарий (доверие системы)
+- [ ] Завершить курс
+- [ ] Работать в production
+- [ ] **Показатели ухудшились**
+- [ ] Проверить:
+  - [ ] Qualification proposal НЕ создаётся
+  - [ ] Recognition (MC) остаётся
+  - [ ] Система НЕ "наказывает"
+  - [ ] Пользователь видит поддержку, не санкции
+
+---
+
+## Deployment
+
+- [ ] Запустить миграцию `add_course_photocompany_fields`
+- [ ] Обновить все существующие курсы (добавить обязательные поля)
+- [ ] Переименовать `reward_mc` → `recognition_mc` в UI
+- [ ] Настроить RBAC для Trainer роли
+- [ ] Включить Anti-Fraud детектор
+- [ ] Обновить Telegram Bot с новыми интентами
+- [ ] Провести все тесты
+- [ ] Обучить команду новому процессу квалификации
+
+---
+
+## Rollback Plan
+
+- [ ] Подготовить скрипт отката миграции
+- [ ] Подготовить feature flags для новых endpoint'ов
+- [ ] Документировать процедуру отката
+
+---
+
+**Прогресс:** 0% (Ready to Start)  
+**Следующий шаг:** Component 1 — Database Schema
