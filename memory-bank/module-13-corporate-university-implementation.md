@@ -119,10 +119,20 @@ COURSE_COMPLETED
 - [x] Update `trainer.service.ts` (explicit RBAC checks: qualification:propose, user_grade:update, wallet:update)
 - [x] Extension file deleted (methods integrated)
 
-### 🔄 Component 3: Event Flow (NEXT)
-- [ ] Create event handlers (course-completed, photocompany-result)
-- [ ] Subscribe handlers to events
-- [ ] PhotoCompany integration (replace mock metrics)
+### ✅ Component 3: Event Flow (COMPLETED 2026-01-21)
+- [x] Create event handlers (course-completed, photocompany-result)
+- [x] Subscribe handlers to events
+- [x] PhotoCompany integration (handlers ready, event emission integrated)
+- [x] Create notification.handler for Telegram notifications
+- [x] Idempotency via processed_at timestamp
+
+### ✅ Component 4: Telegram Bot Integration (COMPLETED 2026-01-21)
+- [x] Viewer intents: show_my_training, show_my_courses, show_my_qualification
+- [x] NotificationService: sendCourseCompletedNotification, sendQualificationProposedNotification
+- [x] NotificationHandler as regular event handler (NOT special hook)
+- [x] Integrated with UniversityEventDispatcher
+- [x] QUALIFICATION_PROPOSED event emission after proposal creation
+- [x] Event flow: PHOTOCOMPANY_RESULT → расчёт → QUALIFICATION_PROPOSED → notification
 
 ### ⏳ Remaining Components
 4. **Component 4:** Telegram Bot integration

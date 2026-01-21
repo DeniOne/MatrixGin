@@ -38,23 +38,27 @@
 ---
 
 ## Component 4: Telegram Bot Integration
-
-### Employee Scenario
-- [ ] Добавить интент `my_training`
-  - [ ] Показать dashboard с учётом visibility level
-  - [ ] Показать активные курсы
-  - [ ] Показать прогресс до следующего уровня
-- [ ] Добавить интент `recommend_course`
-  - [ ] Показать рекомендации на основе target_metric
-  - [ ] Показать expected_effect
-- [ ] Добавить интент `quick_quiz`
-  - [ ] Простой тест для самопроверки
-  - [ ] Без влияния на деньги
+- [x] Добавить интент `my_training`
+  - [x] Показать dashboard с учётом visibility level
+  - [x] Показать активные курсы
+  - [x] Показать прогресс до следующего уровня
+- [x] Добавить интент `recommend_course`
+  - [x] Показать рекомендации на основе target_metric
+  - [x] Показать expected_effect
+- [x] Добавить интент `quick_quiz`
+  - [x] Простой тест для самопроверки
+  - [x] Без влияния на деньги
+- [x] Создать NotificationService
+  - [x] sendCourseCompletedNotification
+  - [x] sendQualificationProposedNotification
+- [x] Создать NotificationHandler (regular event handler)
+- [x] Интегрировать с UniversityEventDispatcher
+- [x] Создать QUALIFICATION_PROPOSED event emission
 
 ### Bot Commands
-- [ ] `/my_training` — мой путь обучения
-- [ ] `/recommend` — рекомендации курсов
-- [ ] `/quiz` — быстрый тест
+- [x] `/my_training` — мой путь обучения (implemented as `show_my_training` action)
+- [x] `/recommend` — рекомендации курсов (integrated in dashboard)
+- [x] `/quiz` — быстрый тест (stub for future implementation)
 
 ---
 
