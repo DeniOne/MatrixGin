@@ -63,23 +63,28 @@
 ---
 
 ## Component 5: Anti-Fraud Mechanisms
-
-### Fraud Detector
-- [ ] Создать `anti-fraud/university-fraud-detector.ts`
-- [ ] Реализовать флаг: `NO_RESULT_IMPROVEMENT`
-- [ ] Реализовать флаг: `NO_PRODUCTION_ACTIVITY`
-- [ ] Реализовать флаг: `EXCESSIVE_RETESTS`
-- [ ] Реализовать флаг: `ROLE_METRIC_MISMATCH`
-- [ ] Реализовать `logFraudFlags(userId, courseId, flags)`
-- [ ] **КРИТИЧЕСКОЕ:** Определить severity для каждого флага
-  - [ ] INFO — только логируем
-  - [ ] WARNING — добавляем в review queue
-  - [ ] CRITICAL — требует manual approval для qualification
-- [ ] **КАНОН:** Флаги = ADVISORY ONLY (не блокируют, только влияют на Approval)
+- [x] Создать `anti-fraud/university-fraud-detector.ts`
+- [x] Реализовать флаг: `NO_RESULT_IMPROVEMENT` (MEDIUM)
+- [x] Реализовать флаг: `NO_PRODUCTION_ACTIVITY` (HIGH)
+- [x] Реализовать флаг: `EXCESSIVE_RETESTS` (MEDIUM)
+- [x] Реализовать флаг: `ROLE_METRIC_MISMATCH` (HIGH)
+- [x] Реализовать `AntiFraudSignalWriter` (append-only persistence)
+- [x] **КРИТИЧЕСКОЕ:** Определить severity для каждого флага
+  - [x] INFO — только логируем
+  - [x] WARNING — добавляем в review queue (MEDIUM)
+  - [x] CRITICAL — требует manual approval для qualification (HIGH)
+- [x] **КАНОН:** Флаги = ADVISORY ONLY (не блокируют, только влияют на Approval)
 
 ### Integration
-- [ ] Подключить детектор к `completeCourse()`
-- [ ] Подключить детектор к `proposeQualificationUpgrade()`
+- [x] Интеграция с `enrollment.service.ts` (non-blocking)
+- [x] **NO** интеграция с `qualification.service.ts` (no coupling)
+- [x] Signals reviewed OUTSIDE service (ops/review dashboard)
+
+### Architectural Invariants
+- [x] Detector = pure function (separate from persistence)
+- [x] Signals are append-only, immutable
+- [x] No automatic punishment
+- [x] Separation of detection and action
 
 ---
 

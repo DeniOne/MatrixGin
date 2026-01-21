@@ -134,6 +134,15 @@ COURSE_COMPLETED
 - [x] QUALIFICATION_PROPOSED event emission after proposal creation
 - [x] Event flow: PHOTOCOMPANY_RESULT → расчёт → QUALIFICATION_PROPOSED → notification
 
+### ✅ Component 5: Anti-Fraud Mechanisms (COMPLETED 2026-01-21)
+- [x] Created AntiFraudSignal model (append-only, immutable)
+- [x] Implemented AntiFraudDetector as pure function (stateless, deterministic)
+- [x] Implemented AntiFraudSignalWriter (separate persistence)
+- [x] 4 signal types: NO_RESULT_IMPROVEMENT (MEDIUM), EXCESSIVE_RETESTS (MEDIUM), NO_PRODUCTION_ACTIVITY (HIGH), ROLE_METRIC_MISMATCH (HIGH)
+- [x] Integrated with enrollment service (non-blocking)
+- [x] NO coupling with qualification service
+- [x] Architectural invariants: pure detector, append-only signals, no automatic punishment
+
 ### ⏳ Remaining Components
 4. **Component 4:** Telegram Bot integration
 5. **Component 5:** Anti-Fraud detector
