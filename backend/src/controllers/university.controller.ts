@@ -417,6 +417,7 @@ export class UniversityController {
      */
     async accreditTrainer(req: Request, res: Response) {
         try {
+            const { id } = req.params;
             // RBAC: Only MANAGER or EXECUTIVE can accredit trainers
             const userRole = (req as any).user.role;
             const userId = (req as any).user.id;
@@ -434,7 +435,6 @@ export class UniversityController {
                 });
             }
 
-            const { id } = req.params;
             const trainer = await trainerService.accreditTrainer(id);
             res.json({
                 success: true,
