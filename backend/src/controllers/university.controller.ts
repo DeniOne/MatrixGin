@@ -7,6 +7,7 @@ import { Request, Response } from 'express';
 import { universityService } from '../services/university.service';
 import { enrollmentService } from '../services/enrollment.service';
 import { trainerService } from '../services/trainer.service';
+import { requireRole } from '../middleware/roles.middleware';
 
 export class UniversityController {
     /**
@@ -113,10 +114,20 @@ export class UniversityController {
 
     /**
      * POST /api/university/courses
-     * Create new course (Admin only)
+     * Create new course
+     * RBAC: TRAINER or MANAGER only
      */
     async createCourse(req: Request, res: Response) {
         try {
+            // RBAC: Only TRAINER or MANAGER can create courses
+            const userRole = (req as any).user.role;
+            if (!['TRAINER', 'MANAGER'].includes(userRole)) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Forbidden: Only trainers or managers can create courses',
+                });
+            }
+
             const course = await universityService.createCourse(req.body);
             res.status(201).json({
                 success: true,
@@ -133,12 +144,22 @@ export class UniversityController {
     /**
      * POST /api/university/courses/:id/enroll
      * Enroll in a course
+     * RBAC: EMPLOYEE only (self-enrollment)
      */
     async enrollInCourse(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const userId = (req as any).user.id; // From auth middleware
             const { assignedBy } = req.body;
+
+            // RBAC: Only EMPLOYEE can enroll (self-enrollment)
+            const userRole = (req as any).user.role;
+            if (userRole !== 'EMPLOYEE') {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Forbidden: Only employees can enroll in courses',
+                });
+            }
 
             const enrollment = await enrollmentService.enrollInCourse(userId, id, assignedBy);
 
@@ -162,10 +183,15 @@ export class UniversityController {
     /**
      * GET /api/university/my-courses
      * Get my enrolled courses
+     * RBAC: Authenticated users only (self-only)
      */
     async getMyCourses(req: Request, res: Response) {
         try {
             const userId = (req as any).user.id;
+
+            // RBAC: User can only view own courses
+            // Already enforced by using userId from token
+
             const courses = await enrollmentService.getMyCourses(userId);
             res.json({
                 success: true,
@@ -205,11 +231,21 @@ export class UniversityController {
     /**
      * POST /api/university/courses/:id/complete
      * Complete a course
+     * RBAC: EMPLOYEE only (self-only)
      */
     async completeCourse(req: Request, res: Response) {
         try {
             const { id } = req.params;
             const userId = (req as any).user.id;
+
+            // RBAC: Only EMPLOYEE can complete courses
+            const userRole = (req as any).user.role;
+            if (userRole !== 'EMPLOYEE') {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Forbidden: Only employees can complete courses',
+                });
+            }
 
             const enrollment = await enrollmentService.completeCourse(userId, id);
 
@@ -297,10 +333,20 @@ export class UniversityController {
 
     /**
      * PUT /api/university/trainers/:id/accredit
-     * Accredit a trainer (Admin/Coordinator only)
+     * Accredit a trainer
+     * RBAC: MANAGER or EXECUTIVE only
      */
     async accreditTrainer(req: Request, res: Response) {
         try {
+            // RBAC: Only MANAGER or EXECUTIVE can accredit trainers
+            const userRole = (req as any).user.role;
+            if (!['MANAGER', 'EXECUTIVE'].includes(userRole)) {
+                return res.status(403).json({
+                    success: false,
+                    error: 'Forbidden: Only managers or executives can accredit trainers',
+                });
+            }
+
             const { id } = req.params;
             const trainer = await trainerService.accreditTrainer(id);
             res.json({
