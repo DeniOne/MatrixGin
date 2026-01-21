@@ -8,6 +8,7 @@ import { universityService } from '../services/university.service';
 import { enrollmentService } from '../services/enrollment.service';
 import { trainerService } from '../services/trainer.service';
 import { requireRole } from '../middleware/roles.middleware';
+import { logger } from '../config/logger';
 
 export class UniversityController {
     /**
@@ -122,6 +123,12 @@ export class UniversityController {
             // RBAC: Only TRAINER or MANAGER can create courses
             const userRole = (req as any).user.role;
             if (!['TRAINER', 'MANAGER'].includes(userRole)) {
+                logger.warn('[RBAC] Access denied: createCourse', {
+                    userId: (req as any).user.id,
+                    role: userRole,
+                    action: 'createCourse',
+                    resource: 'course'
+                });
                 return res.status(403).json({
                     success: false,
                     error: 'Forbidden: Only trainers or managers can create courses',
@@ -132,6 +139,64 @@ export class UniversityController {
             res.status(201).json({
                 success: true,
                 data: course,
+            });
+        } catch (error: any) {
+            res.status(400).json({
+                success: false,
+                error: error.message,
+            });
+        }
+    }
+
+    /**
+     * PUT /api/university/courses/:id
+     * Update course
+     * RBAC: TRAINER (own courses only) or MANAGER
+     */
+    async updateCourse(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const userRole = (req as any).user.role;
+            const userId = (req as any).user.id;
+
+            // RBAC: Only TRAINER or MANAGER can update courses
+            if (!['TRAINER', 'MANAGER'].includes(userRole)) {
+                logger.warn('[RBAC] Access denied: updateCourse', {
+                    userId,
+                    role: userRole,
+                    action: 'updateCourse',
+                    resource: 'course',
+                    courseId: id
+                });
+                return res.status(403).json({
+                    success: false,
+                    error: 'Forbidden: Only trainers or managers can update courses',
+                });
+            }
+
+            // FIX 1: Trainer ownership check
+            if (userRole === 'TRAINER') {
+                const course = await universityService.getCourseById(id);
+                if (course.created_by !== userId) {
+                    logger.warn('[RBAC] Access denied: updateCourse (not owner)', {
+                        userId,
+                        role: userRole,
+                        action: 'updateCourse',
+                        resource: 'course',
+                        courseId: id,
+                        ownerId: course.created_by
+                    });
+                    return res.status(403).json({
+                        success: false,
+                        error: 'Forbidden: Trainers can only update their own courses',
+                    });
+                }
+            }
+
+            const updated = await universityService.updateCourse(id, req.body);
+            res.json({
+                success: true,
+                data: updated,
             });
         } catch (error: any) {
             res.status(400).json({
@@ -155,6 +220,13 @@ export class UniversityController {
             // RBAC: Only EMPLOYEE can enroll (self-enrollment)
             const userRole = (req as any).user.role;
             if (userRole !== 'EMPLOYEE') {
+                logger.warn('[RBAC] Access denied: enrollInCourse', {
+                    userId,
+                    role: userRole,
+                    action: 'enrollInCourse',
+                    resource: 'course',
+                    courseId: id
+                });
                 return res.status(403).json({
                     success: false,
                     error: 'Forbidden: Only employees can enroll in courses',
@@ -241,6 +313,13 @@ export class UniversityController {
             // RBAC: Only EMPLOYEE can complete courses
             const userRole = (req as any).user.role;
             if (userRole !== 'EMPLOYEE') {
+                logger.warn('[RBAC] Access denied: completeCourse', {
+                    userId,
+                    role: userRole,
+                    action: 'completeCourse',
+                    resource: 'course',
+                    courseId: id
+                });
                 return res.status(403).json({
                     success: false,
                     error: 'Forbidden: Only employees can complete courses',
@@ -340,7 +419,15 @@ export class UniversityController {
         try {
             // RBAC: Only MANAGER or EXECUTIVE can accredit trainers
             const userRole = (req as any).user.role;
+            const userId = (req as any).user.id;
             if (!['MANAGER', 'EXECUTIVE'].includes(userRole)) {
+                logger.warn('[RBAC] Access denied: accreditTrainer', {
+                    userId,
+                    role: userRole,
+                    action: 'accreditTrainer',
+                    resource: 'trainer',
+                    trainerId: id
+                });
                 return res.status(403).json({
                     success: false,
                     error: 'Forbidden: Only managers or executives can accredit trainers',
