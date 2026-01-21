@@ -31,6 +31,7 @@ export class UniversityEventDispatcher {
                     type: {
                         in: ['COURSE_COMPLETED', 'PHOTOCOMPANY_RESULT']
                     }
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } as any,
                 orderBy: { timestamp: 'asc' },
                 take: 50 // Batch processing

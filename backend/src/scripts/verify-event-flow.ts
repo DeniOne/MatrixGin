@@ -59,6 +59,7 @@ async function verifyEventFlow() {
     logger.info(`Simulating COURSE_COMPLETED for user ${userId}`);
     const courseEvent = await prisma.event.create({
         data: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             type: 'COURSE_COMPLETED' as any,
             source: 'VERIFICATION_SCRIPT',
             subject_id: userId,
@@ -81,6 +82,7 @@ async function verifyEventFlow() {
     logger.info(`Simulating PHOTOCOMPANY_RESULT for user ${userId}`);
     const photoEvent = await prisma.event.create({
         data: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             type: 'PHOTOCOMPANY_RESULT' as any,
             source: 'VERIFICATION_SCRIPT',
             subject_id: userId,
@@ -108,7 +110,9 @@ async function verifyEventFlow() {
     await new Promise(r => setTimeout(r, 1000));
 
     // 5. Verify results
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const processedCourseEvent = await prisma.event.findUnique({ where: { id: courseEvent.id } }) as any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const processedPhotoEvent = await prisma.event.findUnique({ where: { id: photoEvent.id } }) as any;
 
     console.log('--- FINAL VERIFICATION RESULTS ---');
