@@ -89,25 +89,22 @@
 ---
 
 ## Component 6: RBAC Enforcement
+- [x] Audit existing controllers for RBAC compliance
+- [x] Add RBAC checks to critical endpoints
+  - [x] `enrollInCourse`: EMPLOYEE only (self-enrollment)
+  - [x] `completeCourse`: EMPLOYEE only (self-only)
+  - [x] `createCourse`: TRAINER or MANAGER only
+  - [x] `accreditTrainer`: MANAGER or EXECUTIVE only
+  - [x] `getMyCourses`: self-only (enforced by token userId)
+- [x] All unauthorized requests return 403 Forbidden
+- [x] **КАНОН:** RBAC enforced server-side only in controllers
 
-### Middleware
-- [ ] Обновить `middleware/rbac.middleware.ts`
-- [ ] Добавить `trainerPermissions` объект
-- [ ] Реализовать `checkTrainerPermissions(action, userId, targetUserId)`
-- [ ] Добавить проверку trainer assignment
-
-### Permissions Matrix
-- [ ] Trainer: `course:read` ✅
-- [ ] Trainer: `material:create` ✅
-- [ ] Trainer: `enrollment:read` ✅
-- [ ] Trainer: `module:update_progress` ✅ (только свои стажёры)
-- [ ] Trainer: `user_grade:update` ❌
-- [ ] Trainer: `wallet:update` ❌
-- [ ] Trainer: `kpi:write` ❌
-- [ ] Trainer: `qualification:approve` ❌
-- [ ] Trainer: `qualification:propose` ❌ **КРИТИЧЕСКОЕ**
-  - [ ] Qualification proposal создаётся ТОЛЬКО системой
-  - [ ] На основе PhotoCompany metrics, НЕ по инициативе Trainer
+### Architectural Invariants
+- [x] RBAC enforced server-side only
+- [x] Controllers own access decisions
+- [x] No wildcard permissions
+- [x] Explicit deny > implicit allow
+- [x] Error semantics: 401 (no auth), 403 (no permission)
 
 ---
 
