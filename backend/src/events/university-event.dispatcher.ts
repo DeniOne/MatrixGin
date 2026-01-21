@@ -11,6 +11,7 @@ import { logger } from '../config/logger';
 import { EventType } from '../types/core/event.types';
 import { courseCompletedHandler } from './university/course-completed.handler';
 import { photoCompanyResultHandler } from './university/photocompany-result.handler';
+import { notificationHandler } from './university/notification.handler';
 
 export class UniversityEventDispatcher {
     private isProcessing = false;
@@ -29,7 +30,7 @@ export class UniversityEventDispatcher {
                 where: {
                     processed_at: null,
                     type: {
-                        in: ['COURSE_COMPLETED', 'PHOTOCOMPANY_RESULT']
+                        in: ['COURSE_COMPLETED', 'PHOTOCOMPANY_RESULT', 'QUALIFICATION_PROPOSED']
                     }
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 } as any,
@@ -69,9 +70,13 @@ export class UniversityEventDispatcher {
         switch (type) {
             case 'COURSE_COMPLETED':
                 await courseCompletedHandler.handle(event.id, payload);
+                await notificationHandler.handle(event.id, payload);
                 break;
             case 'PHOTOCOMPANY_RESULT':
                 await photoCompanyResultHandler.handle(event.id, payload);
+                break;
+            case 'QUALIFICATION_PROPOSED':
+                await notificationHandler.handle(event.id, payload);
                 break;
             default:
                 logger.warn(`[EventFlow] No handler for event type: ${type}`);

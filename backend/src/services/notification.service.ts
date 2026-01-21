@@ -131,6 +131,52 @@ class NotificationService {
             metadata: { amount, currency, transactionType: type }
         });
     }
+
+    /**
+     * Module 13: Send COURSE_COMPLETED notification
+     * 
+     * Template: «✅ Курс "{title}" завершён! +{mc} MC»
+     */
+    async sendCourseCompletedNotification(userId: string, payload: {
+        course_id: string;
+        recognition_mc: number;
+    }): Promise<void> {
+        const course = await prisma.course.findUnique({
+            where: { id: payload.course_id },
+            select: { title: true }
+        });
+
+        if (!course) return;
+
+        await this.createNotification({
+            userId,
+            type: 'course_completed',
+            title: '✅ Курс завершён',
+            message: `Курс "${course.title}" завершён!\n\nПолучено: ${payload.recognition_mc} MC 🪙\n\nПродолжай развиваться! 🚀`,
+            metadata: { courseId: payload.course_id, recognitionMC: payload.recognition_mc }
+        });
+    }
+
+    /**
+     * Module 13: Send QUALIFICATION_PROPOSED notification
+     * 
+     * Template: «🎯 Предложено повышение до {grade}»
+     * 
+     * CANON: Triggered ONLY by QUALIFICATION_PROPOSED event,
+     * NOT directly by PHOTOCOMPANY_RESULT
+     */
+    async sendQualificationProposedNotification(userId: string, payload: {
+        new_grade: string;
+        proposal_id?: string;
+    }): Promise<void> {
+        await this.createNotification({
+            userId,
+            type: 'qualification_proposed',
+            title: '🎯 Предложено повышение',
+            message: `ПРЕДЛОЖЕНО ПОВЫШЕНИЕ КВАЛИФИКАЦИИ!\n\nНовый уровень: ${payload.new_grade}\n\nТвои результаты стабильны и соответствуют требованиям.\nПредложение направлено на утверждение руководству.\n\nТак держать! 💪`,
+            metadata: { newGrade: payload.new_grade, proposalId: payload.proposal_id }
+        });
+    }
 }
 
 export default new NotificationService();

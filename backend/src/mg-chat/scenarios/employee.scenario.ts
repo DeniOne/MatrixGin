@@ -4,6 +4,9 @@ import { mesService } from '../../mes/services/mes.service';
 import { prisma } from '../../config/prisma';
 import { growthMatrixService } from '../../services/growth-matrix.service';
 import { managerToolsService } from '../../services/manager-tools.service';
+import { universityService } from '../../services/university.service';
+import { enrollmentService } from '../../services/enrollment.service';
+import { qualificationService } from '../../services/qualification.service';
 
 /**
  * Handle Employee scenarios (Execution contour)
@@ -48,11 +51,88 @@ export async function handleEmployeeScenario(action: string, intent: ResolvedInt
             };
 
         case 'show_my_training':
-            // Read-only enrollment check
-            return {
-                text: '📚 МОЁ ОБУЧЕНИЕ\n\n(Функция в разработке, заглушка)', // University service integration pending
-                actions: ['employee.show_my_status_path']
-            };
+            // Module 13: Corporate University Dashboard
+            try {
+                const dashboard = await universityService.getStudentDashboard(intent.userId);
+                const userGrade = await prisma.userGrade.findUnique({ where: { user_id: intent.userId } });
+
+                const activeCount = dashboard.enrollments.filter(e => e.status === 'IN_PROGRESS').length;
+                const completedCount = dashboard.enrollments.filter(e => e.status === 'COMPLETED').length;
+                const currentGrade = userGrade?.current_grade || 'INTERN';
+
+                return {
+                    text: `📚 МОЁ ОБУЧЕНИЕ\n\n` +
+                        `📊 Квалификация: ${currentGrade}\n` +
+                        `📖 Активных курсов: ${activeCount}\n` +
+                        `✅ Завершено: ${completedCount}\n\n` +
+                        `Выбери действие:`,
+                    actions: ['employee.show_my_courses', 'employee.show_my_qualification', 'employee.show_my_status_path']
+                };
+            } catch (error: any) {
+                return {
+                    text: `❌ Ошибка загрузки данных: ${error.message}`,
+                    actions: ['employee.show_my_status_path']
+                };
+            }
+
+        case 'show_my_courses':
+            // Module 13: User's course list
+            try {
+                const courses = await enrollmentService.getMyCourses(intent.userId);
+
+                if (courses.length === 0) {
+                    return {
+                        text: '📚 МОИ КУРСЫ\n\nУ тебя пока нет активных курсов.\n\nОбратись к руководителю для назначения обучения.',
+                        actions: ['employee.show_my_training']
+                    };
+                }
+
+                const courseList = courses.map(c => {
+                    const status = c.status === 'COMPLETED' ? '✅' : c.status === 'IN_PROGRESS' ? '📖' : '⏸️';
+                    const progress = c.progress ? `${Math.round(c.progress)}%` : '0%';
+                    return `${status} ${c.course.title} (${progress})`;
+                }).join('\n');
+
+                return {
+                    text: `📚 МОИ КУРСЫ\n\n${courseList}`,
+                    actions: ['employee.show_my_training', 'employee.show_my_qualification']
+                };
+            } catch (error: any) {
+                return {
+                    text: `❌ Ошибка загрузки курсов: ${error.message}`,
+                    actions: ['employee.show_my_training']
+                };
+            }
+
+        case 'show_my_qualification':
+            // Module 13: Qualification level and progress
+            try {
+                const userGrade = await prisma.userGrade.findUnique({ where: { user_id: intent.userId } });
+                const progress = await universityService.calculateProgressToNext(intent.userId);
+
+                if (!userGrade) {
+                    return {
+                        text: '📊 КВАЛИФИКАЦИЯ\n\nДанные о квалификации не найдены.\n\nОбратись к руководителю.',
+                        actions: ['employee.show_my_training']
+                    };
+                }
+
+                const currentGrade = userGrade.current_grade;
+                const nextGrade = progress?.nextGrade || 'MAX';
+                const progressText = progress?.progress
+                    ? `\n\n📈 Прогресс до ${nextGrade}: ${Math.round(progress.progress)}%\n\n${progress.requirements || ''}`
+                    : '\n\nТы на максимальном уровне! 🏆';
+
+                return {
+                    text: `📊 МОЯ КВАЛИФИКАЦИЯ\n\nТекущий уровень: ${currentGrade}${progressText}`,
+                    actions: ['employee.show_my_training', 'employee.show_my_courses']
+                };
+            } catch (error: any) {
+                return {
+                    text: `❌ Ошибка загрузки квалификации: ${error.message}`,
+                    actions: ['employee.show_my_training']
+                };
+            }
 
         case 'growth_matrix':
             const pulse = await growthMatrixService.getGrowthPulse(intent.userId);
