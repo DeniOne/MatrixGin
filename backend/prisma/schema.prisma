@@ -66,12 +66,31 @@ model Event {
   timestamp    DateTime  @default(now())
 
   // IDEMPOTENCY: Track if and when this event was processed by system handlers
-  processed_at DateTime? 
+  processed_at DateTime?
 
   @@index([type, timestamp])
   @@index([subject_id, subject_type])
   @@index([processed_at])
   @@map("events")
+}
+
+// Module 13: Anti-Fraud Signals
+// CANON: Signals are append-only, immutable, never deleted
+// Used for detection & signaling, NOT for automatic punishment
+model AntiFraudSignal {
+  id              String   @id @default(uuid())
+  entity_type     String // User, PhotoCompany, Shift, Course
+  entity_id       String
+  level           String // LOW, MEDIUM, HIGH
+  type            String // SignalType enum (NO_RESULT_IMPROVEMENT, etc.)
+  metric_snapshot Json // Snapshot of metrics at detection time
+  detected_at     DateTime @default(now())
+  context         Json // Read-only metadata (event_id, course_id, etc.)
+
+  @@index([entity_type, entity_id])
+  @@index([level, type])
+  @@index([detected_at])
+  @@map("anti_fraud_signals")
 }
 
 model KPI {

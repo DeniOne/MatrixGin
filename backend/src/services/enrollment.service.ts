@@ -210,6 +210,30 @@ export class EnrollmentService {
             },
         });
 
+        // Module 13: Anti-Fraud Detection (AFTER completion, NON-BLOCKING)
+        // CANON: Signals do NOT block course completion
+        try {
+            const { antiFraudDetector } = await import('./anti-fraud-detector.service');
+            const { antiFraudSignalWriter } = await import('./anti-fraud-signal-writer.service');
+
+            // Pure detection
+            const signals = antiFraudDetector.detectSignals('Course', courseId, {
+                userId,
+                courseId,
+                enrollmentData: { ...enrollment, user: await prisma.user.findUnique({ where: { id: userId }, include: { role: true } }) },
+                moduleProgress: progress,
+                completionDate: new Date(),
+                // Note: PhotoCompany metrics would be fetched separately for production
+                // For now, detector handles missing data gracefully
+            });
+
+            // Separate persistence
+            await antiFraudSignalWriter.append(signals);
+        } catch (error) {
+            // Log error but DO NOT block completion
+            console.error('[EnrollmentService] Anti-fraud detection failed', error);
+        }
+
         return completed;
     }
 
