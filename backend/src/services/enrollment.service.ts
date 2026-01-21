@@ -127,7 +127,12 @@ export class EnrollmentService {
     }
 
     /**
-     * Complete course and award MC/GMC
+     * Complete course and emit recognition event
+     * 
+     * CANON:
+     * - Course NEVER changes qualification directly
+     * - Course NEVER awards money directly
+     * - Only registerRecognition (MC) + event emission
      */
     async completeCourse(userId: string, courseId: string) {
         const enrollment = await prisma.enrollment.findUnique({
@@ -180,8 +185,30 @@ export class EnrollmentService {
             },
         });
 
-        // Award rewards
-        await this.awardRewards(userId, enrollment.course);
+        // CANON: Register recognition (NOT direct MC award)
+        // Decoupled via RewardService
+        await this.registerRecognition(userId, enrollment.course);
+
+        // Emit COURSE_COMPLETED event for other systems
+        await prisma.event.create({
+            data: {
+                type: 'COURSE_COMPLETED',
+                source: 'enrollment_service',
+                subject_id: userId,
+                subject_type: 'user',
+                payload: {
+                    user_id: userId,
+                    course_id: courseId,
+                    enrollment_id: enrollment.id,
+                    academy_id: enrollment.course.academy_id || '',
+                    completed_at: new Date(),
+                    duration_minutes: 0,
+                    recognition_mc: enrollment.course.recognition_mc,
+                    target_metric: enrollment.course.target_metric,
+                    expected_effect: enrollment.course.expected_effect,
+                },
+            },
+        });
 
         return completed;
     }
@@ -212,7 +239,7 @@ export class EnrollmentService {
             courseName: c.course.title,
             academyName: c.course.academy?.name || 'Unknown Academy',
             completedAt: c.completed_at,
-            rewardMc: c.course.reward_mc,
+            rewardMc: c.course.recognition_mc,
         }));
     }
 
@@ -255,16 +282,17 @@ export class EnrollmentService {
         };
     }
 
-    private async awardRewards(userId: string, course: any) {
+    private async registerRecognition(userId: string, course: any) {
         const { rewardService } = require('./reward.service');
 
         // Register Eligibility Event (Decoupled Reward Logic)
-        if (course.reward_mc > 0) {
+        // CANON: Course = recognition (MC), NOT money
+        if (course.recognition_mc > 0) {
             await rewardService.registerEligibility(
                 userId,
                 'COURSE_COMPLETED',
                 course.id,
-                course.reward_mc
+                course.recognition_mc
             );
         }
 

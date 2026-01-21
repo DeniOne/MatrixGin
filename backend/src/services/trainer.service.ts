@@ -1,12 +1,65 @@
 /**
  * Trainer Service
+ * Module 13: Corporate University - Trainer RBAC
  * Handles Trainer Institute functionality
+ * 
+ * CANON:
+ * - Trainer CANNOT propose qualification upgrades
+ * - Trainer CANNOT update user_grade table
+ * - Trainer CANNOT update wallet table
  */
-
 
 import { prisma } from '../config/prisma';
 
 export class TrainerService {
+    /**
+     * RBAC: Check if action is forbidden for Trainer
+     * 
+     * CANON: Trainer has NO write access to:
+     * - qualification:propose
+     * - user_grade:update
+     * - wallet:update
+     * - kpi:write
+     */
+    private checkTrainerForbiddenAction(action: string): void {
+        const forbiddenActions = [
+            'qualification:propose',
+            'user_grade:update',
+            'wallet:update',
+            'kpi:write',
+        ];
+
+        if (forbiddenActions.includes(action)) {
+            throw new Error(
+                `RBAC Violation: Trainer is forbidden from action: ${action}. ` +
+                `Only system can perform this action.`
+            );
+        }
+    }
+
+    /**
+     * RBAC: Validate trainer permissions before sensitive operations
+     */
+    private async validateTrainerPermissions(
+        trainerId: string,
+        action: string
+    ): Promise<void> {
+        this.checkTrainerForbiddenAction(action);
+
+        // Additional checks can be added here
+        const trainer = await prisma.trainer.findUnique({
+            where: { id: trainerId },
+        });
+
+        if (!trainer) {
+            throw new Error('Trainer not found');
+        }
+
+        if (trainer.status === 'CANDIDATE') {
+            throw new Error('Trainer must be accredited before performing this action');
+        }
+    }
+
     /**
      * Get all trainers with filters
      */

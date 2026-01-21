@@ -32,6 +32,7 @@ export const EventTypes = [
     'TASK_CREATED',
     'TASK_COMPLETED',
     'TRANSACTION_CREATED',
+    'PHOTOCOMPANY_RESULT', // Module 13: PhotoCompany shift results
 ] as const;
 
 export type EventType = typeof EventTypes[number];
@@ -117,6 +118,7 @@ export interface EventPayloadMap {
     TASK_CREATED: ITaskCreatedPayload;
     TASK_COMPLETED: ITaskCompletedPayload;
     TRANSACTION_CREATED: ITransactionCreatedPayload;
+    PHOTOCOMPANY_RESULT: IPhotoCompanyResultPayload;
 }
 
 // =============================================================================
@@ -198,14 +200,22 @@ export interface IFeedbackSubmittedPayload {
 
 /**
  * COURSE_COMPLETED payload
+ * 
+ * Module 13: Corporate University
+ * CANON: Course completion triggers recognition (MC), NOT money
  */
 export interface ICourseCompletedPayload {
     course_id: string;
     user_id: string;
+    enrollment_id: string;
     academy_id: string;
     completed_at: Date;
     score?: number;
     duration_minutes: number;
+    // Module 13: Canonical fields
+    recognition_mc: number; // Course = recognition, NOT money
+    target_metric: string; // Which PhotoCompany metric this course targets
+    expected_effect: string; // Expected improvement (e.g., "↓ declined 10%")
 }
 
 /**
@@ -307,6 +317,31 @@ export interface ITransactionCreatedPayload {
     currency: 'MC' | 'GMC' | 'RUB';
     reason: string;
     related_event_id?: string;
+}
+
+/**
+ * PHOTOCOMPANY_RESULT payload
+ * 
+ * Module 13: Corporate University
+ * CANON: PhotoCompany metrics are the ONLY source of truth for qualification upgrades
+ */
+export interface IPhotoCompanyResultPayload {
+    shift_id: string;
+    user_id: string;
+    role: string; // PHOTOGRAPHER, SALES, RETOUCH
+    // PhotoCompany metrics
+    okk?: number; // Общий коэффициент качества
+    ck?: number; // Коэффициент конверсии
+    conversion?: number; // Процент конверсии
+    quality?: number; // Качество работы
+    retouch_time?: number; // Время ретуши (минуты)
+    avg_check?: number; // Средний чек
+    anomalies?: number; // Количество аномалий
+    // Metadata
+    shift_date: Date;
+    shift_duration_minutes: number;
+    // Stability tracking (for qualification upgrades)
+    is_stable: boolean; // Metrics within expected range
 }
 
 // =============================================================================

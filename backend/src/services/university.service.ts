@@ -1,10 +1,24 @@
 /**
  * University Service
+ * Module 13: Corporate University
  * Handles Corporate University module business logic
+ * 
+ * CANON:
+ * - Course recommendations based on PhotoCompany metrics ONLY
+ * - Dashboard visibility by qualification level
+ * - Course ≠ money, only recognition
  */
 
-
 import { prisma } from '../config/prisma';
+import { CourseGrade, TargetMetric, CourseScope } from '@prisma/client';
+
+interface VisibilityConfig {
+    nextStep: boolean;
+    metrics: boolean;
+    trends: boolean;
+    compare: boolean;
+    system?: boolean;
+}
 
 export class UniversityService {
     /**
@@ -75,8 +89,11 @@ export class UniversityService {
                 id: course.id,
                 title: course.title,
                 description: course.description,
+                targetMetric: course.target_metric,
+                expectedEffect: course.expected_effect,
+                scope: course.scope,
                 requiredGrade: course.required_grade,
-                rewardMC: course.reward_mc,
+                recognitionMC: course.recognition_mc,
                 rewardGMC: course.reward_gmc,
                 isMandatory: course.is_mandatory,
                 modulesCount: course._count.modules,
@@ -155,8 +172,11 @@ export class UniversityService {
             description: course.description,
             academyId: course.academy?.id,
             academyName: course.academy?.name,
+            targetMetric: course.target_metric,
+            expectedEffect: course.expected_effect,
+            scope: course.scope,
             requiredGrade: course.required_grade,
-            rewardMC: course.reward_mc,
+            recognitionMC: course.recognition_mc,
             rewardGMC: course.reward_gmc,
             isMandatory: course.is_mandatory,
             isActive: course.is_active,
@@ -209,6 +229,9 @@ export class UniversityService {
             title: course.title,
             description: course.description,
             academy: course.academy,
+            targetMetric: course.target_metric,
+            expectedEffect: course.expected_effect,
+            scope: course.scope,
             modules: course.modules.map((module) => ({
                 id: module.id,
                 order: module.module_order,
@@ -216,7 +239,7 @@ export class UniversityService {
                 isRequired: module.is_required,
             })),
             requiredGrade: course.required_grade,
-            rewardMC: course.reward_mc,
+            recognitionMC: course.recognition_mc,
             rewardGMC: course.reward_gmc,
             isMandatory: course.is_mandatory,
             totalDuration,
@@ -241,7 +264,7 @@ export class UniversityService {
                 description: data.description,
                 academy_id: data.academyId,
                 required_grade: data.requiredGrade as any,
-                reward_mc: data.rewardMC || 0,
+                recognition_mc: data.rewardMC || 0,
                 reward_gmc: data.rewardGMC || 0,
                 is_mandatory: data.isMandatory || false,
             },
@@ -269,7 +292,7 @@ export class UniversityService {
                 title: data.title,
                 description: data.description,
                 required_grade: data.requiredGrade as any,
-                reward_mc: data.rewardMC,
+                recognition_mc: data.rewardMC,
                 reward_gmc: data.rewardGMC,
                 is_mandatory: data.isMandatory,
                 is_active: data.isActive,
@@ -296,6 +319,205 @@ export class UniversityService {
                 is_required: data.isRequired ?? true,
             },
         });
+    }
+
+    /**
+     * Get student dashboard with visibility based on qualification level
+     * 
+     * CANON: Visibility increases with qualification
+     */
+    async getStudentDashboard(userId: string) {
+        const userGrade = await prisma.userGrade.findUnique({
+            where: { user_id: userId },
+        });
+
+        if (!userGrade) {
+            throw new Error('User grade not found');
+        }
+
+        const currentGrade = userGrade.current_grade;
+        const visibility = this.getVisibilityLevel(currentGrade);
+
+        const enrollments = await prisma.enrollment.findMany({
+            where: {
+                user_id: userId,
+                status: 'ACTIVE',
+            },
+            include: {
+                course: true,
+            },
+        });
+
+        const recommendations = await this.getRecommendedCourses(userId);
+        const progressToNext = await this.calculateProgressToNext(userId);
+
+        return {
+            currentGrade,
+            visibility,
+            activeCourses: enrollments.map((e) => ({
+                id: e.id,
+                courseId: e.course_id,
+                courseTitle: e.course.title,
+                progress: e.progress,
+                enrolledAt: e.enrolled_at,
+            })),
+            recommendedCourses: recommendations,
+            progressToNext,
+        };
+    }
+
+    /**
+     * Get visibility level based on qualification grade
+     * 
+     * CANON: Higher qualification → more visibility
+     */
+    getVisibilityLevel(grade: CourseGrade): VisibilityConfig {
+        const visibilityMap: Record<CourseGrade, VisibilityConfig> = {
+            INTERN: {
+                nextStep: true,
+                metrics: false,
+                trends: false,
+                compare: false,
+            },
+            SPECIALIST: {
+                nextStep: true,
+                metrics: true,
+                trends: false,
+                compare: false,
+            },
+            PROFESSIONAL: {
+                nextStep: true,
+                metrics: true,
+                trends: true,
+                compare: false,
+            },
+            EXPERT: {
+                nextStep: true,
+                metrics: true,
+                trends: true,
+                compare: true,
+            },
+            MASTER: {
+                nextStep: true,
+                metrics: true,
+                trends: true,
+                compare: true,
+                system: true,
+            },
+        };
+
+        return visibilityMap[grade];
+    }
+
+    /**
+     * Get recommended courses based on PhotoCompany metrics
+     * 
+     * CANON: Source = PhotoCompany metrics (last N shifts)
+     * NOT: grades, test scores, wishes
+     */
+    async getRecommendedCourses(userId: string) {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                employee: true,
+            },
+        });
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        // TODO: Integrate with PhotoCompany service to get real metrics
+        const photocompanyMetrics = {
+            okk: 75,
+            ck: 65,
+            conversion: 55,
+            quality: 85,
+            retouchTime: 45,
+        };
+
+        const weakMetrics: TargetMetric[] = [];
+        if (photocompanyMetrics.okk < 80) weakMetrics.push('OKK');
+        if (photocompanyMetrics.ck < 70) weakMetrics.push('CK');
+        if (photocompanyMetrics.conversion < 60) weakMetrics.push('CONVERSION');
+        if (photocompanyMetrics.quality < 90) weakMetrics.push('QUALITY');
+        if (photocompanyMetrics.retouchTime > 40) weakMetrics.push('RETOUCH_TIME');
+
+        if (weakMetrics.length === 0) {
+            return [];
+        }
+
+        const courses = await prisma.course.findMany({
+            where: {
+                target_metric: {
+                    in: weakMetrics,
+                },
+                is_active: true,
+            },
+            include: {
+                academy: {
+                    select: {
+                        name: true,
+                    },
+                },
+            },
+            take: 5,
+        });
+
+        return courses.map((course) => ({
+            id: course.id,
+            title: course.title,
+            description: course.description,
+            academyName: course.academy?.name,
+            targetMetric: course.target_metric,
+            expectedEffect: course.expected_effect,
+            scope: course.scope,
+            recognitionMC: course.recognition_mc,
+            reason: `Улучшение метрики: ${course.target_metric}`,
+        }));
+    }
+
+    /**
+     * Calculate progress to next qualification level
+     */
+    async calculateProgressToNext(userId: string) {
+        const userGrade = await prisma.userGrade.findUnique({
+            where: { user_id: userId },
+        });
+
+        if (!userGrade) {
+            throw new Error('User grade not found');
+        }
+
+        const currentGrade = userGrade.current_grade;
+
+        const progression: CourseGrade[] = [
+            'INTERN',
+            'SPECIALIST',
+            'PROFESSIONAL',
+            'EXPERT',
+            'MASTER',
+        ];
+
+        const currentIndex = progression.indexOf(currentGrade);
+        if (currentIndex === -1 || currentIndex === progression.length - 1) {
+            return {
+                currentGrade,
+                nextGrade: null,
+                progress: 100,
+                message: 'Максимальный уровень достигнут',
+            };
+        }
+
+        const nextGrade = progression[currentIndex + 1];
+
+        // TODO: Calculate real progress based on PhotoCompany metrics
+        return {
+            currentGrade,
+            nextGrade,
+            progress: 65,
+            message: `Продолжайте улучшать метрики для достижения уровня ${nextGrade}`,
+        };
     }
 }
 

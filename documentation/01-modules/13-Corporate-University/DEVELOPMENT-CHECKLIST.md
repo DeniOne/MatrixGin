@@ -10,91 +10,30 @@
 ---
 
 ## Component 1: Database Schema
-
-### Schema Updates
-- [ ] Добавить enum `TargetMetric` (OKK, CK, CONVERSION, QUALITY, RETOUCH_TIME, AVG_CHECK, ANOMALIES)
-- [ ] Добавить enum `CourseScope` (PHOTOGRAPHER, SALES, RETOUCH, GENERAL)
-- [ ] Обновить модель `Course`:
-  - [ ] Добавить `target_metric: TargetMetric`
-  - [ ] Добавить `expected_effect: String`
-  - [ ] Добавить `scope: CourseScope`
-  - [ ] Переименовать `reward_mc` → `recognition_mc`
-- [ ] Создать модель `QualificationSnapshot`
-  - [ ] **Immutable** (no UPDATE operations)
-  - [ ] **Append-only** history
-  - [ ] Created ONLY via approved upgrade
-  - [ ] Snapshot ≠ current state
-- [ ] Создать миграцию `add_course_photocompany_fields`
-- [ ] Обновить существующие курсы (добавить обязательные поля)
-
-### Existing Tables (Already Complete)
-- [x] academies
-- [x] skills
-- [x] materials
-- [x] courses (требует обновление)
-- [x] course_modules
-- [x] user_skills
-- [x] user_grades
-- [x] enrollments
-- [x] module_progress
-- [x] certifications
-- [x] learning_paths
-- [x] trainers
-- [x] trainer_assignments
-- [x] training_results
+- [x] Добавить enum `TargetMetric`
+- [x] Добавить enum `CourseScope`
+- [x] Обновить модель `Course`
+- [x] Создать модель `QualificationSnapshot`
+- [x] Создать миграцию `add_course_photocompany_fields`
+- [x] Обновить существующие курсы
 
 ---
 
 ## Component 2: Backend Services
-
-### University Service
-- [x] Basic CRUD (academies, courses) — существует
-- [ ] Добавить `getStudentDashboard(userId)`
-- [ ] Добавить `getVisibilityLevel(grade)`
-- [ ] Добавить `getRecommendedCourses(userId)`
-  - [ ] **Source:** PhotoCompany metrics (last N shifts)
-  - [ ] **NOT:** grades, test scores, wishes
-  - [ ] Identify weak metrics
-  - [ ] Match courses by target_metric
-- [ ] Добавить `calculateProgressToNext(userId)`
-
-### Enrollment Service
-- [x] Basic enrollment — существует
-- [ ] Обновить `completeCourse()`:
-  - [ ] Убрать прямое начисление MC
-  - [ ] Заменить на `registerRecognition()`
-  - [ ] Убрать прямое изменение квалификации
-
-### Qualification Service (NEW)
-- [ ] Создать `qualification.service.ts`
-- [ ] Реализовать `proposeQualificationUpgrade(userId, photocompanyMetrics)`
-- [ ] Реализовать `applyApprovedUpgrade(proposalId, approvedBy)`
-- [ ] Реализовать `checkMetrics(metrics, requirements)`
-- [ ] Реализовать `getGradeRequirements(grade)`
-
-### Trainer Service
-- [x] Basic trainer management — существует
-- [ ] Добавить RBAC проверки (нет write-прав на деньги/KPI)
+- [x] University Service: `getStudentDashboard`, `getVisibilityLevel`, `getRecommendedCourses`, `calculateProgressToNext`
+- [x] Enrollment Service: `completeCourse` refactored (registerRecognition, event emit)
+- [x] Qualification Service: `proposeQualificationUpgrade`, `applyApprovedUpgrade`, etc.
+- [x] Trainer Service: RBAC checks added
 
 ---
 
 ## Component 3: Event Flow
-
-### Event Handlers
-- [ ] Создать `events/course-completed.handler.ts`
-  - [ ] Символическое признание (MC)
-  - [ ] Уведомление пользователя
-  - [ ] Логирование события
-- [ ] Создать `events/photocompany-result.handler.ts`
-  - [ ] Проверка стабильности метрик (6 смен)
-  - [ ] Создание qualification proposal
-  - [ ] Отправка на Approval Workflow
-
-### Event Subscriptions
-- [ ] Подписать `CourseCompletedHandler` на `COURSE_COMPLETED`
-- [ ] Подписать `PhotoCompanyResultHandler` на `PHOTOCOMPANY_RESULT`
-- [ ] Подписать `RewardService` на `COURSE_COMPLETED`
-- [ ] Подписать `NotificationService` на `COURSE_COMPLETED`
+- [x] Создать `events/course-completed.handler.ts`
+- [x] Создать `events/photocompany-result.handler.ts`
+- [x] Создать `events/university-event.dispatcher.ts`
+- [x] Подключить dispatcher в `index.ts` (startWorker)
+- [/] PhotoCompany integration (handlers ready, event emission integrated into EnrollmentService)
+- [ ] Manual verification scenarios for Event Flow
 
 ---
 

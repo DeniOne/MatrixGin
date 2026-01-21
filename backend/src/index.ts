@@ -36,6 +36,7 @@ import aiOpsRoutes from './ai-ops/ai-ops.routes';
 import adaptationRoutes from './routes/adaptation.routes';
 import managerToolsRoutes from './routes/manager-tools.routes';
 import statusRoutes from './routes/status.routes';
+import { universityEventDispatcher } from './events/university-event.dispatcher';
 
 
 // Handle BigInt serialization
@@ -147,6 +148,9 @@ async function startServer() {
         cache.connect().catch(error => {
             logger.warn('Redis not available, caching disabled', { error: error.message });
         });
+
+        // 4.1 Start University Event Worker (Module 13)
+        universityEventDispatcher.startWorker();
 
         // 5. Start HTTP server
         app.listen(port, () => {

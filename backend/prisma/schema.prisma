@@ -7,6 +7,1277 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Role {
+  id          String         @id @default(uuid())
+  name        String         @unique
+  description String?
+  code        String         @unique
+  is_active   Boolean        @default(true)
+  created_at  DateTime       @default(now())
+  updated_at  DateTime       @updatedAt
+  contracts   RoleContract[]
+  users       User[]
+
+  @@map("roles")
+}
+
+model RoleContract {
+  id                   String    @id @default(uuid())
+  role_id              String
+  mission              String
+  value_product        String
+  responsibility_zones Json
+  kpi_definitions      Json
+  permissions          Json
+  growth_paths         Json
+  version              Int       @default(1)
+  is_active            Boolean   @default(true)
+  effective_from       DateTime  @default(now())
+  effective_to         DateTime?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+  role                 Role      @relation(fields: [role_id], references: [id])
+
+  @@unique([role_id, version])
+  @@map("role_contracts")
+}
+
+model QualificationLevel {
+  id           String   @id @default(uuid())
+  name         String   @unique
+  level        Int      @unique
+  description  String?
+  requirements Json?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+  users        User[]
+
+  @@map("qualification_levels")
+}
+
+model Event {
+  id           String    @id @default(uuid())
+  type         EventType
+  source       String
+  subject_id   String
+  subject_type String
+  payload      Json
+  metadata     Json?
+  timestamp    DateTime  @default(now())
+
+  // IDEMPOTENCY: Track if and when this event was processed by system handlers
+  processed_at DateTime? 
+
+  @@index([type, timestamp])
+  @@index([subject_id, subject_type])
+  @@index([processed_at])
+  @@map("events")
+}
+
+model KPI {
+  id                 String      @id @default(uuid())
+  name               String      @unique
+  description        String?
+  formula            String
+  source_events      Json
+  calculation_period String
+  unit               String?
+  is_active          Boolean     @default(true)
+  created_at         DateTime    @default(now())
+  updated_at         DateTime    @updatedAt
+  records            KPIRecord[]
+
+  @@map("kpis")
+}
+
+model KPIRecord {
+  id               String   @id @default(uuid())
+  kpi_id           String
+  user_id          String?
+  department_id    String?
+  value            Decimal  @db.Decimal(15, 4)
+  period_start     DateTime
+  period_end       DateTime
+  calculated_at    DateTime @default(now())
+  source_event_ids Json
+  kpi              KPI      @relation(fields: [kpi_id], references: [id])
+
+  @@index([kpi_id, period_start, period_end])
+  @@map("kpi_records")
+}
+
+model RewardRule {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  trigger     Json
+  condition   Json
+  reward      Json
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("reward_rules")
+}
+
+model User {
+  id                           String                       @id @default(uuid())
+  email                        String                       @unique
+  password_hash                String
+  first_name                   String
+  last_name                    String
+  middle_name                  String?
+  phone_number                 String?
+  role                         UserRole                     @default(EMPLOYEE)
+  status                       UserStatus                   @default(ACTIVE)
+  avatar                       String?
+  department_id                String?
+  last_login_at                DateTime?
+  created_at                   DateTime                     @default(now())
+  updated_at                   DateTime                     @updatedAt
+  telegram_id                  String?                      @unique
+  consent_date                 DateTime?
+  personal_data_consent        Boolean                      @default(false)
+  qualification_level_id       String?
+  role_id                      String?
+  ai_feedback                  AIFeedback[]
+  audit_logs                   AuditLog[]
+  reward_eligibilities         RewardEligibility[]
+  assigned_roles               EmployeeRole[]               @relation("RoleAssigner")
+  employee_roles               EmployeeRole[]
+  employee                     Employee?
+  hybrid_interactions          HybridTeamInteraction[]
+  submitted_ideas              IdeaChannel[]
+  kaizen_suggestions           Kaizen[]
+  mentorship_as_mentee         Mentorship?                  @relation("MenteeUser")
+  mentorship_as_mentor         Mentorship[]                 @relation("MentorUser")
+  mes_registered_defects       Defect[]
+  mes_created_orders           ProductionOrder[]
+  mes_quality_checks           QualityCheck[]
+  mes_assigned_works           WorkOrder[]
+  notifications                Notification[]
+  one_on_ones_attended         OneOnOne[]                   @relation("Employee1on1")
+  one_on_ones_managed          OneOnOne[]                   @relation("Manager1on1")
+  structure_changes            OrgStructureHistory[]
+  participation_status_history ParticipationStatusHistory[]
+  purchases                    Purchase[]
+  raci_entries                 RaciMatrix[]
+  subordinate_relations        ReportingRelationship[]      @relation("SubordinateRelation")
+  supervisor_relations         ReportingRelationship[]      @relation("SupervisorRelation")
+  attachments                  TaskAttachment[]
+  comments                     TaskComment[]
+  assigned_tasks               Task[]                       @relation("AssignedTasks")
+  created_tasks                Task[]                       @relation("CreatedTasks")
+  received_transactions        Transaction[]                @relation("ReceivedTransactions")
+  sent_transactions            Transaction[]                @relation("SentTransactions")
+  triangle_assignments         TriangleAssignment[]
+  achievements                 UserAchievement[]
+  statuses                     UserGamificationStatus[]
+  current_participation_rank   UserParticipationRank?
+  current_participation_status UserParticipationStatus?
+  qualification_level          QualificationLevel?          @relation(fields: [qualification_level_id], references: [id])
+  erp_role                     Role?                        @relation(fields: [role_id], references: [id])
+  wallet                       Wallet?
+
+  @@map("users")
+}
+
+model Mentorship {
+  id         String   @id @default(uuid())
+  mentor_id  String
+  mentee_id  String   @unique
+  status     String   @default("ACTIVE")
+  goals      Json?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  mentee     User     @relation("MenteeUser", fields: [mentee_id], references: [id])
+  mentor     User     @relation("MentorUser", fields: [mentor_id], references: [id])
+
+  @@map("mentorships")
+}
+
+model OneOnOne {
+  id           String    @id @default(uuid())
+  manager_id   String
+  employee_id  String
+  scheduled_at DateTime
+  completed_at DateTime?
+  notes        String?
+  action_items Json?
+  mood         Int?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  employee     User      @relation("Employee1on1", fields: [employee_id], references: [id])
+  manager      User      @relation("Manager1on1", fields: [manager_id], references: [id])
+
+  @@map("one_on_ones")
+}
+
+model Kaizen {
+  id              String   @id @default(uuid())
+  author_id       String
+  text            String
+  status          String   @default("NEW")
+  manager_comment String?
+  history         Json     @default("[]")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  author          User     @relation(fields: [author_id], references: [id])
+
+  @@map("kaizen")
+}
+
+model Department {
+  id              String                 @id @default(uuid())
+  name            String                 @unique
+  description     String?
+  head_id         String?
+  parent_id       String?
+  created_at      DateTime               @default(now())
+  updated_at      DateTime               @updatedAt
+  code            String                 @unique
+  annual_goals    String?
+  budget_annual   Decimal?               @db.Decimal(15, 2)
+  department_type String?
+  faculty_link    String?
+  functions       String[]
+  hierarchy_level Int?
+  is_active       Boolean                @default(true)
+  kpis            Json?
+  level           Int                    @default(0)
+  path            String?
+  parent          Department?            @relation("DepartmentHierarchy", fields: [parent_id], references: [id])
+  children        Department[]           @relation("DepartmentHierarchy")
+  employees       Employee[]
+  role_matrices   RoleCompetencyMatrix[]
+  tasks           Task[]
+
+  @@map("departments")
+}
+
+model Employee {
+  id               String         @id @default(uuid())
+  user_id          String         @unique
+  department_id    String?
+  position         String?
+  bio              String?
+  status           EmployeeStatus @default(PHOTON)
+  rank             EmployeeRank   @default(COLLECTOR)
+  hired_at         DateTime       @default(now())
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+  emotional_tone   Int?           @default(0)
+  employee_number  String?        @unique
+  gmc_balance      Decimal?       @default(0) @db.Decimal(10, 2)
+  mc_balance       Decimal?       @default(0) @db.Decimal(10, 2)
+  salary           Decimal?       @db.Decimal(10, 2)
+  termination_date DateTime?
+  hire_date        DateTime?
+  department       Department?    @relation(fields: [department_id], references: [id])
+  user             User           @relation(fields: [user_id], references: [id])
+
+  @@map("employees")
+}
+
+model Task {
+  id            String           @id @default(uuid())
+  title         String
+  description   String
+  status        TaskStatus       @default(TODO)
+  priority      TaskPriority     @default(MEDIUM)
+  creator_id    String
+  assignee_id   String?
+  department_id String?
+  due_date      DateTime?
+  completed_at  DateTime?
+  tags          String[]
+  mc_reward     Decimal?         @db.Decimal(10, 2)
+  created_at    DateTime         @default(now())
+  updated_at    DateTime         @updatedAt
+  attachments   TaskAttachment[]
+  comments      TaskComment[]
+  assignee      User?            @relation("AssignedTasks", fields: [assignee_id], references: [id])
+  creator       User             @relation("CreatedTasks", fields: [creator_id], references: [id])
+  department    Department?      @relation(fields: [department_id], references: [id])
+
+  @@map("tasks")
+}
+
+model TaskComment {
+  id         String   @id @default(uuid())
+  task_id    String
+  user_id    String
+  text       String
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  task       Task     @relation(fields: [task_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
+
+  @@map("task_comments")
+}
+
+model TaskAttachment {
+  id         String   @id @default(uuid())
+  task_id    String
+  user_id    String
+  file_url   String
+  file_name  String
+  file_type  String
+  created_at DateTime @default(now())
+  task       Task     @relation(fields: [task_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
+
+  @@map("task_attachments")
+}
+
+model Wallet {
+  id                String    @id @default(uuid())
+  user_id           String    @unique
+  mc_balance        Decimal   @default(0) @db.Decimal(10, 2)
+  gmc_balance       Decimal   @default(0) @db.Decimal(10, 2)
+  mc_frozen         Decimal   @default(0) @db.Decimal(10, 2)
+  safe_activated_at DateTime?
+  safe_expires_at   DateTime?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  user              User      @relation(fields: [user_id], references: [id])
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id           String          @id @default(uuid())
+  type         TransactionType
+  currency     Currency
+  amount       Decimal         @db.Decimal(10, 2)
+  sender_id    String?
+  recipient_id String?
+  description  String?
+  metadata     Json?
+  created_at   DateTime        @default(now())
+  recipient    User?           @relation("ReceivedTransactions", fields: [recipient_id], references: [id])
+  sender       User?           @relation("SentTransactions", fields: [sender_id], references: [id])
+
+  @@map("transactions")
+}
+
+model Notification {
+  id         String    @id @default(uuid())
+  user_id    String
+  type       String
+  title      String
+  message    String
+  read       Boolean   @default(false)
+  read_at    DateTime?
+  metadata   Json?
+  created_at DateTime  @default(now())
+  user       User      @relation(fields: [user_id], references: [id])
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  user_id     String?
+  action      String
+  entity_type String?
+  entity_id   String?
+  details     Json?
+  ip_address  String?
+  user_agent  String?
+  created_at  DateTime @default(now())
+  user        User?    @relation(fields: [user_id], references: [id])
+
+  @@map("audit_logs")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  price       Decimal  @db.Decimal(10, 2)
+  stock       Int      @default(0)
+  image_url   String?
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+
+  @@map("products")
+}
+
+model StoreItem {
+  id            String     @id @default(uuid())
+  title         String
+  description   String
+  priceMC       Int
+  category      String
+  active        Boolean    @default(true)
+  stock         Int?
+  purchaseLimit Int?
+  metadata      Json       @default("{}")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  purchases     Purchase[]
+
+  @@map("store_items")
+}
+
+model Purchase {
+  id             String         @id @default(uuid())
+  createdAt      DateTime       @default(now())
+  idempotencyKey String
+  itemId         String
+  priceMC        Int
+  transactionId  String
+  userId         String
+  status         PurchaseStatus @default(COMPLETED)
+  item           StoreItem      @relation(fields: [itemId], references: [id])
+  user           User           @relation(fields: [userId], references: [id])
+
+  @@unique([userId, idempotencyKey])
+  @@index([userId])
+  @@index([itemId])
+  @@map("purchases")
+}
+
+model GamificationLevel {
+  id           String                   @id @default(uuid())
+  name         String                   @unique
+  level        Int                      @unique
+  requirements Json?
+  created_at   DateTime                 @default(now())
+  updated_at   DateTime                 @updatedAt
+  users        UserGamificationStatus[]
+
+  @@map("gamification_levels")
+}
+
+model UserGamificationStatus {
+  id          String            @id @default(uuid())
+  user_id     String
+  status_id   String
+  achieved_at DateTime          @default(now())
+  status      GamificationLevel @relation(fields: [status_id], references: [id])
+  user        User              @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, status_id])
+  @@index([user_id])
+  @@index([achieved_at])
+  @@map("user_gamification_statuses")
+}
+
+model Achievement {
+  id          String            @id @default(uuid())
+  name        String
+  description String?
+  icon_url    String?
+  created_at  DateTime          @default(now())
+  users       UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id             String      @id @default(uuid())
+  user_id        String
+  achievement_id String
+  earned_at      DateTime    @default(now())
+  achievement    Achievement @relation(fields: [achievement_id], references: [id])
+  user           User        @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, achievement_id])
+  @@index([user_id])
+  @@map("user_achievements")
+}
+
+model Leaderboard {
+  id         String            @id @default(uuid())
+  metric     LeaderboardMetric
+  period     LeaderboardPeriod
+  top_users  Json
+  updated_at DateTime          @updatedAt
+  created_at DateTime          @default(now())
+
+  @@unique([metric, period])
+  @@map("leaderboards")
+}
+
+model Quest {
+  id            String          @id @default(uuid())
+  title         String
+  description   String?
+  icon_url      String?
+  requirements  Json?
+  reward_mc     Int             @default(0)
+  reward_gmc    Int             @default(0)
+  is_active     Boolean         @default(true)
+  duration_days Int?
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+  progress      QuestProgress[]
+
+  @@map("quests")
+}
+
+model QuestProgress {
+  id           String      @id @default(uuid())
+  user_id      String
+  quest_id     String
+  progress     Json?
+  status       QuestStatus @default(NOT_STARTED)
+  started_at   DateTime?
+  completed_at DateTime?
+  created_at   DateTime    @default(now())
+  updated_at   DateTime    @updatedAt
+  quest        Quest       @relation(fields: [quest_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, quest_id])
+  @@index([user_id])
+  @@index([status])
+  @@map("quest_progress")
+}
+
+model RoleCompetencyMatrix {
+  id                           String         @id @default(uuid())
+  role_name                    String
+  department_id                String?
+  required_competencies        Json
+  responsibilities             String[]
+  permissions                  Json?
+  salary_min                   Decimal?       @db.Decimal(15, 2)
+  salary_max                   Decimal?       @db.Decimal(15, 2)
+  purpose                      String?
+  expected_results             String[]
+  required_knowledge           String[]
+  required_skills              String[]
+  interactions                 Json?
+  corporate_university_courses String[]
+  golden_standard_processes    String[]
+  efficiency_metrics           Json?
+  lean_principles              String[]
+  documents                    Json?
+  created_at                   DateTime       @default(now())
+  updated_at                   DateTime       @updatedAt
+  employee_roles               EmployeeRole[]
+  raci_matrix_entries          RaciMatrix[]
+  department                   Department?    @relation(fields: [department_id], references: [id], onDelete: Cascade)
+
+  @@unique([role_name, department_id])
+  @@map("role_competency_matrix")
+}
+
+model EmployeeRole {
+  id             String                @id @default(uuid())
+  employee_id    String
+  role_matrix_id String?
+  assigned_at    DateTime              @default(now())
+  effective_from DateTime              @db.Date
+  effective_to   DateTime?             @db.Date
+  assigned_by    String?
+  is_active      Boolean               @default(true)
+  created_at     DateTime              @default(now())
+  assigner       User?                 @relation("RoleAssigner", fields: [assigned_by], references: [id])
+  user           User                  @relation(fields: [employee_id], references: [id], onDelete: Cascade)
+  role           RoleCompetencyMatrix? @relation(fields: [role_matrix_id], references: [id], onDelete: Cascade)
+
+  @@map("employee_roles")
+}
+
+model OrgStructureHistory {
+  id          String   @id @default(uuid())
+  entity_type String
+  entity_id   String
+  action      String
+  changed_by  String?
+  old_data    Json?
+  new_data    Json?
+  reason      String?
+  ip_address  String?
+  user_agent  String?
+  created_at  DateTime @default(now())
+  changer     User?    @relation(fields: [changed_by], references: [id])
+
+  @@map("org_structure_history")
+}
+
+model ReportingRelationship {
+  id                String    @id @default(uuid())
+  subordinate_id    String
+  supervisor_id     String
+  relationship_type String    @default("direct")
+  effective_from    DateTime  @db.Date
+  effective_to      DateTime? @db.Date
+  is_active         Boolean   @default(true)
+  created_at        DateTime  @default(now())
+  subordinate       User      @relation("SubordinateRelation", fields: [subordinate_id], references: [id], onDelete: Cascade)
+  supervisor        User      @relation("SupervisorRelation", fields: [supervisor_id], references: [id], onDelete: Cascade)
+
+  @@map("reporting_relationships")
+}
+
+model OrgHierarchyLevel {
+  id                String   @id @default(uuid())
+  level_number      Int      @unique
+  level_name        String
+  level_name_ru     String
+  description       String?
+  can_have_children Boolean  @default(true)
+  created_at        DateTime @default(now())
+
+  @@map("org_hierarchy_levels")
+}
+
+model PyramidRole {
+  id                String   @id @default(uuid())
+  role_type         String
+  role_name         String
+  description       String?
+  kpi_metrics       Json?
+  interdependencies Json?
+  created_at        DateTime @default(now())
+
+  @@unique([role_type, role_name])
+  @@map("pyramid_roles")
+}
+
+model TriangleAssignment {
+  id            String   @id @default(uuid())
+  employee_id   String
+  triangle_role String
+  is_primary    Boolean  @default(true)
+  flow_metrics  Json?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  user          User     @relation(fields: [employee_id], references: [id], onDelete: Cascade)
+
+  @@map("triangle_assignments")
+}
+
+model RaciMatrix {
+  id           String                @id @default(uuid())
+  project_name String
+  task_name    String
+  employee_id  String?
+  role_id      String?
+  raci_role    String
+  description  String?
+  created_at   DateTime              @default(now())
+  user         User?                 @relation(fields: [employee_id], references: [id], onDelete: Cascade)
+  role         RoleCompetencyMatrix? @relation(fields: [role_id], references: [id])
+
+  @@map("raci_matrix")
+}
+
+model IdeaChannel {
+  id                  String   @id @default(uuid())
+  channel_type        String
+  title               String
+  description         String?
+  submitted_by        String?
+  target_level        Int?
+  status              String   @default("submitted")
+  priority            String?
+  implementation_plan String?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  submitter           User?    @relation(fields: [submitted_by], references: [id])
+
+  @@map("idea_channels")
+}
+
+model HybridTeamInteraction {
+  id                String   @id @default(uuid())
+  human_employee_id String?
+  ai_agent_name     String
+  interaction_type  String?
+  privacy_consent   Boolean  @default(false)
+  ai_mode_enabled   Boolean  @default(true)
+  interaction_data  Json?
+  created_at        DateTime @default(now())
+  human_employee    User?    @relation(fields: [human_employee_id], references: [id], onDelete: Cascade)
+
+  @@map("hybrid_team_interactions")
+}
+
+model Academy {
+  id             String          @id @default(uuid())
+  name           String          @unique
+  description    String?
+  icon_url       String?
+  is_active      Boolean         @default(true)
+  created_at     DateTime        @default(now())
+  updated_at     DateTime        @updatedAt
+  certifications Certification[]
+  courses        Course[]
+  materials      Material[]
+  skills         Skill[]
+
+  @@map("academies")
+}
+
+model Skill {
+  id             String      @id @default(uuid())
+  academy_id     String?
+  name           String
+  category       String?
+  level_required String?
+  kpi_impact     String?
+  description    String?
+  created_at     DateTime    @default(now())
+  academy        Academy?    @relation(fields: [academy_id], references: [id], onDelete: Cascade)
+  user_skills    UserSkill[]
+
+  @@map("skills")
+}
+
+model Material {
+  id               String         @id @default(uuid())
+  type             MaterialType
+  title            String
+  content_url      String?
+  content_text     String?
+  duration_minutes Int?
+  tags             Json?
+  level            String?
+  academy_id       String?
+  version          Int            @default(1)
+  status           MaterialStatus @default(DRAFT)
+  created_by       String?
+  reviewed_by      String?
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+  course_modules   CourseModule[]
+  academy          Academy?       @relation(fields: [academy_id], references: [id])
+
+  @@map("materials")
+}
+
+model Course {
+  id              String          @id @default(uuid())
+  academy_id      String?
+  title           String
+  description     String?
+  required_grade  CourseGrade?
+  recognition_mc  Int             @default(0) @map("reward_mc")
+  reward_gmc      Int             @default(0)
+  is_mandatory    Boolean         @default(false)
+  is_active       Boolean         @default(true)
+  created_at      DateTime        @default(now())
+  updated_at      DateTime        @updatedAt
+  expected_effect String
+  scope           CourseScope
+  target_metric   TargetMetric
+  certifications  Certification[]
+  modules         CourseModule[]
+  academy         Academy?        @relation(fields: [academy_id], references: [id])
+  enrollments     Enrollment[]
+
+  @@map("courses")
+}
+
+model CourseModule {
+  id           String           @id @default(uuid())
+  course_id    String
+  material_id  String?
+  module_order Int
+  is_required  Boolean          @default(true)
+  created_at   DateTime         @default(now())
+  course       Course           @relation(fields: [course_id], references: [id], onDelete: Cascade)
+  material     Material?        @relation(fields: [material_id], references: [id])
+  progress     ModuleProgress[]
+
+  @@map("course_modules")
+}
+
+model UserSkill {
+  id          String    @id @default(uuid())
+  user_id     String
+  skill_id    String
+  level       Int       @default(0)
+  verified_at DateTime?
+  verified_by String?
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  skill       Skill     @relation(fields: [skill_id], references: [id])
+
+  @@unique([user_id, skill_id])
+  @@map("user_skills")
+}
+
+model UserGrade {
+  id                     String      @id @default(uuid())
+  user_id                String      @unique
+  current_grade          CourseGrade @default(INTERN)
+  motivation_coefficient Decimal     @default(0.8) @db.Decimal(3, 2)
+  grade_history          Json        @default("[]")
+  created_at             DateTime    @default(now())
+  updated_at             DateTime    @updatedAt
+
+  @@map("user_grades")
+}
+
+model Enrollment {
+  id              String           @id @default(uuid())
+  user_id         String
+  course_id       String
+  progress        Int              @default(0)
+  status          EnrollmentStatus @default(ACTIVE)
+  enrolled_at     DateTime         @default(now())
+  completed_at    DateTime?
+  assigned_by     String?
+  course          Course           @relation(fields: [course_id], references: [id])
+  module_progress ModuleProgress[]
+
+  @@unique([user_id, course_id])
+  @@map("enrollments")
+}
+
+model ModuleProgress {
+  id            String       @id @default(uuid())
+  enrollment_id String
+  module_id     String
+  status        ModuleStatus @default(NOT_STARTED)
+  score         Int?
+  started_at    DateTime?
+  completed_at  DateTime?
+  enrollment    Enrollment   @relation(fields: [enrollment_id], references: [id], onDelete: Cascade)
+  module        CourseModule @relation(fields: [module_id], references: [id])
+
+  @@map("module_progress")
+}
+
+model Certification {
+  id              String       @id @default(uuid())
+  user_id         String
+  course_id       String?
+  academy_id      String?
+  level           CourseGrade?
+  score           Int?
+  issued_at       DateTime     @default(now())
+  expires_at      DateTime?
+  certificate_url String?
+  academy         Academy?     @relation(fields: [academy_id], references: [id])
+  course          Course?      @relation(fields: [course_id], references: [id])
+
+  @@map("certifications")
+}
+
+model LearningPath {
+  id              String   @id @default(uuid())
+  user_id         String   @unique
+  title           String?
+  courses_planned Json?
+  skills_target   Json?
+  ai_generated    Boolean  @default(false)
+  ai_rules        Json?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@map("learning_paths")
+}
+
+model Trainer {
+  id                  String              @id @default(uuid())
+  user_id             String              @unique
+  specialty           TrainerSpecialty
+  status              TrainerStatus       @default(CANDIDATE)
+  accreditation_date  DateTime?
+  rating              Decimal?            @db.Decimal(3, 2)
+  trainees_total      Int                 @default(0)
+  trainees_successful Int                 @default(0)
+  avg_nps             Decimal?            @db.Decimal(3, 2)
+  created_at          DateTime            @default(now())
+  updated_at          DateTime            @updatedAt
+  assignments         TrainerAssignment[]
+
+  @@map("trainers")
+}
+
+model TrainerAssignment {
+  id         String           @id @default(uuid())
+  trainer_id String
+  trainee_id String
+  start_date DateTime         @db.Date
+  end_date   DateTime?        @db.Date
+  status     AssignmentStatus @default(ACTIVE)
+  plan       Json?
+  created_at DateTime         @default(now())
+  updated_at DateTime         @updatedAt
+  trainer    Trainer          @relation(fields: [trainer_id], references: [id])
+  results    TrainingResult[]
+
+  @@map("trainer_assignments")
+}
+
+model TrainingResult {
+  id                   String            @id @default(uuid())
+  assignment_id        String
+  kpi_improvement      Int?
+  nps_score            Int?
+  retention_days       Int?
+  hot_leads_percentage Int?
+  quality_score        Int?
+  notes                String?
+  created_at           DateTime          @default(now())
+  assignment           TrainerAssignment @relation(fields: [assignment_id], references: [id], onDelete: Cascade)
+
+  @@map("training_results")
+}
+
+model QualificationSnapshot {
+  id                   String       @id @default(uuid())
+  user_id              String
+  previous_grade       CourseGrade?
+  new_grade            CourseGrade
+  photocompany_metrics Json
+  stability_period     Int
+  proposal_id          String?
+  approved_by          String?
+  approved_at          DateTime?
+  reason               String
+  created_at           DateTime     @default(now())
+
+  @@index([user_id])
+  @@index([new_grade])
+  @@index([created_at])
+  @@map("qualification_snapshots")
+}
+
+model RegistryEntity {
+  urn             String   @id
+  entity_type_urn String
+  version         Int      @default(1)
+  name            String?
+  description     String?
+  attributes      Json
+  fsm_state       String
+  is_system       Boolean  @default(false)
+  is_active       Boolean  @default(true)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@index([entity_type_urn])
+  @@index([fsm_state])
+  @@map("registry_entities")
+}
+
+model RegistryAuditEvent {
+  id         String   @id @default(uuid())
+  entity_urn String?
+  action     String
+  actor_urn  String?
+  payload    Json?
+  created_at DateTime @default(now())
+
+  @@index([entity_urn])
+  @@map("registry_audit_events")
+}
+
+model RegistryRelationship {
+  id             String   @id @default(uuid())
+  definition_urn String
+  from_urn       String
+  to_urn         String
+  attributes     Json?
+  created_at     DateTime @default(now())
+
+  @@index([definition_urn])
+  @@index([from_urn])
+  @@index([to_urn])
+  @@map("registry_relationships")
+}
+
+model RegistryOrgProjection {
+  id            String   @id @default(uuid())
+  urn           String   @unique
+  path          String
+  depth         Int
+  parent_urn    String?
+  root_urn      String
+  snapshot_hash String
+  updated_at    DateTime @updatedAt
+
+  @@index([path])
+  @@index([parent_urn])
+  @@index([root_urn])
+  @@map("registry_org_projections")
+}
+
+model RegistryOwnerProjection {
+  id            String   @id @default(uuid())
+  owner_urn     String
+  asset_urn     String
+  asset_type    String
+  relation_urn  String
+  snapshot_hash String
+  updated_at    DateTime @updatedAt
+
+  @@unique([owner_urn, asset_urn])
+  @@index([owner_urn])
+  @@index([asset_type])
+  @@map("registry_owner_projections")
+}
+
+model ProductionOrder {
+  id             String                @id @default(uuid())
+  source_type    String
+  source_ref_id  String?
+  product_type   String
+  quantity       Int
+  status         ProductionOrderStatus @default(DRAFT)
+  created_at     DateTime              @default(now())
+  closed_at      DateTime?
+  created_by_id  String
+  updated_at     DateTime              @updatedAt
+  defects        Defect[]
+  created_by     User                  @relation(fields: [created_by_id], references: [id])
+  quality_checks QualityCheck[]
+  work_orders    WorkOrder[]
+
+  @@index([status])
+  @@index([source_ref_id])
+  @@map("mes_production_orders")
+}
+
+model WorkOrder {
+  id                  String          @id @default(uuid())
+  production_order_id String
+  operation_type      String
+  status              WorkOrderStatus @default(PENDING)
+  sequence_order      Int
+  started_at          DateTime?
+  finished_at         DateTime?
+  assigned_to_id      String?
+  created_at          DateTime        @default(now())
+  updated_at          DateTime        @updatedAt
+  quality_checks      QualityCheck[]
+  assigned_to         User?           @relation(fields: [assigned_to_id], references: [id])
+  production_order    ProductionOrder @relation(fields: [production_order_id], references: [id], onDelete: Cascade)
+
+  @@index([production_order_id])
+  @@index([status])
+  @@map("mes_work_orders")
+}
+
+model QualityCheck {
+  id                  String           @id @default(uuid())
+  production_order_id String
+  work_order_id       String?
+  check_type          QualityCheckType
+  result              QualityResult
+  created_by_id       String
+  created_at          DateTime         @default(now())
+  comments            String?
+  defects             Defect[]
+  created_by          User             @relation(fields: [created_by_id], references: [id])
+  production_order    ProductionOrder  @relation(fields: [production_order_id], references: [id])
+  work_order          WorkOrder?       @relation(fields: [work_order_id], references: [id])
+
+  @@index([production_order_id])
+  @@map("mes_quality_checks")
+}
+
+model Defect {
+  id                  String          @id @default(uuid())
+  production_order_id String
+  quality_check_id    String?
+  defect_type         String
+  severity            DefectSeverity
+  root_cause          String?
+  requires_rework     Boolean         @default(false)
+  resolved            Boolean         @default(false)
+  registered_by_id    String
+  registered_at       DateTime        @default(now())
+  updated_at          DateTime        @updatedAt
+  production_order    ProductionOrder @relation(fields: [production_order_id], references: [id])
+  quality_check       QualityCheck?   @relation(fields: [quality_check_id], references: [id])
+  registered_by       User            @relation(fields: [registered_by_id], references: [id])
+
+  @@index([production_order_id])
+  @@index([resolved])
+  @@map("mes_defects")
+}
+
+model CanonicalViolation {
+  id         String    @id @default(uuid())
+  canon      CanonType
+  violation  String
+  source     String
+  action     String
+  payload    Json?
+  user_id    String?
+  created_at DateTime  @default(now())
+
+  @@index([canon, created_at])
+  @@index([violation])
+  @@map("canonical_violations")
+}
+
+model EconomyAuditLog {
+  id          String   @id @default(uuid())
+  event_id    String   @unique
+  event_type  String
+  occurred_at DateTime
+  actor_id    String
+  actor_role  String
+  user_id     String?
+  context_id  String?  @map("usage_context_id")
+  payload     Json
+  created_at  DateTime @default(now())
+
+  @@index([user_id])
+  @@index([event_type])
+  @@index([context_id])
+  @@map("economy_audit_logs")
+}
+
+model RewardEligibility {
+  id           String    @id @default(uuid())
+  user_id      String
+  event_type   String
+  event_ref_id String
+  mc_amount    Int
+  status       String    @default("PENDING")
+  processed_at DateTime?
+  audit_flag   String?
+  created_at   DateTime  @default(now())
+  user         User      @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, event_type, event_ref_id])
+  @@index([status])
+  @@index([created_at])
+  @@map("economy_reward_eligibility")
+}
+
+model MatrixCoinSnapshot {
+  id            String   @id @default(uuid())
+  snapshot_id   String   @unique
+  user_id       String
+  total_amount  Decimal  @db.Decimal(20, 8)
+  mc_state_json Json
+  captured_at   DateTime
+  created_at    DateTime @default(now())
+
+  @@index([user_id, captured_at])
+  @@map("matrixcoin_snapshots")
+}
+
+model AuctionEventState {
+  id            String   @id @default(uuid())
+  event_id      String   @unique
+  status        String
+  state_payload Json
+  updated_at    DateTime @updatedAt
+  created_at    DateTime @default(now())
+
+  @@index([status])
+  @@map("auction_event_states")
+}
+
+model GovernanceFlag {
+  id           String    @id @default(uuid())
+  flag_id      String    @unique
+  user_id      String
+  context_id   String
+  review_level String
+  status       String
+  reason       String
+  payload      Json
+  flagged_at   DateTime
+  resolved_at  DateTime?
+  created_at   DateTime  @default(now())
+
+  @@index([status])
+  @@index([review_level])
+  @@map("economy_governance_flags")
+}
+
+model AIFeedback {
+  id                String       @id @default(uuid())
+  recommendationId  String
+  userId            String
+  feedbackType      FeedbackType
+  comment           String?      @db.VarChar(500)
+  basedOnSnapshotId String?
+  aiVersion         String?
+  ruleSetVersion    String?
+  timestamp         DateTime     @default(now())
+  user              User         @relation(fields: [userId], references: [id])
+
+  @@unique([userId, recommendationId])
+  @@index([recommendationId])
+  @@index([feedbackType])
+  @@index([timestamp])
+  @@map("ai_feedback")
+}
+
+model ParticipationStatus {
+  code             String                    @id
+  description      String
+  governance_flags Json?
+  is_active        Boolean                   @default(true)
+  created_at       DateTime                  @default(now())
+  updated_at       DateTime                  @updatedAt
+  user_statuses    UserParticipationStatus[]
+
+  @@map("participation_statuses")
+}
+
+model UserParticipationStatus {
+  id          String              @id @default(uuid())
+  user_id     String              @unique
+  status_code String
+  assigned_at DateTime            @default(now())
+  assigned_by String
+  reason      String
+  status      ParticipationStatus @relation(fields: [status_code], references: [code])
+  user        User                @relation(fields: [user_id], references: [id])
+
+  @@index([status_code])
+  @@index([assigned_at])
+  @@map("user_participation_statuses")
+}
+
+model ParticipationStatusHistory {
+  id         String   @id @default(uuid())
+  user_id    String
+  old_status String?
+  new_status String
+  reason     String
+  changed_at DateTime @default(now())
+  changed_by String
+  user       User     @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+  @@index([changed_at])
+  @@map("participation_status_history")
+}
+
+model ParticipationRank {
+  code        String                  @id
+  conditions  Json
+  description String
+  is_active   Boolean                 @default(true)
+  created_at  DateTime                @default(now())
+  updated_at  DateTime                @updatedAt
+  user_ranks  UserParticipationRank[]
+
+  @@map("participation_ranks")
+}
+
+model UserParticipationRank {
+  id            String            @id @default(uuid())
+  user_id       String            @unique
+  rank_code     String
+  calculated_at DateTime          @default(now())
+  rank          ParticipationRank @relation(fields: [rank_code], references: [code])
+  user          User              @relation(fields: [user_id], references: [id])
+
+  @@index([rank_code])
+  @@index([calculated_at])
+  @@map("user_participation_ranks")
+}
+
 enum UserRole {
   ADMIN
   HR_MANAGER
@@ -21,68 +1292,6 @@ enum UserStatus {
   SUSPENDED
 }
 
-// ============================================================================
-// PHASE 0.1 - CORE DOMAIN MODELS (ERP Foundation)
-// Based on: Core Domain Schemas v1, ERP + AI Roadmap V1
-// Canon: Нет роли без контракта, нет KPI без события
-// ============================================================================
-
-// Role Model - Роли в системе (отдельная таблица, не enum)
-model Role {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  code        String   @unique // e.g., "PHOTOGRAPHER", "RETOUCHER", "SELLER"
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  contracts RoleContract[]
-  users     User[]
-
-  @@map("roles")
-}
-
-// RoleContract Model - Контракты ролей (МДР + Мотивация)
-// Canon: RoleContract = API между человеком и системой
-model RoleContract {
-  id                   String   @id @default(uuid())
-  role_id              String
-  mission              String   // Миссия роли
-  value_product        String   // ЦКП (Целевой Конечный Продукт)
-  responsibility_zones Json     // String[] - зоны ответственности
-  kpi_definitions      Json     // KPIDefinition[] - формулы, пороги
-  permissions          Json     // Permission[] - права и ограничения
-  growth_paths         Json     // QualificationPath[] - пути роста
-  version              Int      @default(1)
-  is_active            Boolean  @default(true)
-  effective_from       DateTime @default(now())
-  effective_to         DateTime?
-  created_at           DateTime @default(now())
-  updated_at           DateTime @updatedAt
-
-  role Role @relation(fields: [role_id], references: [id])
-
-  @@unique([role_id, version])
-  @@map("role_contracts")
-}
-
-// QualificationLevel Model - Уровни квалификации
-model QualificationLevel {
-  id           String   @id @default(uuid())
-  name         String   @unique // e.g., "PHOTON", "TOPCHIK", "FLINT_CARBON", "STAR", "UNIVERSE"
-  level        Int      @unique // 1-5
-  description  String?
-  requirements Json?    // Требования для достижения
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  users User[]
-
-  @@map("qualification_levels")
-}
-
-// EventType Enum - Типы событий в системе
 enum EventType {
   SHIFT_STARTED
   SHIFT_COMPLETED
@@ -97,206 +1306,7 @@ enum EventType {
   TASK_CREATED
   TASK_COMPLETED
   TRANSACTION_CREATED
-}
-
-// Event Model - Event Store (единственный источник фактов)
-// Canon: События — единственный источник фактов
-model Event {
-  id           String    @id @default(uuid())
-  type         EventType
-  source       String    // e.g., "system", "user", "api"
-  subject_id   String    // User ID or Entity ID
-  subject_type String    // "user", "task", "shift", etc.
-  payload      Json      // Event-specific data
-  metadata     Json?     // Additional context
-  timestamp    DateTime  @default(now())
-
-  @@index([type, timestamp])
-  @@index([subject_id, subject_type])
-  @@map("events")
-}
-
-// KPI Model - KPI как датчики (не цели)
-// Canon: KPI вычисляются из Events + HypothesisContext
-model KPI {
-  id                 String   @id @default(uuid())
-  name               String   @unique
-  description        String?
-  formula            String   // Mathematical formula or calculation logic
-  source_events      Json     // EventType[] - источники событий
-  calculation_period String   // "daily", "weekly", "monthly"
-  unit               String?  // "count", "percentage", "rubles"
-  is_active          Boolean  @default(true)
-  created_at         DateTime @default(now())
-  updated_at         DateTime @updatedAt
-
-  records KPIRecord[]
-
-  @@map("kpis")
-}
-
-// KPIRecord Model - Записи KPI (всегда вычисляются из Events)
-model KPIRecord {
-  id               String   @id @default(uuid())
-  kpi_id           String
-  user_id          String?
-  department_id    String?
-  value            Decimal  @db.Decimal(15, 4)
-  period_start     DateTime
-  period_end       DateTime
-  calculated_at    DateTime @default(now())
-  source_event_ids Json     // String[] - IDs событий, из которых вычислен KPI
-
-  kpi KPI @relation(fields: [kpi_id], references: [id])
-
-  @@index([kpi_id, period_start, period_end])
-  @@map("kpi_records")
-}
-
-// RewardRule Model - Правила вознаграждения
-// Canon: Reward — следствие, не причина
-model RewardRule {
-  id          String   @id @default(uuid())
-  name        String   @unique
-  description String?
-  trigger     Json     // EventType | KPIThreshold
-  condition   Json     // Condition logic
-  reward      Json     // Reward { type: "MC" | "GMC" | "RUB", amount: number }
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  @@map("reward_rules")
-}
-
-// ============================================================================
-// END PHASE 0.1 CORE DOMAIN MODELS
-// ============================================================================
-
-model User {
-  id            String    @id @default(uuid())
-  email         String    @unique
-  password_hash String
-  first_name    String
-  last_name     String
-  middle_name   String?
-  phone_number  String?
-  telegram_id   String?   @unique
-  role          UserRole  @default(EMPLOYEE) // Legacy field, будет заменён на role_id
-  status        UserStatus @default(ACTIVE)
-  avatar        String?
-  department_id String?
-  
-  // Phase 0.1 - Core Domain Model Links
-  role_id                String? // Link to Role model
-  qualification_level_id String? // Link to QualificationLevel model
-  
-  last_login_at DateTime?
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
-  personal_data_consent Boolean @default(false)
-  consent_date          DateTime?
-
-  employee      Employee?
-  created_tasks  Task[]    @relation("CreatedTasks")
-  assigned_tasks Task[]    @relation("AssignedTasks")
-  comments       TaskComment[]
-  attachments    TaskAttachment[]
-  wallet         Wallet?
-  sent_transactions     Transaction[] @relation("SentTransactions")
-  received_transactions Transaction[] @relation("ReceivedTransactions")
-  notifications  Notification[]
-  audit_logs     AuditLog[]
-  purchases      Purchase[]
-  statuses       UserGamificationStatus[]
-  achievements   UserAchievement[]
-  reward_eligibilities RewardEligibility[]
-
-  // OFS Relations
-  employee_roles          EmployeeRole[]
-  assigned_roles          EmployeeRole[]        @relation("RoleAssigner")
-  structure_changes       OrgStructureHistory[]
-  subordinate_relations   ReportingRelationship[] @relation("SubordinateRelation")
-  supervisor_relations    ReportingRelationship[] @relation("SupervisorRelation")
-  triangle_assignments    TriangleAssignment[]
-  raci_entries            RaciMatrix[]
-  submitted_ideas         IdeaChannel[]
-  hybrid_interactions     HybridTeamInteraction[]
-  kaizen_suggestions      Kaizen[]
-
-  // MES Module Relations
-  mes_created_orders      ProductionOrder[]
-  mes_assigned_works      WorkOrder[]
-  mes_quality_checks      QualityCheck[]
-  mes_registered_defects  Defect[]
-  
-  // Phase 0.1 - Core Domain Model Relations
-  erp_role            Role?              @relation(fields: [role_id], references: [id])
-  qualification_level QualificationLevel? @relation(fields: [qualification_level_id], references: [id])
-
-  // Phase 4.5 - AI Feedback Loop
-  ai_feedback         AIFeedback[]
-
-  // Sprint 7-8 - Adaptation & Mentorship
-  mentorship_as_mentor Mentorship[] @relation("MentorUser")
-  mentorship_as_mentee Mentorship?   @relation("MenteeUser")
-  one_on_ones_managed  OneOnOne[]   @relation("Manager1on1")
-  one_on_ones_attended OneOnOne[]   @relation("Employee1on1")
-
-  // Module 09 - Participation Status & Ranks
-  current_participation_status   UserParticipationStatus?
-  participation_status_history   ParticipationStatusHistory[]
-  current_participation_rank     UserParticipationRank?
-
-  @@map("users")
-}
-
-model Mentorship {
-  id          String   @id @default(uuid())
-  mentor_id   String
-  mentee_id   String   @unique
-  status      String   @default("ACTIVE") // ACTIVE, COMPLETED, SUSPENDED
-  goals       Json?    // Array of goals
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  mentor User @relation("MentorUser", fields: [mentor_id], references: [id])
-  mentee User @relation("MenteeUser", fields: [mentee_id], references: [id])
-
-  @@map("mentorships")
-}
-
-model OneOnOne {
-  id             String   @id @default(uuid())
-  manager_id     String
-  employee_id    String
-  scheduled_at   DateTime
-  completed_at   DateTime?
-  notes          String?  @db.Text // Private to manager
-  action_items   Json?    // Array of items
-  mood           Int?     // 1-5 (Soft signal, NOT a KPI)
-  created_at     DateTime @default(now())
-  updated_at     DateTime @updatedAt
-
-  manager  User @relation("Manager1on1", fields: [manager_id], references: [id])
-  employee User @relation("Employee1on1", fields: [employee_id], references: [id])
-
-  @@map("one_on_ones")
-}
-
-model Kaizen {
-  id               String   @id @default(uuid())
-  author_id        String
-  text             String   @db.Text
-  status           String   @default("NEW") // NEW, APPROVED, REJECTED
-  manager_comment  String?  @db.Text // Mandatory for REJECTED
-  history          Json     @default("[]") // [{status: string, actorId: string, timestamp: Date, comment: string}]
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
-
-  author User @relation(fields: [author_id], references: [id])
-
-  @@map("kaizen")
+  PHOTOCOMPANY_RESULT
 }
 
 enum EmployeeStatus {
@@ -313,63 +1323,6 @@ enum EmployeeRank {
   MAGNATE
 }
 
-model Department {
-  id          String       @id @default(uuid())
-  name        String       @unique
-  code        String       @unique
-  description String?
-  head_id     String?
-  parent_id   String?
-  
-  // OFS Module fields
-  functions           String[]
-  kpis                Json?
-  annual_goals        String?
-  budget_annual       Decimal?     @db.Decimal(15, 2)
-  is_active           Boolean      @default(true)
-  level               Int          @default(0)
-  path                String?      // ltree type
-  department_type     String?      // 'operational', 'support', 'management'
-  faculty_link        String?      // Link to Corporate University faculty
-  hierarchy_level     Int?         // 1-7: Constitution hierarchy
-  
-  created_at  DateTime     @default(now())
-  updated_at  DateTime     @updatedAt
-
-  employees   Employee[]
-  tasks       Task[]
-  parent      Department?  @relation("DepartmentHierarchy", fields: [parent_id], references: [id])
-  children    Department[] @relation("DepartmentHierarchy")
-  role_matrices RoleCompetencyMatrix[]
-
-  @@map("departments")
-}
-
-model Employee {
-  id               String         @id @default(uuid())
-  user_id          String         @unique
-  department_id    String?
-  position         String?
-  bio              String?
-  status           EmployeeStatus @default(PHOTON)
-  rank             EmployeeRank   @default(COLLECTOR)
-  salary           Decimal?       @db.Decimal(10, 2)
-  employee_number  String?        @unique
-  hired_at         DateTime       @default(now())
-  hire_date        DateTime?
-  termination_date DateTime?
-  emotional_tone   Int?           @default(0)
-  mc_balance       Decimal?       @default(0) @db.Decimal(10, 2)
-  gmc_balance      Decimal?       @default(0) @db.Decimal(10, 2)
-  created_at       DateTime       @default(now())
-  updated_at       DateTime       @updatedAt
-
-  user             User           @relation(fields: [user_id], references: [id])
-  department       Department?    @relation(fields: [department_id], references: [id])
-
-  @@map("employees")
-}
-
 enum TaskStatus {
   TODO
   IN_PROGRESS
@@ -383,60 +1336,6 @@ enum TaskPriority {
   MEDIUM
   HIGH
   URGENT
-}
-
-model Task {
-  id            String       @id @default(uuid())
-  title         String
-  description   String
-  status        TaskStatus   @default(TODO)
-  priority      TaskPriority @default(MEDIUM)
-  creator_id    String
-  assignee_id   String?
-  department_id String?
-  due_date      DateTime?
-  completed_at  DateTime?
-  tags          String[]
-  mc_reward     Decimal?     @db.Decimal(10, 2)
-  created_at    DateTime     @default(now())
-  updated_at    DateTime     @updatedAt
-
-  creator     User             @relation("CreatedTasks", fields: [creator_id], references: [id])
-  assignee    User?            @relation("AssignedTasks", fields: [assignee_id], references: [id])
-  department  Department?      @relation(fields: [department_id], references: [id])
-  comments    TaskComment[]
-  attachments TaskAttachment[]
-
-  @@map("tasks")
-}
-
-model TaskComment {
-  id         String   @id @default(uuid())
-  task_id    String
-  user_id    String
-  text       String
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  task Task @relation(fields: [task_id], references: [id])
-  user User @relation(fields: [user_id], references: [id])
-
-  @@map("task_comments")
-}
-
-model TaskAttachment {
-  id         String   @id @default(uuid())
-  task_id    String
-  user_id    String
-  file_url   String
-  file_name  String
-  file_type  String
-  created_at DateTime @default(now())
-
-  task Task @relation(fields: [task_id], references: [id])
-  user User @relation(fields: [user_id], references: [id])
-
-  @@map("task_attachments")
 }
 
 enum Currency {
@@ -457,187 +1356,11 @@ enum TransactionType {
   SAFE_ACTIVATION
 }
 
-// PHASE 0: Store Purchase Core
 enum PurchaseStatus {
   COMPLETED
   PENDING_APPROVAL
   REJECTED
   ROLLED_BACK
-}
-
-model Wallet {
-  id                String    @id @default(uuid())
-  user_id           String    @unique
-  mc_balance        Decimal   @default(0) @db.Decimal(10, 2)
-  gmc_balance       Decimal   @default(0) @db.Decimal(10, 2)
-  mc_frozen         Decimal   @default(0) @db.Decimal(10, 2)
-  safe_activated_at DateTime?
-  safe_expires_at   DateTime?
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
-
-  user User @relation(fields: [user_id], references: [id])
-
-  @@map("wallets")
-}
-
-model Transaction {
-  id           String          @id @default(uuid())
-  type         TransactionType
-  currency     Currency
-  amount       Decimal         @db.Decimal(10, 2)
-  sender_id    String?
-  recipient_id String?
-  description  String?
-  metadata     Json?
-  created_at   DateTime        @default(now())
-
-  sender    User? @relation("SentTransactions", fields: [sender_id], references: [id])
-  recipient User? @relation("ReceivedTransactions", fields: [recipient_id], references: [id])
-
-  @@map("transactions")
-}
-
-model Notification {
-  id         String    @id @default(uuid())
-  user_id    String
-  type       String
-  title      String
-  message    String
-  read       Boolean   @default(false)
-  read_at    DateTime?
-  metadata   Json?
-  created_at DateTime  @default(now())
-
-  user User @relation(fields: [user_id], references: [id])
-
-  @@map("notifications")
-}
-
-model AuditLog {
-  id          String   @id @default(uuid())
-  user_id     String?
-  action      String
-  entity_type String?
-  entity_id   String?
-  details     Json?
-  ip_address  String?
-  user_agent  String?
-  created_at  DateTime @default(now())
-
-  user User? @relation(fields: [user_id], references: [id])
-
-  @@map("audit_logs")
-}
-
-model Product {
-  id          String   @id @default(uuid())
-  name        String
-  description String
-  price       Decimal  @db.Decimal(10, 2)
-  stock       Int      @default(0)
-  image_url   String?
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  @@map("products")
-}
-
-// PHASE 0: Store Purchase Core - StoreItem
-model StoreItem {
-  id            String    @id @default(uuid())
-  title         String
-  description   String
-  priceMC       Int       // MC — целочисленный актив (STORE-TECH.md)
-  category      String
-  active        Boolean   @default(true)
-  stock         Int?
-  purchaseLimit Int?
-  metadata      Json      @default("{}")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  purchases     Purchase[]
-
-  @@map("store_items")
-}
-
-// PHASE 0: Store Purchase Core - Purchase (NEW)
-model Purchase {
-  id             String         @id @default(uuid())
-  userId         String
-  itemId         String
-  priceMC        Int            // MC — целочисленный актив (STORE-TECH.md)
-  status         PurchaseStatus @default(COMPLETED)
-  transactionId  String
-  idempotencyKey String
-  createdAt      DateTime       @default(now())
-
-  user           User           @relation(fields: [userId], references: [id])
-  item           StoreItem      @relation(fields: [itemId], references: [id])
-
-  // Idempotency: (userId + endpoint + idempotencyKey)
-  // На PHASE 0: endpoint зашит логически (только POST /store/purchase)
-  // Уникальность по (userId, idempotencyKey) достаточна для одного endpoint
-  @@unique([userId, idempotencyKey])
-  @@index([userId])
-  @@index([itemId])
-  @@map("purchases")
-}
-
-
-
-model GamificationLevel {
-  id           String       @id @default(uuid())
-  name         String       @unique
-  level        Int          @unique
-  requirements Json?
-  users        UserGamificationStatus[]
-  created_at   DateTime     @default(now())
-  updated_at   DateTime     @updatedAt
-
-  @@map("gamification_levels")
-}
-
-model UserGamificationStatus {
-  id          String   @id @default(uuid())
-  user_id     String
-  status_id   String
-  achieved_at DateTime @default(now())
-
-  user   User   @relation(fields: [user_id], references: [id])
-  status GamificationLevel @relation(fields: [status_id], references: [id])
-
-  @@unique([user_id, status_id])
-  @@index([user_id])
-  @@index([achieved_at])
-  @@map("user_gamification_statuses")
-}
-
-model Achievement {
-  id          String            @id @default(uuid())
-  name        String
-  description String?
-  icon_url    String?
-  users       UserAchievement[]
-  created_at  DateTime          @default(now())
-
-  @@map("achievements")
-}
-
-model UserAchievement {
-  id             String   @id @default(uuid())
-  user_id        String
-  achievement_id String
-  earned_at      DateTime @default(now())
-
-  user        User        @relation(fields: [user_id], references: [id])
-  achievement Achievement @relation(fields: [achievement_id], references: [id])
-
-  @@unique([user_id, achievement_id])
-  @@index([user_id])
-  @@map("user_achievements")
 }
 
 enum LeaderboardMetric {
@@ -653,242 +1376,12 @@ enum LeaderboardPeriod {
   ALL_TIME
 }
 
-model Leaderboard {
-  id         String             @id @default(uuid())
-  metric     LeaderboardMetric
-  period     LeaderboardPeriod
-  top_users  Json               // Array of top 100 users with their stats
-  updated_at DateTime           @updatedAt
-  created_at DateTime           @default(now())
-
-  @@unique([metric, period])
-  @@map("leaderboards")
-}
-
 enum QuestStatus {
   NOT_STARTED
   IN_PROGRESS
   COMPLETED
   ABANDONED
 }
-
-model Quest {
-  id              String   @id @default(uuid())
-  title           String
-  description     String?
-  icon_url        String?
-  requirements    Json?    // Conditions to complete the quest
-  reward_mc       Int      @default(0)
-  reward_gmc      Int      @default(0)
-  is_active       Boolean  @default(true)
-  duration_days   Int?     // Quest duration in days
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-
-  progress        QuestProgress[]
-
-  @@map("quests")
-}
-
-model QuestProgress {
-  id           String      @id @default(uuid())
-  user_id      String
-  quest_id     String
-  progress     Json?       // Detailed progress tracking
-  status       QuestStatus @default(NOT_STARTED)
-  started_at   DateTime?
-  completed_at DateTime?
-  created_at   DateTime    @default(now())
-  updated_at   DateTime    @updatedAt
-
-  quest        Quest       @relation(fields: [quest_id], references: [id], onDelete: Cascade)
-
-  @@unique([user_id, quest_id])
-  @@index([user_id])
-  @@index([status])
-  @@map("quest_progress")
-}
-
-// OFS Module Models
-
-model RoleCompetencyMatrix {
-  id                        String   @id @default(uuid())
-  role_name                 String
-  department_id             String?
-  required_competencies     Json
-  responsibilities          String[]
-  permissions               Json?
-  salary_min                Decimal? @db.Decimal(15, 2)
-  salary_max                Decimal? @db.Decimal(15, 2)
-  
-  // MDR Fields
-  purpose                   String?
-  expected_results          String[]
-  required_knowledge        String[]
-  required_skills           String[]
-  interactions              Json?
-  corporate_university_courses String[]
-  
-  // Golden Standard Fields
-  golden_standard_processes String[]
-  efficiency_metrics        Json?
-  lean_principles           String[]
-  
-  // Documents
-  documents                 Json?    // Array of { name: string, url: string, type: string }
-  
-  created_at                DateTime @default(now())
-  updated_at                DateTime @updatedAt
-
-  department                Department? @relation(fields: [department_id], references: [id], onDelete: Cascade)
-  employee_roles            EmployeeRole[]
-  raci_matrix_entries       RaciMatrix[]
-
-  @@unique([role_name, department_id])
-  @@map("role_competency_matrix")
-}
-
-model EmployeeRole {
-  id             String    @id @default(uuid())
-  employee_id    String
-  role_matrix_id String?
-  assigned_at    DateTime  @default(now())
-  effective_from DateTime  @db.Date
-  effective_to   DateTime? @db.Date
-  assigned_by    String?
-  is_active      Boolean   @default(true)
-  created_at     DateTime  @default(now())
-
-  user           User      @relation(fields: [employee_id], references: [id], onDelete: Cascade)
-  role           RoleCompetencyMatrix? @relation(fields: [role_matrix_id], references: [id], onDelete: Cascade)
-  assigner       User?     @relation("RoleAssigner", fields: [assigned_by], references: [id])
-
-  @@map("employee_roles")
-}
-
-model OrgStructureHistory {
-  id          String   @id @default(uuid())
-  entity_type String
-  entity_id   String
-  action      String
-  changed_by  String?
-  old_data    Json?
-  new_data    Json?
-  reason      String?
-  ip_address  String?
-  user_agent  String?
-  created_at  DateTime @default(now())
-
-  changer     User?    @relation(fields: [changed_by], references: [id])
-
-  @@map("org_structure_history")
-}
-
-model ReportingRelationship {
-  id              String    @id @default(uuid())
-  subordinate_id  String
-  supervisor_id   String
-  relationship_type String  @default("direct") // direct, functional, dotted_line
-  effective_from  DateTime  @db.Date
-  effective_to    DateTime? @db.Date
-  is_active       Boolean   @default(true)
-  created_at      DateTime  @default(now())
-
-  subordinate     User      @relation("SubordinateRelation", fields: [subordinate_id], references: [id], onDelete: Cascade)
-  supervisor      User      @relation("SupervisorRelation", fields: [supervisor_id], references: [id], onDelete: Cascade)
-
-  @@map("reporting_relationships")
-}
-
-model OrgHierarchyLevel {
-  id                String   @id @default(uuid())
-  level_number      Int      @unique
-  level_name        String
-  level_name_ru     String
-  description       String?
-  can_have_children Boolean  @default(true)
-  created_at        DateTime @default(now())
-
-  @@map("org_hierarchy_levels")
-}
-
-model PyramidRole {
-  id          String   @id @default(uuid())
-  role_type   String   // management, photographers, production, sales
-  role_name   String
-  description String?
-  kpi_metrics Json?
-  interdependencies Json?
-  created_at  DateTime @default(now())
-
-  @@unique([role_type, role_name])
-  @@map("pyramid_roles")
-}
-
-model TriangleAssignment {
-  id            String   @id @default(uuid())
-  employee_id   String
-  triangle_role String   // photographer, designer, seller
-  is_primary    Boolean  @default(true)
-  flow_metrics  Json?
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-
-  user          User     @relation(fields: [employee_id], references: [id], onDelete: Cascade)
-
-  @@map("triangle_assignments")
-}
-
-model RaciMatrix {
-  id           String   @id @default(uuid())
-  project_name String
-  task_name    String
-  employee_id  String?
-  role_id      String?
-  raci_role    String   // R, A, C, I
-  description  String?
-  created_at   DateTime @default(now())
-
-  user         User?    @relation(fields: [employee_id], references: [id], onDelete: Cascade)
-  role         RoleCompetencyMatrix? @relation(fields: [role_id], references: [id])
-
-  @@map("raci_matrix")
-}
-
-model IdeaChannel {
-  id                  String   @id @default(uuid())
-  channel_type        String   // strategic, tactical, mentoring
-  title               String
-  description         String?
-  submitted_by        String?
-  target_level        Int?
-  status              String   @default("submitted")
-  priority            String?
-  implementation_plan String?
-  created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
-
-  submitter           User?    @relation(fields: [submitted_by], references: [id])
-
-  @@map("idea_channels")
-}
-
-model HybridTeamInteraction {
-  id                String   @id @default(uuid())
-  human_employee_id String?
-  ai_agent_name     String
-  interaction_type  String?
-  privacy_consent   Boolean  @default(false)
-  ai_mode_enabled   Boolean  @default(true)
-  interaction_data  Json?
-  created_at        DateTime @default(now())
-
-  human_employee    User?    @relation(fields: [human_employee_id], references: [id], onDelete: Cascade)
-
-  @@map("hybrid_team_interactions")
-}
-
-// Corporate University Module
 
 enum MaterialType {
   VIDEO
@@ -905,11 +1398,11 @@ enum MaterialStatus {
 }
 
 enum CourseGrade {
-  INTERN         // стажёр
-  SPECIALIST     // специалист
-  PROFESSIONAL   // профессионал
-  EXPERT         // эксперт
-  MASTER         // мастер
+  INTERN
+  SPECIALIST
+  PROFESSIONAL
+  EXPERT
+  MASTER
 }
 
 enum EnrollmentStatus {
@@ -931,11 +1424,11 @@ enum TrainerSpecialty {
 }
 
 enum TrainerStatus {
-  CANDIDATE       // кандидат
-  TRAINER         // обучающий
-  ACCREDITED      // аккредитованный
-  SENIOR          // старший
-  METHODOLOGIST   // методист
+  CANDIDATE
+  TRAINER
+  ACCREDITED
+  SENIOR
+  METHODOLOGIST
 }
 
 enum AssignmentStatus {
@@ -944,368 +1437,22 @@ enum AssignmentStatus {
   CANCELLED
 }
 
-model Academy {
-  id          String    @id @default(uuid())
-  name        String    @unique
-  description String?
-  icon_url    String?
-  is_active   Boolean   @default(true)
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-
-  skills        Skill[]
-  materials     Material[]
-  courses       Course[]
-  certifications Certification[]
-
-  @@map("academies")
+enum TargetMetric {
+  OKK
+  CK
+  CONVERSION
+  QUALITY
+  RETOUCH_TIME
+  AVG_CHECK
+  ANOMALIES
 }
 
-model Skill {
-  id             String    @id @default(uuid())
-  academy_id     String?
-  name           String
-  category       String?   // hard, soft, technical
-  level_required String?   // A0, A1, B1, B2, C1, C2
-  kpi_impact     String?   // какой KPI улучшает
-  description    String?
-  created_at     DateTime  @default(now())
-
-  academy        Academy?  @relation(fields: [academy_id], references: [id], onDelete: Cascade)
-  user_skills    UserSkill[]
-
-  @@map("skills")
+enum CourseScope {
+  PHOTOGRAPHER
+  SALES
+  RETOUCH
+  GENERAL
 }
-
-model Material {
-  id               String         @id @default(uuid())
-  type             MaterialType
-  title            String
-  content_url      String?
-  content_text     String?
-  duration_minutes Int?
-  
-  // Метаданные
-  tags             Json?
-  level            String?        // A0-C2
-  academy_id       String?
-  
-  version          Int            @default(1)
-  status           MaterialStatus @default(DRAFT)
-  
-  created_by       String?
-  reviewed_by      String?
-  
-  created_at       DateTime       @default(now())
-  updated_at       DateTime       @updatedAt
-
-  academy          Academy?       @relation(fields: [academy_id], references: [id])
-  course_modules   CourseModule[]
-
-  @@map("materials")
-}
-
-model Course {
-  id             String      @id @default(uuid())
-  academy_id     String?
-  title          String
-  description    String?
-  
-  required_grade CourseGrade?
-  reward_mc      Int         @default(0)
-  reward_gmc     Int         @default(0)
-  
-  is_mandatory   Boolean     @default(false)
-  is_active      Boolean     @default(true)
-  
-  created_at     DateTime    @default(now())
-  updated_at     DateTime    @updatedAt
-
-  academy        Academy?    @relation(fields: [academy_id], references: [id])
-  modules        CourseModule[]
-  enrollments    Enrollment[]
-  certifications Certification[]
-
-  @@map("courses")
-}
-
-model CourseModule {
-  id          String   @id @default(uuid())
-  course_id   String
-  material_id String?
-  
-  module_order Int
-  is_required Boolean  @default(true)
-  
-  created_at  DateTime @default(now())
-
-  course      Course   @relation(fields: [course_id], references: [id], onDelete: Cascade)
-  material    Material? @relation(fields: [material_id], references: [id])
-  progress    ModuleProgress[]
-
-  @@map("course_modules")
-}
-
-model UserSkill {
-  id          String    @id @default(uuid())
-  user_id     String
-  skill_id    String
-  
-  level       Int       @default(0) // 0-100
-  verified_at DateTime?
-  verified_by String?
-  
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @updatedAt
-
-  skill       Skill     @relation(fields: [skill_id], references: [id])
-
-  @@unique([user_id, skill_id])
-  @@map("user_skills")
-}
-
-model UserGrade {
-  id                      String      @id @default(uuid())
-  user_id                 String      @unique
-  
-  current_grade           CourseGrade @default(INTERN)
-  motivation_coefficient  Decimal     @default(0.8) @db.Decimal(3, 2)
-  
-  // История грейдов
-  grade_history           Json        @default("[]")
-  
-  created_at              DateTime    @default(now())
-  updated_at              DateTime    @updatedAt
-
-  @@map("user_grades")
-}
-
-model Enrollment {
-  id          String           @id @default(uuid())
-  user_id     String
-  course_id   String
-  
-  progress    Int              @default(0) // %
-  status      EnrollmentStatus @default(ACTIVE)
-  
-  enrolled_at DateTime         @default(now())
-  completed_at DateTime?
-  
-  assigned_by String?
-
-  course      Course           @relation(fields: [course_id], references: [id])
-  module_progress ModuleProgress[]
-
-  @@unique([user_id, course_id])
-  @@map("enrollments")
-}
-
-model ModuleProgress {
-  id            String       @id @default(uuid())
-  enrollment_id String
-  module_id     String
-  
-  status        ModuleStatus @default(NOT_STARTED)
-  score         Int?
-  
-  started_at    DateTime?
-  completed_at  DateTime?
-
-  enrollment    Enrollment   @relation(fields: [enrollment_id], references: [id], onDelete: Cascade)
-  module        CourseModule @relation(fields: [module_id], references: [id])
-
-  @@map("module_progress")
-}
-
-model Certification {
-  id              String      @id @default(uuid())
-  user_id         String
-  course_id       String?
-  academy_id      String?
-  
-  level           CourseGrade?
-  score           Int?
-  
-  issued_at       DateTime    @default(now())
-  expires_at      DateTime?
-  
-  certificate_url String?
-
-  course          Course?     @relation(fields: [course_id], references: [id])
-  academy         Academy?    @relation(fields: [academy_id], references: [id])
-
-  @@map("certifications")
-}
-
-model LearningPath {
-  id              String   @id @default(uuid())
-  user_id         String   @unique
-  
-  title           String?
-  courses_planned Json?    // массив course_id
-  skills_target   Json?    // целевые навыки
-  
-  ai_generated    Boolean  @default(false)
-  ai_rules        Json?    // правила генерации
-  
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-
-  @@map("learning_paths")
-}
-
-// === TRAINER INSTITUTE ===
-
-model Trainer {
-  id                 String           @id @default(uuid())
-  user_id            String           @unique
-  
-  specialty          TrainerSpecialty
-  status             TrainerStatus    @default(CANDIDATE)
-  
-  accreditation_date DateTime?
-  rating             Decimal?         @db.Decimal(3, 2)
-  
-  // Статистика
-  trainees_total     Int              @default(0)
-  trainees_successful Int             @default(0)
-  avg_nps            Decimal?         @db.Decimal(3, 2)
-  
-  created_at         DateTime         @default(now())
-  updated_at         DateTime         @updatedAt
-
-  assignments        TrainerAssignment[]
-
-  @@map("trainers")
-}
-
-model TrainerAssignment {
-  id          String           @id @default(uuid())
-  trainer_id  String
-  trainee_id  String
-  
-  start_date  DateTime         @db.Date
-  end_date    DateTime?        @db.Date
-  
-  status      AssignmentStatus @default(ACTIVE)
-  plan        Json?            // индивидуальный план на 4 смены
-  
-  created_at  DateTime         @default(now())
-  updated_at  DateTime         @updatedAt
-
-  trainer     Trainer          @relation(fields: [trainer_id], references: [id])
-  results     TrainingResult[]
-
-  @@map("trainer_assignments")
-}
-
-model TrainingResult {
-  id                   String   @id @default(uuid())
-  assignment_id        String
-  
-  kpi_improvement      Int?     // % улучшения KPI
-  nps_score            Int?     // оценка стажёра
-  retention_days       Int?     // сколько дней удержан
-  
-  hot_leads_percentage Int?     // % горячих лидов
-  quality_score        Int?     // оценка качества работы
-  
-  notes                String?
-  
-  created_at           DateTime @default(now())
-
-  assignment           TrainerAssignment @relation(fields: [assignment_id], references: [id], onDelete: Cascade)
-
-  @@map("training_results")
-}
-
-// ===================================
-// REGISTRY MODULE (METADATA PLATFORM)
-// ===================================
-
-model RegistryEntity {
-  urn             String   @id
-  entity_type_urn String
-  version         Int      @default(1)
-  name            String?
-  description     String?
-  attributes      Json     // All other properties
-  fsm_state       String
-  is_system       Boolean  @default(false)
-  is_active       Boolean  @default(true)
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
-
-  @@index([entity_type_urn])
-  @@index([fsm_state])
-  @@map("registry_entities")
-}
-
-model RegistryAuditEvent {
-  id              String   @id @default(uuid())
-  entity_urn      String?
-  action          String   // CREATE, UPDATE, TRANSITION, BOOTSTRAP
-  actor_urn       String?  // Who did it
-  payload         Json?
-  created_at      DateTime @default(now())
-
-  @@index([entity_urn])
-  @@map("registry_audit_events")
-}
-
-model RegistryRelationship {
-  id             String   @id @default(uuid())
-  definition_urn String   // References valid active relationship_definition
-  from_urn       String
-  to_urn         String
-  attributes     Json?    // Instance-specific attributes
-  created_at     DateTime @default(now())
-
-  @@index([definition_urn])
-  @@index([from_urn])
-  @@index([to_urn])
-  @@map("registry_relationships")
-}
-
-// ============================================================================
-// REGISTRY PROJECTIONS (Read-Only Views)
-// Derived strictly from Registry Core.
-// ============================================================================
-
-model RegistryOrgProjection {
-  id            String   @id @default(uuid())
-  urn           String   @unique
-  path          String   // Materialized path (e.g., "/root/child")
-  depth         Int
-  parent_urn    String?
-  root_urn      String
-  snapshot_hash String   // Reference to Core Snapshot
-  updated_at    DateTime @updatedAt
-  
-  @@index([path])
-  @@index([parent_urn])
-  @@index([root_urn])
-  @@map("registry_org_projections")
-}
-
-model RegistryOwnerProjection {
-  id            String   @id @default(uuid())
-  owner_urn     String   // User URN
-  asset_urn     String   // Wallet/Device URN
-  asset_type    String   // 'wallet', 'device'
-  relation_urn  String   // Core Relationship URN
-  snapshot_hash String
-  updated_at    DateTime @updatedAt
-
-  @@unique([owner_urn, asset_urn])
-  @@index([owner_urn])
-  @@index([asset_type])
-  @@map("registry_owner_projections")
-}
-
-// ===================================
-// MODULE 06 - PRODUCTION MES & QUALITY
-// ===================================
 
 enum ProductionOrderStatus {
   DRAFT
@@ -1339,333 +1486,13 @@ enum DefectSeverity {
   CRITICAL
 }
 
-model ProductionOrder {
-  id              String                @id @default(uuid())
-  source_type     String                // PSEE, MANUAL
-  source_ref_id   String?               // PSEE Session ID or similar
-  product_type    String
-  quantity        Int
-  status          ProductionOrderStatus @default(DRAFT)
-  created_at      DateTime              @default(now())
-  closed_at       DateTime?
-  created_by_id   String
-  updated_at      DateTime              @updatedAt
-
-  created_by      User                  @relation(fields: [created_by_id], references: [id])
-  work_orders     WorkOrder[]
-  quality_checks  QualityCheck[]
-  defects         Defect[]
-
-  @@index([status])
-  @@index([source_ref_id])
-  @@map("mes_production_orders")
-}
-
-model WorkOrder {
-  id                  String          @id @default(uuid())
-  production_order_id String
-  operation_type      String
-  status              WorkOrderStatus @default(PENDING)
-  sequence_order      Int
-  started_at          DateTime?
-  finished_at         DateTime?
-  assigned_to_id      String?
-  created_at          DateTime        @default(now())
-  updated_at          DateTime        @updatedAt
-
-  production_order    ProductionOrder @relation(fields: [production_order_id], references: [id], onDelete: Cascade)
-  assigned_to         User?           @relation(fields: [assigned_to_id], references: [id])
-  quality_checks      QualityCheck[]
-
-  @@index([production_order_id])
-  @@index([status])
-  @@map("mes_work_orders")
-}
-
-model QualityCheck {
-  id                  String           @id @default(uuid())
-  production_order_id String
-  work_order_id       String?
-  check_type          QualityCheckType
-  result              QualityResult
-  created_by_id       String
-  created_at          DateTime         @default(now())
-  comments            String?
-
-  production_order    ProductionOrder  @relation(fields: [production_order_id], references: [id])
-  work_order          WorkOrder?       @relation(fields: [work_order_id], references: [id])
-  created_by          User             @relation(fields: [created_by_id], references: [id])
-  defects             Defect[]
-
-  @@index([production_order_id])
-  @@map("mes_quality_checks")
-}
-
-model Defect {
-  id                  String         @id @default(uuid())
-  production_order_id String
-  quality_check_id    String?
-  defect_type         String
-  severity            DefectSeverity
-  root_cause          String?
-  requires_rework     Boolean        @default(false)
-  resolved            Boolean        @default(false)
-  registered_by_id    String
-  registered_at       DateTime       @default(now())
-  updated_at          DateTime       @updatedAt
-
-  production_order    ProductionOrder @relation(fields: [production_order_id], references: [id])
-  quality_check       QualityCheck?   @relation(fields: [quality_check_id], references: [id])
-  registered_by       User            @relation(fields: [registered_by_id], references: [id])
-
-  @@index([production_order_id])
-  @@index([resolved])
-  @@map("mes_defects")
-}
-
-// ============================================================================
-// CANONICAL GUARD - GMC Philosophy Enforcement
-// ============================================================================
-
 enum CanonType {
   MC
   GMC
 }
 
-model CanonicalViolation {
-  id         String   @id @default(uuid())
-  canon      CanonType
-  violation  String   // CanonicalViolationType as string
-  source     String   // 'UI', 'API', 'AI', 'CRON'
-  action     String   // Action that was attempted
-  payload    Json?    // Full context of the violation attempt
-  user_id    String?  // User who triggered the violation (if applicable)
-  created_at DateTime @default(now())
-
-  @@index([canon, created_at])
-  @@index([violation])
-  @@map("canonical_violations")
-}
-
-// ============================================================================
-// MODULE 08 - MATRIXCOIN ECONOMY PERSISTENCE (STRICT ADAPTER LAYER)
-// ============================================================================
-
-// AUDIT LOG (IMMUTABLE, APPEND-ONLY)
-model EconomyAuditLog {
-  id              String   @id @default(uuid())
-  event_id        String   @unique // From Domain Event
-  event_type      String   // AuditEventType Enum value
-  occurred_at     DateTime
-  actor_id        String
-  actor_role      String
-  
-  // Normalized searchable fields
-  user_id         String?
-  context_id      String?  @map("usage_context_id")
-  
-  // Full Payload
-  payload         Json     // Stores full typed event interface
-  
-  created_at      DateTime @default(now())
-
-  @@index([user_id])
-  @@index([event_type])
-  @@index([context_id])
-  @@map("economy_audit_logs")
-}
-
-// REWARD ELIGIBILITY (STAGING AREA FOR ANTI-FRAUD & CANONICAL CHECKS)
-model RewardEligibility {
-  id              String   @id @default(uuid())
-  user_id         String
-  event_type      String   // e.g., 'COURSE_COMPLETED'
-  event_ref_id    String   // Enrollment ID or Task ID
-  mc_amount       Int
-  status          String   @default("PENDING") // PENDING, APPROVED, REJECTED, PROCESSED
-  processed_at    DateTime?
-  audit_flag      String?  // e.g., 'REWARD_LIMIT_REACHED'
-  
-  user            User     @relation(fields: [user_id], references: [id])
-  created_at      DateTime @default(now())
-
-  @@unique([user_id, event_type, event_ref_id])
-  @@index([status])
-  @@index([created_at])
-  @@map("economy_reward_eligibility")
-}
-
-// MC SNAPSHOT (IMMUTABLE STATE HISTORY)
-model MatrixCoinSnapshot {
-  id              String   @id @default(uuid())
-  snapshot_id     String   @unique
-  user_id         String
-  total_amount    Decimal  @db.Decimal(20, 8)
-  
-  // Serialized State
-  mc_state_json   Json     // Stores readonly MCState[]
-  
-  captured_at     DateTime
-  created_at      DateTime @default(now())
-
-  @@index([user_id, captured_at])
-  @@map("matrixcoin_snapshots")
-}
-
-// AUCTION EVENT STATE (RAW PERSISTENCE)
-model AuctionEventState {
-  id              String   @id @default(uuid())
-  event_id        String   @unique
-  status          String   // AuctionEventStatus Enum
-  
-  // Raw State Data
-  state_payload   Json     // Stores complete AuctionEventContext/State
-  
-  updated_at      DateTime @updatedAt
-  created_at      DateTime @default(now())
-
-  @@index([status])
-  @@map("auction_event_states")
-}
-
-// GOVERNANCE FLAGS (REVIEW QUEUE)
-model GovernanceFlag {
-  id              String   @id @default(uuid())
-  flag_id         String   @unique
-  user_id         String
-  context_id      String
-  
-  review_level    String   // GovernanceReviewLevel Enum
-  status          String   // Pending, Resolved, Ignored
-  
-  // Details
-  reason          String
-  payload         Json     // Full GovernanceDecision + Context
-  
-  flagged_at      DateTime
-  resolved_at     DateTime?
-  
-  created_at      DateTime @default(now())
-
-  @@index([status])
-  @@index([review_level])
-  @@map("economy_governance_flags")
-}
-
-// ============================================================================
-// PHASE 4.5 - AI FEEDBACK LOOP (Human-in-the-Loop)
-// Canon: Feedback ≠ Control, Feedback ≠ Learning
-// ============================================================================
-
 enum FeedbackType {
   HELPFUL
   NOT_APPLICABLE
   UNSURE
-}
-
-model AIFeedback {
-  id                String       @id @default(uuid())
-  recommendationId  String
-  userId            String
-  feedbackType      FeedbackType
-  comment           String?      @db.VarChar(500)
-  
-  // Context Binding (Phase 2 - P45-PR-03)
-  basedOnSnapshotId String?
-  aiVersion         String?
-  ruleSetVersion    String?
-  
-  timestamp         DateTime     @default(now())
-  
-  user              User         @relation(fields: [userId], references: [id])
-  
-  // Idempotency: 1 feedback per user per recommendation
-  @@unique([userId, recommendationId])
-  @@index([recommendationId])
-  @@index([feedbackType])
-  @@index([timestamp])
-  @@map("ai_feedback")
-}
-
-// ============================================================================
-// MODULE 09 - PARTICIPATION STATUS & RANKS
-// Canon: Status = Governance influence, Rank = GMC-based calculation
-// NO multipliers, NO automatic income bonuses, NO KPI usage
-// ============================================================================
-
-// ParticipationStatus - Reference data for statuses (PHOTON, TOPCHIK, STAR, UNIVERSE)
-model ParticipationStatus {
-  code              String   @id // PHOTON, TOPCHIK, STAR, UNIVERSE
-  description       String
-  governance_flags  Json?    // { can_mentor: true, vote_weight: 2 }
-  is_active         Boolean  @default(true)
-  created_at        DateTime @default(now())
-  updated_at        DateTime @updatedAt
-
-  user_statuses     UserParticipationStatus[]
-
-  @@map("participation_statuses")
-}
-
-// UserParticipationStatus - Current status assignment (one per user)
-model UserParticipationStatus {
-  id          String   @id @default(uuid())
-  user_id     String   @unique
-  status_code String
-  assigned_at DateTime @default(now())
-  assigned_by String
-  reason      String
-  
-  user        User                 @relation(fields: [user_id], references: [id])
-  status      ParticipationStatus  @relation(fields: [status_code], references: [code])
-
-  @@index([status_code])
-  @@index([assigned_at])
-  @@map("user_participation_statuses")
-}
-
-// ParticipationStatusHistory - Audit trail for status changes (append-only)
-model ParticipationStatusHistory {
-  id          String   @id @default(uuid())
-  user_id     String
-  old_status  String?
-  new_status  String
-  reason      String
-  changed_at  DateTime @default(now())
-  changed_by  String
-  
-  user        User     @relation(fields: [user_id], references: [id])
-
-  @@index([user_id])
-  @@index([changed_at])
-  @@map("participation_status_history")
-}
-
-// ParticipationRank - Reference data for ranks (COLLECTOR, INVESTOR, MAGNATE, DIAMOND_HAND)
-model ParticipationRank {
-  code        String   @id // COLLECTOR, INVESTOR, MAGNATE, DIAMOND_HAND
-  conditions  Json     // { min_gmc: 10, min_duration_days: 30 }
-  description String
-  is_active   Boolean  @default(true)
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  user_ranks  UserParticipationRank[]
-
-  @@map("participation_ranks")
-}
-
-// UserParticipationRank - Calculated rank position (one per user, auto-calculated)
-model UserParticipationRank {
-  id            String   @id @default(uuid())
-  user_id       String   @unique
-  rank_code     String
-  calculated_at DateTime @default(now())
-  
-  user          User               @relation(fields: [user_id], references: [id])
-  rank          ParticipationRank  @relation(fields: [rank_code], references: [code])
-
-  @@index([rank_code])
-  @@index([calculated_at])
-  @@map("user_participation_ranks")
 }
