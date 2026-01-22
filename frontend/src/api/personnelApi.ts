@@ -1,13 +1,13 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type {
+import {
     PersonalFile,
     PersonnelOrder,
     LaborContract,
     PersonnelDocument,
     HRStatus,
     OrderStatus,
-    ContractStatus,
-} from '@prisma/client';
+    ContractStatus
+} from '../types/personnel.types';
 
 // Request DTOs
 interface UpdateStatusRequest {
@@ -75,7 +75,7 @@ export const personnelApi = createApi({
 
         getPersonalFileById: builder.query<PersonalFile, string>({
             query: (id) => `/files/${id}`,
-            providesTags: (result, error, id) => [{ type: 'PersonalFile', id }],
+            providesTags: (_result, _error, id) => [{ type: 'PersonalFile', id }],
         }),
 
         // NOTE: createPersonalFile REMOVED from UI
@@ -91,7 +91,7 @@ export const personnelApi = createApi({
                 method: 'PATCH',
                 body,
             }),
-            invalidatesTags: (result, error, { id }) => [
+            invalidatesTags: (_result, _error, { id }) => [
                 { type: 'PersonalFile', id },
                 'PersonalFile',
             ],
@@ -109,7 +109,7 @@ export const personnelApi = createApi({
 
         getOrderById: builder.query<PersonnelOrder, string>({
             query: (id) => `/orders/${id}`,
-            providesTags: (result, error, id) => [{ type: 'Order', id }],
+            providesTags: (_result, _error, id) => [{ type: 'Order', id }],
         }),
 
         createOrder: builder.mutation<PersonnelOrder, CreateOrderRequest>({
@@ -130,7 +130,7 @@ export const personnelApi = createApi({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: (result, error, { id }) => [
+            invalidatesTags: (_result, _error, { id }) => [
                 { type: 'Order', id },
                 'Order',
             ],
@@ -145,7 +145,7 @@ export const personnelApi = createApi({
                 method: 'POST',
                 body: { reason },
             }),
-            invalidatesTags: (result, error, { id }) => [
+            invalidatesTags: (_result, _error, { id }) => [
                 { type: 'Order', id },
                 'Order',
             ],
@@ -163,7 +163,7 @@ export const personnelApi = createApi({
 
         getContractById: builder.query<LaborContract, string>({
             query: (id) => `/contracts/${id}`,
-            providesTags: (result, error, id) => [{ type: 'Contract', id }],
+            providesTags: (_result, _error, id) => [{ type: 'Contract', id }],
         }),
 
         createContract: builder.mutation<LaborContract, CreateContractRequest>({
@@ -184,7 +184,7 @@ export const personnelApi = createApi({
                 method: 'POST',
                 body,
             }),
-            invalidatesTags: (result, error, { id }) => [
+            invalidatesTags: (_result, _error, { id }) => [
                 { type: 'Contract', id },
                 'Contract',
             ],

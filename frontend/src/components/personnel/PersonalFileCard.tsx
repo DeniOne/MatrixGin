@@ -1,5 +1,5 @@
 import React from 'react';
-import { PersonalFile } from '@prisma/client';
+import { PersonalFile } from '../../types/personnel.types';
 import { PersonalFileStatusBadge } from './PersonalFileStatusBadge';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,7 +11,7 @@ interface PersonalFileCardProps {
 
 export const PersonalFileCard: React.FC<PersonalFileCardProps> = ({
     file,
-    onStatusChange,
+    onStatusChange: _onStatusChange,
     onArchive
 }) => {
     const navigate = useNavigate();

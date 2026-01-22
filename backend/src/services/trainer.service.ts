@@ -1,419 +1,253 @@
 /**
  * Trainer Service
- * Module 13: Corporate University - Trainer RBAC
- * Handles Trainer Institute functionality
+ * Module 13: Corporate University - Trainer Institute
  * 
  * CANON:
- * - Trainer CANNOT propose qualification upgrades
- * - Trainer CANNOT update user_grade table
- * - Trainer CANNOT update wallet table
+ * - Accreditation != Role (Decoupled weight/level)
+ * - NO direct wallet updates (Event-driven rewards via Reward Engine)
+ * - Mentorship is a formal period (PROBATION, ACTIVE, COMPLETED)
+ * - Dashboard is strictly READ-ONLY
  */
 
 import { prisma } from '../config/prisma';
+import { MentorshipStatus } from '@prisma/client';
+import { antiFraudEngine } from '../engines/anti-fraud.engine';
+import { logger } from '../config/logger';
 
 export class TrainerService {
     /**
-     * RBAC: Check if action is forbidden for Trainer
-     * 
-     * CANON: Trainer has NO write access to:
-     * - qualification:propose
-     * - user_grade:update
-     * - wallet:update
-     * - kpi:write
+     * Get trainer dashboard data (READ-MODEL)
+     * Strictly aggregation, no side effects
      */
-    private checkTrainerForbiddenAction(action: string): void {
-        const forbiddenActions = [
-            'qualification:propose',
-            'user_grade:update',
-            'wallet:update',
-            'kpi:write',
-        ];
+    async getTrainerDashboardData(trainerId: string) {
+        const trainer = await prisma.trainer.findUnique({
+            where: { id: trainerId },
+            include: {
+                accreditations: {
+                    where: { is_active: true },
+                    orderBy: { granted_at: 'desc' },
+                    take: 1
+                },
+                mentorships: {
+                    orderBy: { created_at: 'desc' }
+                }
+            }
+        });
 
-        if (forbiddenActions.includes(action)) {
-            throw new Error(
-                `RBAC Violation: Trainer is forbidden from action: ${action}. ` +
-                `Only system can perform this action.`
-            );
-        }
+        if (!trainer) throw new Error('Trainer not found');
+
+        const activeTrainees = trainer.mentorships.filter(m => m.status === 'PROBATION' || m.status === 'ACTIVE');
+        const completedTrainees = trainer.mentorships.filter(m => m.status === 'COMPLETED');
+
+        return {
+            trainerId: trainer.id,
+            status: trainer.status,
+            currentAccreditation: trainer.accreditations[0] || null,
+            rating: trainer.rating ? Number(trainer.rating) : 0,
+            stats: {
+                traineesTotal: trainer.trainees_total,
+                traineesSuccessful: trainer.trainees_successful,
+                avgNPS: trainer.avg_nps ? Number(trainer.avg_nps) : 0
+            },
+            activeMentorships: activeTrainees,
+            history: completedTrainees.slice(0, 10)
+        };
     }
 
     /**
-     * RBAC: Validate trainer permissions before sensitive operations
+     * Grant accreditation to trainer
+     * CANON: Creates a versioned record, does NOT just update a flag
      */
-    private async validateTrainerPermissions(
-        trainerId: string,
-        action: string
-    ): Promise<void> {
-        this.checkTrainerForbiddenAction(action);
-
-        // Additional checks can be added here
-        const trainer = await prisma.trainer.findUnique({
-            where: { id: trainerId },
+    async grantAccreditation(params: {
+        trainerId: string;
+        level: 'JUNIOR' | 'SENIOR' | 'MASTER';
+        weight: number;
+        grantedBy: string;
+        expiresAt?: Date;
+    }) {
+        // Deactivate previous active accreditations
+        await prisma.trainerAccreditation.updateMany({
+            where: { trainer_id: params.trainerId, is_active: true },
+            data: { is_active: false }
         });
 
-        if (!trainer) {
-            throw new Error('Trainer not found');
+        return await prisma.trainerAccreditation.create({
+            data: {
+                trainer_id: params.trainerId,
+                level: params.level,
+                weight: params.weight,
+                granted_by: params.grantedBy,
+                expires_at: params.expiresAt,
+                is_active: true
+            }
+        });
+    }
+
+    /**
+     * Start formal mentorship period
+     */
+    async startMentorship(params: {
+        trainerId: string;
+        traineeId: string;
+        plan?: any;
+    }) {
+        const trainer = await prisma.trainer.findUnique({
+            where: { id: params.trainerId },
+            include: { accreditations: { where: { is_active: true } } }
+        });
+
+        if (!trainer || trainer.accreditations.length === 0) {
+            throw new Error('Trainer must have an active accreditation to start mentorship');
         }
 
-        if (trainer.status === 'CANDIDATE') {
-            throw new Error('Trainer must be accredited before performing this action');
+        // Expected end: current date + 60 days probation
+        const expectedEnd = new Date();
+        expectedEnd.setDate(expectedEnd.getDate() + 60);
+
+        const period = await prisma.mentorshipPeriod.create({
+            data: {
+                trainer_id: params.trainerId,
+                trainee_id: params.traineeId,
+                status: 'PROBATION',
+                expected_end_at: expectedEnd,
+                plan: params.plan
+            }
+        });
+
+        // Update trainer stats
+        await prisma.trainer.update({
+            where: { id: params.trainerId },
+            data: { trainees_total: { increment: 1 } }
+        });
+
+        return period;
+    }
+
+    /**
+     * Complete mentorship period
+     * CANON: Legally significant action, Audit logged, Event-driven rewards
+     */
+    async completeMentorship(params: {
+        periodId: string;
+        status: 'COMPLETED' | 'FAILED';
+        notes: string;
+        metrics: {
+            nps_score?: number;
+            kpi_improvement?: number;
+            quality_score?: number;
+        };
+        actorId: string;
+    }) {
+        const period = await prisma.mentorshipPeriod.findUnique({
+            where: { id: params.periodId },
+            include: { trainer: true }
+        });
+
+        if (!period) throw new Error('Mentorship period not found');
+        if (period.status === 'COMPLETED' || period.status === 'FAILED') {
+            throw new Error('Mentorship period is already finalized');
         }
+
+        // 1. Persist result
+        const result = await prisma.trainingResult.create({
+            data: {
+                mentorship_period_id: params.periodId,
+                nps_score: params.metrics.nps_score,
+                kpi_improvement: params.metrics.kpi_improvement,
+                quality_score: params.metrics.quality_score,
+                notes: `Finalized by ${params.actorId}: ${params.notes}`
+            }
+        });
+
+        // 2. Update period status
+        const finishedPeriod = await prisma.mentorshipPeriod.update({
+            where: { id: params.periodId },
+            data: {
+                status: params.status,
+                finished_at: new Date()
+            }
+        });
+
+        // 3. Update trainer global stats if successful
+        if (params.status === 'COMPLETED') {
+            await prisma.trainer.update({
+                where: { id: period.trainer_id },
+                data: { trainees_successful: { increment: 1 } }
+            });
+        }
+
+        // 4. Emit canonical event for Reward Engine
+        await prisma.event.create({
+            data: {
+                type: 'MENTORSHIP_COMPLETED',
+                source: 'trainer_service',
+                subject_id: period.trainee_id,
+                subject_type: 'user',
+                payload: {
+                    periodId: period.id,
+                    trainerId: period.trainer_id,
+                    mentorUserId: period.trainer.user_id,
+                    status: params.status,
+                    metrics: params.metrics,
+                    notes: params.notes,
+                    finalizedBy: params.actorId
+                }
+            }
+        });
+
+        // 5. Recalculate ratings (ReadOnly logic inside service is fine)
+        await this.updateTrainerRating(period.trainer_id);
+
+        return { period: finishedPeriod, result };
+    }
+
+    /**
+     * Update trainer rating based on historical results
+     */
+    private async updateTrainerRating(trainerId: string) {
+        const results = await prisma.trainingResult.findMany({
+            where: { mentorship_period: { trainer_id: trainerId } }
+        });
+
+        if (results.length === 0) return;
+
+        const npsScores = results.filter(r => r.nps_score !== null).map(r => r.nps_score!);
+        const avgNPS = npsScores.length > 0 ? npsScores.reduce((a, b) => a + b, 0) / npsScores.length : 0;
+
+        await prisma.trainer.update({
+            where: { id: trainerId },
+            data: {
+                rating: avgNPS, // Simplified rating for MVP
+                avg_nps: avgNPS
+            }
+        });
     }
 
     /**
      * Get all trainers with filters
      */
-    async getTrainers(filters?: {
-        specialty?: 'PHOTOGRAPHER' | 'SALES' | 'DESIGNER';
-        status?: string;
-        minRating?: number;
-    }) {
-        const where: any = {};
-
-        if (filters?.specialty) {
-            where.specialty = filters.specialty;
-        }
-
-        if (filters?.status) {
-            where.status = filters.status;
-        }
-
-        if (filters?.minRating) {
-            where.rating = {
-                gte: filters.minRating,
-            };
-        }
-
-        const trainers = await prisma.trainer.findMany({
-            where,
-            orderBy: {
-                rating: 'desc',
-            },
+    async getTrainers(filters?: { specialty?: any; status?: string }) {
+        return await prisma.trainer.findMany({
+            where: filters,
+            include: { accreditations: { where: { is_active: true } } },
+            orderBy: { rating: 'desc' }
         });
-
-        return trainers.map((trainer) => ({
-            id: trainer.id,
-            userId: trainer.user_id,
-            specialty: trainer.specialty,
-            status: trainer.status,
-            rating: trainer.rating ? Number(trainer.rating) : null,
-            accreditationDate: trainer.accreditation_date?.toISOString(),
-            statistics: {
-                traineesTotal: trainer.trainees_total,
-                traineesSuccessful: trainer.trainees_successful,
-                avgNPS: trainer.avg_nps ? Number(trainer.avg_nps) : null,
-            },
-        }));
     }
 
     /**
      * Apply to become a trainer
      */
-    async createTrainer(userId: string, specialty: 'PHOTOGRAPHER' | 'SALES' | 'DESIGNER') {
-        // Check if already a trainer
-        const existing = await prisma.trainer.findUnique({
-            where: { user_id: userId },
-        });
-
-        if (existing) {
-            throw new Error('User is already a trainer');
-        }
+    async createTrainerApplication(userId: string, specialty: any) {
+        const existing = await prisma.trainer.findUnique({ where: { user_id: userId } });
+        if (existing) throw new Error('User is already a trainer or candidate');
 
         return await prisma.trainer.create({
             data: {
                 user_id: userId,
                 specialty,
-                status: 'CANDIDATE',
-            },
+                status: 'CANDIDATE'
+            }
         });
-    }
-
-    /**
-     * Accredit a trainer
-     */
-    async accreditTrainer(trainerId: string) {
-        const trainer = await prisma.trainer.findUnique({
-            where: { id: trainerId },
-        });
-
-        if (!trainer) {
-            throw new Error('Trainer not found');
-        }
-
-        return await prisma.trainer.update({
-            where: { id: trainerId },
-            data: {
-                status: 'ACCREDITED',
-                accreditation_date: new Date(),
-            },
-        });
-    }
-
-    /**
-     * Get trainer's assignments
-     */
-    async getTrainerAssignments(trainerId: string) {
-        return await prisma.trainerAssignment.findMany({
-            where: { trainer_id: trainerId },
-            orderBy: {
-                created_at: 'desc',
-            },
-        });
-    }
-
-    /**
-     * Assign trainer to trainee
-     */
-    async assignTrainer(data: {
-        trainerId: string;
-        traineeId: string;
-        startDate: string;
-        plan?: any;
-    }) {
-        // Check if trainer exists and is accredited
-        const trainer = await prisma.trainer.findUnique({
-            where: { id: data.trainerId },
-        });
-
-        if (!trainer) {
-            throw new Error('Trainer not found');
-        }
-
-        if (trainer.status === 'CANDIDATE') {
-            throw new Error('Trainer must be accredited before assignments');
-        }
-
-        // Create assignment
-        const assignment = await prisma.trainerAssignment.create({
-            data: {
-                trainer_id: data.trainerId,
-                trainee_id: data.traineeId,
-                start_date: new Date(data.startDate),
-                status: 'ACTIVE',
-                plan: data.plan || null,
-            },
-        });
-
-        // Increment trainer's trainees count
-        await prisma.trainer.update({
-            where: { id: data.trainerId },
-            data: {
-                trainees_total: {
-                    increment: 1,
-                },
-            },
-        });
-
-        return assignment;
-    }
-
-    /**
-     * Create training result
-     */
-    async createTrainingResult(data: {
-        assignmentId: string;
-        kpiImprovement?: number;
-        npsScore?: number;
-        retentionDays?: number;
-        hotLeadsPercentage?: number;
-        qualityScore?: number;
-        notes?: string;
-    }) {
-        const assignment = await prisma.trainerAssignment.findUnique({
-            where: { id: data.assignmentId },
-            include: {
-                trainer: true,
-            },
-        });
-
-        if (!assignment) {
-            throw new Error('Assignment not found');
-        }
-
-        // Create training result
-        const result = await prisma.trainingResult.create({
-            data: {
-                assignment_id: data.assignmentId,
-                kpi_improvement: data.kpiImprovement,
-                nps_score: data.npsScore,
-                retention_days: data.retentionDays,
-                hot_leads_percentage: data.hotLeadsPercentage,
-                quality_score: data.qualityScore,
-                notes: data.notes,
-            },
-        });
-
-        // Update assignment status to completed
-        await prisma.trainerAssignment.update({
-            where: { id: data.assignmentId },
-            data: {
-                status: 'COMPLETED',
-                end_date: new Date(),
-            },
-        });
-
-        // Check if trainee was successful (retention >= 60 days)
-        if (data.retentionDays && data.retentionDays >= 60) {
-            await prisma.trainer.update({
-                where: { id: assignment.trainer_id },
-                data: {
-                    trainees_successful: {
-                        increment: 1,
-                    },
-                },
-            });
-
-            // Award trainer with MC/GMC
-            await this.awardTrainer(assignment.trainer_id, {
-                reason: 'Successful trainee completion',
-                mc: 50,
-                gmc: 5,
-            });
-        }
-
-        // Update trainer rating
-        await this.updateTrainerRating(assignment.trainer_id);
-
-        return result;
-    }
-
-    /**
-     * Update trainer rating based on results
-     */
-    private async updateTrainerRating(trainerId: string) {
-        const results = await prisma.trainingResult.findMany({
-            where: {
-                assignment: {
-                    trainer_id: trainerId,
-                },
-            },
-            include: {
-                assignment: true,
-            },
-        });
-
-        if (results.length === 0) return;
-
-        // Calculate average NPS
-        const npsScores = results.filter((r) => r.nps_score !== null).map((r) => r.nps_score!);
-        const avgNPS = npsScores.length > 0 ? npsScores.reduce((a, b) => a + b, 0) / npsScores.length : 0;
-
-        // Calculate success rate (retention >= 60 days)
-        const successfulTrainees = results.filter(
-            (r) => r.retention_days !== null && r.retention_days >= 60
-        ).length;
-        const successRate = results.length > 0 ? successfulTrainees / results.length : 0;
-
-        // Calculate rating: 60% NPS weight + 40% success rate weight
-        const rating = avgNPS * 0.6 + successRate * 5 * 0.4;
-
-        await prisma.trainer.update({
-            where: { id: trainerId },
-            data: {
-                rating: rating,
-                avg_nps: avgNPS,
-            },
-        });
-    }
-
-    /**
-     * Award trainer with MC/GMC
-     */
-    private async awardTrainer(
-        trainerId: string,
-        reward: { reason: string; mc: number; gmc: number }
-    ) {
-        const trainer = await prisma.trainer.findUnique({
-            where: { id: trainerId },
-        });
-
-        if (!trainer) return;
-
-        // Get or create wallet
-        let wallet = await prisma.wallet.findUnique({
-            where: { user_id: trainer.user_id },
-        });
-
-        if (!wallet) {
-            wallet = await prisma.wallet.create({
-                data: {
-                    user_id: trainer.user_id,
-                    mc_balance: 0,
-                    gmc_balance: 0,
-                },
-            });
-        }
-
-        // Award MC (via canonical registry)
-        if (reward.mc > 0) {
-            const { checkCanon } = require('../core/canon');
-
-            // Validate via centralized registry
-            await checkCanon({
-                canon: 'MC',
-                action: 'MC_REWARD',
-                source: 'API',
-                payload: {
-                    trainerId,
-                    userId: trainer.user_id,
-                    amount: reward.mc,
-                    reason: reward.reason,
-                    // Trainer rewards are operational engagement - allowed
-                    monetaryEquivalent: false,
-                    kpiBased: false,
-                    creativeTask: false,
-                    noExpiration: false,
-                    unlimited: false
-                },
-                userId: trainer.user_id
-            });
-
-            // Registry handles validation, logging, and errors
-            await prisma.wallet.update({
-                where: { user_id: trainer.user_id },
-                data: {
-                    mc_balance: { increment: reward.mc },
-                },
-            });
-
-            await prisma.transaction.create({
-                data: {
-                    type: 'REWARD',
-                    currency: 'MC',
-                    amount: reward.mc,
-                    recipient_id: trainer.user_id,
-                    description: `Trainer reward: ${reward.reason}`,
-                    metadata: {
-                        trainerId: trainer.id,
-                        type: 'trainer_reward',
-                    },
-                },
-            });
-        }
-
-        // GMC rewards are FORBIDDEN by canonical rules
-        if (reward.gmc > 0) {
-            const { checkCanon } = require('../core/canon');
-
-            // Validate via centralized registry
-            // This will throw CanonicalViolationError and log automatically
-            await checkCanon({
-                canon: 'GMC',
-                action: 'GMC_GRANT_AUTOMATIC',
-                source: 'API',
-                payload: {
-                    automatic: true,
-                    trainerId,
-                    userId: trainer.user_id,
-                    amount: reward.gmc,
-                    reason: reward.reason
-                },
-                userId: trainer.user_id
-            });
-
-            // Registry will block this operation
-            // This code should never execute
-        }
     }
 }
 

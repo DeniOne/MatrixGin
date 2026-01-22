@@ -1,5 +1,5 @@
 import React from 'react';
-import { HRStatus } from '@prisma/client';
+import { HRStatus } from '../../types/personnel.types';
 
 interface PersonalFileStatusBadgeProps {
     status: HRStatus;

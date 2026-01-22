@@ -5,6 +5,7 @@
 
 import { Router } from 'express';
 import { universityController } from '../controllers/university.controller';
+import { enrollmentController } from '../controllers/enrollment.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { requireRole } from '../middleware/roles.middleware';
 
@@ -38,6 +39,12 @@ router.post(
 );
 
 // ===== Course Routes =====
+
+/**
+ * GET /api/university/courses/available
+ * Get available courses for current user (filtered by grade)
+ */
+router.get('/courses/available', universityController.getAvailableCourses.bind(universityController));
 
 /**
  * GET /api/university/courses
@@ -77,9 +84,35 @@ router.post('/courses/:id/complete', universityController.completeCourse.bind(un
 
 /**
  * GET /api/university/my-courses
+ * Get my enrolled courses (legacy)
+ */
+router.get('/my-courses', enrollmentController.getMyEnrollments.bind(enrollmentController));
+
+// ===== Enrollment Routes =====
+
+/**
+ * POST /api/university/enrollments
+ * Enroll in a course
+ */
+router.post('/enrollments', enrollmentController.enroll.bind(enrollmentController));
+
+/**
+ * GET /api/university/enrollments/my
  * Get my enrolled courses
  */
-router.get('/my-courses', universityController.getMyCourses.bind(universityController));
+router.get('/enrollments/my', enrollmentController.getMyEnrollments.bind(enrollmentController));
+
+/**
+ * GET /api/university/enrollments/:id
+ * Get enrollment details
+ */
+router.get('/enrollments/:id', enrollmentController.getEnrollmentById.bind(enrollmentController));
+
+/**
+ * DELETE /api/university/enrollments/:id
+ * Withdraw from a course
+ */
+router.delete('/enrollments/:id', enrollmentController.withdraw.bind(enrollmentController));
 
 /**
  * PUT /api/university/enrollments/:id/progress
@@ -87,7 +120,7 @@ router.get('/my-courses', universityController.getMyCourses.bind(universityContr
  */
 router.put(
     '/enrollments/:id/progress',
-    universityController.updateModuleProgress.bind(universityController)
+    enrollmentController.updateProgress.bind(enrollmentController)
 );
 
 // ===== Certification Routes =====
@@ -101,10 +134,10 @@ router.get('/certifications', universityController.getCertifications.bind(univer
 // ===== Trainer Routes =====
 
 /**
- * GET /api/university/trainers
- * Get all trainers with filters
+ * GET /api/university/trainers/dashboard
+ * Get trainer personal dashboard (Read-only)
  */
-router.get('/trainers', universityController.getTrainers.bind(universityController));
+router.get('/trainers/dashboard', universityController.getTrainerDashboard.bind(universityController));
 
 /**
  * POST /api/university/trainers
@@ -113,41 +146,90 @@ router.get('/trainers', universityController.getTrainers.bind(universityControll
 router.post('/trainers', universityController.createTrainer.bind(universityController));
 
 /**
- * PUT /api/university/trainers/:id/accredit
- * Accredit a trainer (Admin/HR Manager only)
+ * POST /api/university/trainers/:id/accredit
+ * Accredit a trainer (Admin/HR only)
  */
-router.put(
+router.post(
     '/trainers/:id/accredit',
     requireRole(['ADMIN', 'HR_MANAGER']),
     universityController.accreditTrainer.bind(universityController)
 );
 
 /**
- * GET /api/university/trainers/:id/assignments
- * Get trainer's assignments
+ * POST /api/university/trainers/mentorship
+ * Start mentorship period (Admin/HR/Dept Head)
+ */
+router.post(
+    '/trainers/mentorship',
+    requireRole(['ADMIN', 'HR_MANAGER', 'DEPARTMENT_HEAD']),
+    universityController.startMentorship.bind(universityController)
+);
+
+/**
+ * POST /api/university/trainers/mentorship/:id/complete
+ * Finalize mentorship (Trainer/Admin only)
+ */
+router.post(
+    '/trainers/mentorship/:id/complete',
+    universityController.completeMentorship.bind(universityController)
+);
+
+// ===== Quiz Routes =====
+
+/**
+ * GET /api/university/quizzes/:materialId
+ * Get quiz structure
+ */
+router.get('/quizzes/:materialId', universityController.getQuiz.bind(universityController));
+
+/**
+ * POST /api/university/quizzes/:id/submit
+ * Submit quiz attempt
+ */
+router.post('/quizzes/:id/submit', universityController.submitQuizAttempt.bind(universityController));
+
+// ===== Security & Anti-Fraud Routes =====
+
+/**
+ * GET /api/university/security/signals
+ * Get anti-fraud signals (Admin/HR only)
  */
 router.get(
-    '/trainers/:id/assignments',
-    universityController.getTrainerAssignments.bind(universityController)
+    '/security/signals',
+    requireRole(['ADMIN', 'HR_MANAGER']),
+    universityController.getSecuritySignals.bind(universityController)
 );
 
 /**
- * POST /api/university/trainers/assign
- * Assign trainer to trainee (Admin/HR Manager only)
+ * POST /api/university/security/signals/:id/validate
+ * Validate a signal (Admin/HR only)
  */
 router.post(
-    '/trainers/assign',
-    requireRole(['ADMIN', 'HR_MANAGER', 'DEPARTMENT_HEAD']),
-    universityController.assignTrainer.bind(universityController)
+    '/security/signals/:id/validate',
+    requireRole(['ADMIN', 'HR_MANAGER']),
+    universityController.validateSignal.bind(universityController)
 );
 
 /**
- * POST /api/university/trainers/results
- * Create training result (Trainer/Admin only)
+ * POST /api/university/security/certifications/:id/invalidate
+ * Invalidate a certification (Admin/HR only)
  */
 router.post(
-    '/trainers/results',
-    universityController.createTrainingResult.bind(universityController)
+    '/security/certifications/:id/invalidate',
+    requireRole(['ADMIN', 'HR_MANAGER']),
+    universityController.invalidateCertification.bind(universityController)
+);
+
+// ===== Analytics Routes =====
+
+/**
+ * GET /api/university/analytics/overview
+ * Get university analytics overview (Admin/HR only)
+ */
+router.get(
+    '/analytics/overview',
+    requireRole(['ADMIN', 'HR_MANAGER']),
+    universityController.getAnalyticsOverview.bind(universityController)
 );
 
 export default router;

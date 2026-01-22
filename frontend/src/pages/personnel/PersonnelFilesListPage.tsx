@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useGetPersonalFilesQuery } from '../../api/personnelApi';
 import { PersonalFileCard } from '../../components/personnel';
-import { HRStatus } from '@prisma/client';
+import { HRStatus } from '../../types/personnel.types';
 
 export const PersonnelFilesListPage: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState<HRStatus | ''>('');

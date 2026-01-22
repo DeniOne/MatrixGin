@@ -17,7 +17,7 @@ interface HistoryTabProps {
     personalFileId: string;
 }
 
-export const HistoryTab: React.FC<HistoryTabProps> = ({ personalFileId }) => {
+export const HistoryTab: React.FC<HistoryTabProps> = ({ personalFileId: _personalFileId }) => {
     // TODO: Fetch events from API
     const events: HistoryEvent[] = [];
 

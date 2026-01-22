@@ -1,8 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../config/prisma';
 
 /**
  * UniversityOnboardingListener
@@ -16,11 +12,13 @@ const prisma = new PrismaClient();
  * 
  * Integration: Listens to employee.onboarded event from EmployeeRegistrationService
  */
-@Injectable()
 export class UniversityOnboardingListener {
-    private readonly logger = new Logger(UniversityOnboardingListener.name);
+    private readonly logger = {
+        log: (msg: string) => console.log(`[UniversityOnboardingListener] ${msg}`),
+        warn: (msg: string) => console.warn(`[UniversityOnboardingListener] ${msg}`),
+        error: (msg: string) => console.error(`[UniversityOnboardingListener] ${msg}`)
+    };
 
-    @OnEvent('employee.onboarded')
     async handleEmployeeOnboarded(payload: EmployeeOnboardedEvent) {
         this.logger.log(`Initializing learning context for employee ${payload.employeeId}`);
 
@@ -35,7 +33,7 @@ export class UniversityOnboardingListener {
             await this.createLearningProfile(payload.userId);
 
             this.logger.log(`Learning context initialized for employee ${payload.employeeId}`);
-        } catch (error) {
+        } catch (error: any) {
             this.logger.error(`Failed to initialize learning context: ${error.message}`);
             // НЕ бросаем ошибку — onboarding не должен падать из-за University
         }
@@ -62,8 +60,6 @@ export class UniversityOnboardingListener {
             data: {
                 user_id: userId,
                 current_grade: 'INTERN', // Photon level
-                mc_balance: 0,
-                gmc_balance: 0,
             },
         });
 

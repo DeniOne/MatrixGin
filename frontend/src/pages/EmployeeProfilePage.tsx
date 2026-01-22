@@ -16,8 +16,7 @@ import {
 
 import {
     useGetUserStatusQuery,
-    useGetUserRankQuery,
-    useGetStatusHistoryQuery
+    useGetUserRankQuery
 } from '../features/participation/participationApi';
 import { StatusBadge } from '../components/status/StatusBadge';
 import { RankBadge } from '../components/status/RankBadge';

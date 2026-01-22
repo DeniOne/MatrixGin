@@ -12,6 +12,10 @@ import PersonalAnalyticsPage from './pages/analytics/PersonalAnalyticsPage';
 import ExecutiveAnalyticsPage from './pages/analytics/ExecutiveAnalyticsPage';
 import { UniversityPage } from './pages/UniversityPage';
 import { MyCoursesPage } from './pages/MyCoursesPage';
+import { CourseReaderPage } from './pages/university/CourseReaderPage';
+import { TrainerDashboardPage } from './pages/university/TrainerDashboardPage';
+import { UniversitySecurityDashboard } from './pages/university/UniversitySecurityDashboard';
+import { UniversityAnalyticsDashboard } from './pages/university/UniversityAnalyticsDashboard';
 import ManagerDashboard from './pages/ManagerDashboard';
 
 // AI Module
@@ -98,6 +102,10 @@ const AppRoutes: React.FC = () => {
                         <Route path="/ofs/legacy" element={<OFSPage />} />
                         <Route path="/university" element={<UniversityPage />} />
                         <Route path="/my-courses" element={<MyCoursesPage />} />
+                        <Route path="/university/course/:enrollmentId" element={<CourseReaderPage />} />
+                        <Route path="/university/trainer/dashboard" element={<TrainerDashboardPage />} />
+                        <Route path="/university/admin/security" element={<UniversitySecurityDashboard />} />
+                        <Route path="/university/admin/analytics" element={<UniversityAnalyticsDashboard />} />
                         {/* Gamification routes */}
                         <Route path="/gamification" element={<LeaderboardPage />} />
                         <Route path="/gamification/leaderboard" element={<LeaderboardPage />} />

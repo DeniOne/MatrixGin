@@ -1,182 +1,52 @@
-# Implementation Plan: Employee Registration 100%
+# Implementation Plan: Phase 4 - Trainer Accreditation & Mentorship
 
-**Цель:** Довести процесс регистрации сотрудника до 100% готовности
+Этот этап фокусируется на "Институте Тренерства". Мы превращаем квалифицированных сотрудников в наставников, внедряем систему аккредитации и удобный дашборд для управления обучением новичков.
 
-**Текущий статус:** 60-70%  
-**Целевой статус:** 100%
+## User Review Required
 
----
+> [!IMPORTANT]
+> **Авторизация**: Доступ к Trainer Dashboard будет ограничен только сотрудникам со статусом `TRAINER`, `ACCREDITED` и выше.
+> 
+> **Награды**: За успешное доведение стажера до конца испытательного срока (60 дней) тренер получает автоматическую награду в MC. GMC награды заблокированы на уровне канонов.
 
-## 🎯 Критические проблемы
+## Proposed Changes
 
-### Проблема #1: Событие `employee.hired` не эмитится
-- **Критичность:** 🔴 CRITICAL
-- **Последствие:** PersonalFile не создаётся автоматически
-- **Решение:** Добавить EventEmitter2 и эмиссию события
+### 1. Backend Refinements
 
-### Проблема #2: Frontend UI неизвестен
-- **Критичность:** 🟡 HIGH
-- **Последствие:** HR не может использовать систему
-- **Решение:** Проверить наличие, создать если нужно
+#### [MODIFY] [trainer.service.ts](file:///f:/Matrix_Gin/backend/src/services/trainer.service.ts)
+- Добавление метода `getTrainerDashboardData(trainerId)`: агрегация статистики (NPS, доход, список активных учеников) в один DTO.
+- Усиление логики [assignTrainer](file:///f:/Matrix_Gin/backend/src/services/trainer.service.ts#164-209): автоматическая отправка уведомления ученику о назначении наставника.
 
----
+#### [MODIFY] [university.controller.ts](file:///f:/Matrix_Gin/backend/src/controllers/university.controller.ts)
+- Новые эндпоинты:
+  - `GET /api/university/trainers/dashboard` — данные для личного кабинета тренера.
+  - `GET /api/university/trainers/candidates` — список заявок на аккредитацию (для HR/Admin).
 
-## 📋 План реализации
+### 2. Frontend (Trainer UI)
 
-### **Phase 1: Исправление критической проблемы (MUST)**
+#### [NEW] [TrainerDashboardPage.tsx](file:///f:/Matrix_Gin/frontend/src/pages/university/TrainerDashboardPage.tsx)
+- Статистические карточки (Рейтинг, Успешные стажеры, NPS).
+- Таблица "Мои подопечные" с прогресс-барами их курсов.
+- Кнопка "Завершить наставничество" с формой оценки результата.
 
-#### 1.1. Добавить EventEmitter2 в EmployeeRegistrationService
+#### [NEW] [TrainerApplicationModal.tsx](file:///f:/Matrix_Gin/frontend/src/features/university/components/TrainerApplicationModal.tsx)
+- Форма выбора специализации (Фотограф, Продажи, Дизайнер).
+- Справка о требованиях к кандидату.
 
-**Файл:** [backend/src/services/employee-registration.service.ts](file:///f:/Matrix_Gin/backend/src/services/employee-registration.service.ts)
+### 3. Management UI
 
-**Изменения:**
-1. Импортировать EventEmitter2
-2. Добавить в constructor
-3. Эмитить событие в [approveRegistration()](file:///f:/Matrix_Gin/backend/src/services/employee-registration.service.ts#773-837)
+#### [MODIFY] [UniversityPage.tsx](file:///f:/Matrix_Gin/frontend/src/pages/UniversityPage.tsx)
+- Добавление вкладки "Управление" (только для HR/Admin).
+- Список кандидатов с кнопками "Аккредитовать" / "Отклонить".
 
-**Код:**
-```typescript
-import { EventEmitter2 } from '@nestjs/event-emitter';
+## Verification Plan
 
-export class EmployeeRegistrationService {
-  constructor(private eventEmitter: EventEmitter2) {}
+### Automated Tests
+1. Проверка [assignTrainer](file:///f:/Matrix_Gin/backend/src/services/trainer.service.ts#164-209): убедиться, что `trainees_total` инкрементируется.
+2. Проверка [createTrainingResult](file:///f:/Matrix_Gin/backend/src/services/trainer.service.ts#210-279): симуляция 61 дня ретеншена и проверка начисления MC.
 
-  async approveRegistration(registrationId, reviewedByUserId) {
-    // ... создание User и Employee ...
-
-    // ✅ ДОБАВИТЬ:
-    this.eventEmitter.emit('employee.hired', {
-      employeeId: employee.id,
-      hireDate: new Date(),
-      hiredBy: reviewedByUserId,
-      hiredByRole: 'HR_MANAGER'
-    });
-  }
-}
-```
-
-#### 1.2. Проверить, что EmployeeHiredListener работает
-
-**Файл:** [backend/src/modules/personnel/listeners/employee-hired.listener.ts](file:///f:/Matrix_Gin/backend/src/modules/personnel/listeners/employee-hired.listener.ts)
-
-**Проверка:**
-- ✅ Listener зарегистрирован в PersonnelModule
-- ✅ Слушает событие `employee.hired`
-- ✅ Создаёт PersonalFile через PersonalFileService
-
----
-
-### **Phase 2: Проверка/создание Frontend UI (MUST)**
-
-#### 2.1. Проверить наличие admin panel
-
-**Действия:**
-1. Найти frontend код для admin panel
-2. Проверить наличие страниц:
-   - Отправка приглашений
-   - Список заявок
-   - Детали заявки
-   - Кнопки одобрения/отклонения
-
-#### 2.2. Если UI нет — создать минимальный
-
-**Страницы:**
-1. **Invite Employee Page**
-   - Форма с полями: Telegram ID, Department, Location
-   - Кнопка "Send Invitation"
-
-2. **Registration Requests List Page**
-   - Таблица заявок
-   - Фильтр по статусу
-   - Пагинация
-
-3. **Registration Request Detail Page**
-   - Все данные кандидата
-   - История шагов
-   - Кнопки "Approve" / "Reject"
-
----
-
-### **Phase 3: End-to-end тестирование (MUST)**
-
-#### 3.1. Создать тестовый сценарий
-
-**Сценарий:**
-1. HR отправляет приглашение
-2. Кандидат проходит 11 шагов
-3. HR одобряет заявку
-4. Проверить:
-   - User создан
-   - Employee создан
-   - PersonalFile создан
-   - HR Domain Event сохранён
-
-#### 3.2. Написать integration test
-
-**Файл:** `backend/src/modules/personnel/__tests__/integration/employee-registration.test.ts`
-
----
-
-## 🚀 Execution Plan
-
-### **STEP 1: Fix Critical Issue (30 min)**
-
-1. ✅ Modify [employee-registration.service.ts](file:///f:/Matrix_Gin/backend/src/services/employee-registration.service.ts)
-2. ✅ Add EventEmitter2 dependency
-3. ✅ Emit `employee.hired` event
-4. ✅ Test event emission
-
-### **STEP 2: Verify Module 33 Integration (15 min)**
-
-1. ✅ Check EmployeeHiredListener is registered
-2. ✅ Test PersonalFile creation
-3. ✅ Verify HR Domain Event emission
-
-### **STEP 3: Check Frontend UI (30 min)**
-
-1. ✅ Search for admin panel code
-2. ✅ Check if pages exist
-3. ✅ If not — create minimal UI
-
-### **STEP 4: End-to-end Test (30 min)**
-
-1. ✅ Manual test: full registration flow
-2. ✅ Verify all components work
-3. ✅ Write integration test
-
-### **STEP 5: Documentation (15 min)**
-
-1. ✅ Update EMPLOYEE-REGISTRATION-PROCESS.md
-2. ✅ Update MVP-LEARNING-CONTOUR README
-3. ✅ Commit changes
-
----
-
-## ✅ Acceptance Criteria
-
-Процесс регистрации считается **100% готовым**, если:
-
-- ✅ Событие `employee.hired` эмитится
-- ✅ PersonalFile создаётся автоматически
-- ✅ HR Domain Event `EMPLOYEE_HIRED` сохраняется
-- ✅ Frontend UI существует (или создан минимальный)
-- ✅ End-to-end тест проходит
-- ✅ Документация обновлена
-
----
-
-## 📊 Timeline
-
-| Phase | Время | Статус |
-|-------|-------|--------|
-| Phase 1: Fix Critical Issue | 30 min | ⏳ TODO |
-| Phase 2: Frontend UI | 30 min | ⏳ TODO |
-| Phase 3: Testing | 30 min | ⏳ TODO |
-| Documentation | 15 min | ⏳ TODO |
-| **Total** | **~2 hours** | ⏳ TODO |
-
----
-
-**Автор:** Antigravity AI  
-**Дата:** 2026-01-22  
-**Статус:** Ready for Execution
+### Manual Verification
+1. Зайти под обычным пользователем, подать заявку на тренера.
+2. Под админом подтвердить заявку (Accredit).
+3. Убедиться, что у пользователя появилась вкладка "Дашборд тренера".
+4. Назначить тренера стажеру, убедиться что в дашборде тренера появился новый ученик.

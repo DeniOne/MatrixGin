@@ -768,6 +768,7 @@ model Material {
   updated_at       DateTime       @updatedAt
   course_modules   CourseModule[]
   academy          Academy?       @relation(fields: [academy_id], references: [id])
+  quizzes          Quiz[]
 
   @@map("materials")
 }
@@ -808,6 +809,100 @@ model CourseModule {
   progress     ModuleProgress[]
 
   @@map("course_modules")
+}
+
+model Quiz {
+  id          String   @id @default(uuid())
+  material_id String
+  material    Material @relation(fields: [material_id], references: [id])
+  
+  version     Int      @default(1)
+  is_active   Boolean  @default(true)
+  mode        QuizMode @default(REQUIRED)
+  
+  title       String
+  description String?
+  pass_score  Int      @default(80) 
+  
+  questions   QuizQuestion[]
+  attempts    QuizAttempt[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([material_id])
+  @@map("quizzes")
+}
+
+enum QuizMode {
+  OPTIONAL
+  REQUIRED
+  DIAGNOSTIC
+}
+
+model QuizQuestion {
+  id        String   @id @default(uuid())
+  quiz_id   String
+  quiz      Quiz     @relation(fields: [quiz_id], references: [id], onDelete: Cascade)
+  
+  text      String
+  type      String   // SINGLE, MULTIPLE
+  order     Int
+  base_weight Float  @default(1.0) 
+  
+  options   QuizOption[]
+  answers   QuizAnswer[]
+  
+  @@map("quiz_questions")
+}
+
+model QuizOption {
+  id           String       @id @default(uuid())
+  question_id  String
+  question     QuizQuestion @relation(fields: [question_id], references: [id], onDelete: Cascade)
+  
+  text         String
+  is_correct   Boolean      @default(false)
+  
+  @@map("quiz_options")
+}
+
+model QuizAttempt {
+  id             String       @id @default(uuid())
+  user_id        String
+  quiz_id        String
+  enrollment_id  String?
+  
+  raw_score      Float?       
+  max_score      Float?       
+  passed         Boolean      @default(false)
+  
+  attempt_number Int          @default(1)
+  ip_address     String?
+  user_agent     String?
+  
+  started_at     DateTime     @default(now())
+  finished_at    DateTime?
+  
+  answers        QuizAnswer[]
+  quiz           Quiz         @relation(fields: [quiz_id], references: [id])
+  
+  @@map("quiz_attempts")
+}
+
+model QuizAnswer {
+  id               String       @id @default(uuid())
+  attempt_id       String
+  attempt          QuizAttempt  @relation(fields: [attempt_id], references: [id], onDelete: Cascade)
+  
+  question_id      String
+  question         QuizQuestion @relation(fields: [question_id], references: [id])
+  
+  selected_options String[]     
+  is_correct       Boolean
+  earned_points    Float        @default(0)
+  
+  @@map("quiz_answers")
 }
 
 model UserSkill {
@@ -901,7 +996,7 @@ model Trainer {
   id                  String              @id @default(uuid())
   user_id             String              @unique
   specialty           TrainerSpecialty
-  status              TrainerStatus       @default(CANDIDATE)
+  status              TrainerStatus       @default(CANDIDATE) // System role status
   accreditation_date  DateTime?
   rating              Decimal?            @db.Decimal(3, 2)
   trainees_total      Int                 @default(0)
@@ -909,38 +1004,64 @@ model Trainer {
   avg_nps             Decimal?            @db.Decimal(3, 2)
   created_at          DateTime            @default(now())
   updated_at          DateTime            @updatedAt
-  assignments         TrainerAssignment[]
+  
+  accreditations      TrainerAccreditation[]
+  mentorships         MentorshipPeriod[]
 
   @@map("trainers")
 }
 
-model TrainerAssignment {
-  id         String           @id @default(uuid())
-  trainer_id String
-  trainee_id String
-  start_date DateTime         @db.Date
-  end_date   DateTime?        @db.Date
-  status     AssignmentStatus @default(ACTIVE)
-  plan       Json?
-  created_at DateTime         @default(now())
-  updated_at DateTime         @updatedAt
-  trainer    Trainer          @relation(fields: [trainer_id], references: [id])
-  results    TrainingResult[]
+model TrainerAccreditation {
+  id          String   @id @default(uuid())
+  trainer_id  String
+  level       String   // JUNIOR, SENIOR, MASTER
+  weight      Float    @default(1.0)
+  granted_at  DateTime @default(now())
+  expires_at  DateTime?
+  granted_by  String   // ID админа/HR
+  is_active   Boolean  @default(true)
+  
+  trainer     Trainer  @relation(fields: [trainer_id], references: [id])
+  
+  @@map("trainer_accreditations")
+}
 
-  @@map("trainer_assignments")
+model MentorshipPeriod {
+  id              String           @id @default(uuid())
+  trainer_id      String
+  trainee_id      String
+  status          MentorshipStatus @default(PROBATION)
+  
+  start_at        DateTime         @default(now())
+  expected_end_at DateTime
+  finished_at     DateTime?
+  
+  plan            Json?
+  results         TrainingResult[]
+  
+  trainer         Trainer          @relation(fields: [trainer_id], references: [id])
+  
+  @@map("mentorship_periods")
+}
+
+enum MentorshipStatus {
+  PROBATION
+  ACTIVE
+  COMPLETED
+  FAILED
 }
 
 model TrainingResult {
-  id                   String            @id @default(uuid())
-  assignment_id        String
+  id                   String           @id @default(uuid())
+  mentorship_period_id String
   kpi_improvement      Int?
   nps_score            Int?
   retention_days       Int?
   hot_leads_percentage Int?
   quality_score        Int?
   notes                String?
-  created_at           DateTime          @default(now())
-  assignment           TrainerAssignment @relation(fields: [assignment_id], references: [id], onDelete: Cascade)
+  created_at           DateTime         @default(now())
+  mentorship_period    MentorshipPeriod @relation(fields: [mentorship_period_id], references: [id], onDelete: Cascade)
 
   @@map("training_results")
 }
@@ -1328,6 +1449,8 @@ enum EventType {
   TASK_COMPLETED
   TRANSACTION_CREATED
   PHOTOCOMPANY_RESULT
+  QUIZ_COMPLETED
+  MENTORSHIP_COMPLETED
 }
 
 enum EmployeeStatus {

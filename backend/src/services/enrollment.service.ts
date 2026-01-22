@@ -11,6 +11,40 @@ export class EnrollmentService {
      * Enroll user in a course
      */
     async enrollInCourse(userId: string, courseId: string, assignedBy?: string) {
+        // Check if course exists and verify required grade
+        const course = await prisma.course.findUnique({
+            where: { id: courseId },
+        });
+
+        if (!course) {
+            throw new Error('Course not found');
+        }
+
+        if (course.required_grade) {
+            const userGrade = await prisma.userGrade.findUnique({
+                where: { user_id: userId },
+            });
+
+            if (!userGrade) {
+                throw new Error('User grade not found');
+            }
+
+            const grades: Record<string, number> = {
+                'INTERN': 1,
+                'SPECIALIST': 2,
+                'PROFESSIONAL': 3,
+                'EXPERT': 4,
+                'MASTER': 5
+            };
+
+            const userGradeLevel = grades[userGrade.current_grade] || 0;
+            const requiredGradeLevel = grades[course.required_grade] || 0;
+
+            if (userGradeLevel < requiredGradeLevel) {
+                throw new Error(`Qualification too low. Required grade: ${course.required_grade}`);
+            }
+        }
+
         // Check if already enrolled
         const existing = await prisma.enrollment.findUnique({
             where: {
@@ -22,6 +56,13 @@ export class EnrollmentService {
         });
 
         if (existing) {
+            if (existing.status === 'ABANDONED') {
+                // Reactivate abandonment
+                return await prisma.enrollment.update({
+                    where: { id: existing.id },
+                    data: { status: 'ACTIVE', enrolled_at: new Date(), progress: 0 }
+                });
+            }
             throw new Error('Already enrolled in this course');
         }
 
@@ -88,6 +129,62 @@ export class EnrollmentService {
             .map((e) => this.formatEnrollment(e));
 
         return { active, completed, abandoned };
+    }
+
+    /**
+     * Get enrollment by ID
+     */
+    async getEnrollmentById(id: string) {
+        const enrollment = await prisma.enrollment.findUnique({
+            where: { id },
+            include: {
+                course: {
+                    include: {
+                        academy: true,
+                        modules: {
+                            orderBy: { module_order: 'asc' },
+                            include: { material: true }
+                        }
+                    }
+                },
+                module_progress: {
+                    include: { module: true }
+                }
+            }
+        });
+
+        if (!enrollment) {
+            throw new Error('Enrollment not found');
+        }
+
+        return enrollment;
+    }
+
+    /**
+     * Withdraw from course (abandon)
+     */
+    async withdrawFromCourse(userId: string, enrollmentId: string) {
+        const enrollment = await prisma.enrollment.findFirst({
+            where: {
+                id: enrollmentId,
+                user_id: userId
+            }
+        });
+
+        if (!enrollment) {
+            throw new Error('Enrollment not found or does not belong to user');
+        }
+
+        if (enrollment.status === 'COMPLETED') {
+            throw new Error('Cannot withdraw from a completed course');
+        }
+
+        return await prisma.enrollment.update({
+            where: { id: enrollmentId },
+            data: {
+                status: 'ABANDONED'
+            }
+        });
     }
 
     /**
@@ -312,11 +409,14 @@ export class EnrollmentService {
             id: e.id,
             courseId: e.course_id,
             courseTitle: e.course.title,
-            academyName: e.course.academy.name,
+            courseDescription: e.course.description,
+            academyName: e.course.academy?.name || 'Unknown',
             progress: e.progress,
             status: e.status,
             enrolledAt: e.enrolled_at,
             completedAt: e.completed_at,
+            requiredGrade: e.course.required_grade,
+            isMandatory: e.course.is_mandatory
         };
     }
 

@@ -6,9 +6,12 @@
 import { Request, Response } from 'express';
 import { universityService } from '../services/university.service';
 import { enrollmentService } from '../services/enrollment.service';
+import { enrollmentController } from './enrollment.controller';
 import { trainerService } from '../services/trainer.service';
 import { requireRole } from '../middleware/roles.middleware';
 import { logger } from '../config/logger';
+import { integrityActionService } from '../services/integrity-action.service';
+import { quizService } from '../services/quiz.service';
 
 export class UniversityController {
     /**
@@ -81,6 +84,26 @@ export class UniversityController {
                 requiredGrade: requiredGrade as string,
                 isMandatory: isMandatory === 'true',
             });
+            res.json({
+                success: true,
+                data: courses,
+            });
+        } catch (error: any) {
+            res.status(500).json({
+                success: false,
+                error: error.message,
+            });
+        }
+    }
+
+    /**
+     * GET /api/university/courses/available
+     * Get available courses for current user (filtered by grade)
+     */
+    async getAvailableCourses(req: Request, res: Response) {
+        try {
+            const userId = (req as any).user.id;
+            const courses = await universityService.getAvailableCourses(userId);
             res.json({
                 success: true,
                 data: courses,
@@ -369,11 +392,10 @@ export class UniversityController {
      */
     async getTrainers(req: Request, res: Response) {
         try {
-            const { specialty, status, minRating } = req.query;
+            const { specialty, status } = req.query;
             const trainers = await trainerService.getTrainers({
                 specialty: specialty as any,
                 status: status as string,
-                minRating: minRating ? Number(minRating) : undefined,
             });
             res.json({
                 success: true,
@@ -395,9 +417,7 @@ export class UniversityController {
         try {
             const userId = (req as any).user.id;
             const { specialty } = req.body;
-
-            const trainer = await trainerService.createTrainer(userId, specialty);
-
+            const trainer = await trainerService.createTrainerApplication(userId, specialty);
             res.status(201).json({
                 success: true,
                 data: trainer,
@@ -411,34 +431,51 @@ export class UniversityController {
     }
 
     /**
-     * PUT /api/university/trainers/:id/accredit
-     * Accredit a trainer
-     * RBAC: MANAGER or EXECUTIVE only
+     * GET /api/university/trainers/dashboard
+     * Get trainer dashboard data
+     */
+    async getTrainerDashboard(req: Request, res: Response) {
+        try {
+            const userId = (req as any).user.id;
+            const allTrainers = await trainerService.getTrainers();
+            const trainer = allTrainers.find(t => t.user_id === userId);
+
+            if (!trainer) throw new Error('You are not registered as a trainer');
+
+            const dashboard = await trainerService.getTrainerDashboardData(trainer.id);
+            res.json({
+                success: true,
+                data: dashboard,
+            });
+        } catch (error: any) {
+            res.status(403).json({
+                success: false,
+                error: error.message,
+            });
+        }
+    }
+
+    /**
+     * POST /api/university/trainers/:id/accredit
+     * Accredit a trainer (Admin/HR only)
      */
     async accreditTrainer(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            // RBAC: Only MANAGER or EXECUTIVE can accredit trainers
-            const userRole = (req as any).user.role;
-            const userId = (req as any).user.id;
-            if (!['MANAGER', 'EXECUTIVE'].includes(userRole)) {
-                logger.warn('[RBAC] Access denied: accreditTrainer', {
-                    userId,
-                    role: userRole,
-                    action: 'accreditTrainer',
-                    resource: 'trainer',
-                    trainerId: id
-                });
-                return res.status(403).json({
-                    success: false,
-                    error: 'Forbidden: Only managers or executives can accredit trainers',
-                });
-            }
+            const { level, weight, expiresAt } = req.body;
+            const adminId = (req as any).user.id;
 
-            const trainer = await trainerService.accreditTrainer(id);
+            const accreditation = await trainerService.grantAccreditation({
+                trainerId: id,
+                level,
+                weight: weight || 1.0,
+                grantedBy: adminId,
+                expiresAt: expiresAt ? new Date(expiresAt) : undefined
+            });
+
             res.json({
                 success: true,
-                data: trainer,
+                data: accreditation,
             });
         } catch (error: any) {
             res.status(400).json({
@@ -449,15 +486,20 @@ export class UniversityController {
     }
 
     /**
-     * POST /api/university/trainers/assign
-     * Assign trainer to trainee
+     * POST /api/university/trainers/mentorship
+     * Start mentorship period
      */
-    async assignTrainer(req: Request, res: Response) {
+    async startMentorship(req: Request, res: Response) {
         try {
-            const assignment = await trainerService.assignTrainer(req.body);
+            const { trainerId, traineeId, plan } = req.body;
+            const period = await trainerService.startMentorship({
+                trainerId,
+                traineeId,
+                plan
+            });
             res.status(201).json({
                 success: true,
-                data: assignment,
+                data: period,
             });
         } catch (error: any) {
             res.status(400).json({
@@ -468,33 +510,24 @@ export class UniversityController {
     }
 
     /**
-     * GET /api/university/trainers/:id/assignments
-     * Get trainer's assignments
+     * POST /api/university/trainers/mentorship/:id/complete
+     * Finalize mentorship (COMPLETED/FAILED)
      */
-    async getTrainerAssignments(req: Request, res: Response) {
+    async completeMentorship(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const assignments = await trainerService.getTrainerAssignments(id);
-            res.json({
-                success: true,
-                data: assignments,
-            });
-        } catch (error: any) {
-            res.status(500).json({
-                success: false,
-                error: error.message,
-            });
-        }
-    }
+            const actorId = (req as any).user.id;
+            const { status, notes, metrics } = req.body;
 
-    /**
-     * POST /api/university/trainers/results
-     * Create training result
-     */
-    async createTrainingResult(req: Request, res: Response) {
-        try {
-            const result = await trainerService.createTrainingResult(req.body);
-            res.status(201).json({
+            const result = await trainerService.completeMentorship({
+                periodId: id,
+                status,
+                notes,
+                metrics,
+                actorId
+            });
+
+            res.json({
                 success: true,
                 data: result,
             });
@@ -505,6 +538,152 @@ export class UniversityController {
             });
         }
     }
-}
 
-export const universityController = new UniversityController();
+    /**
+     * GET /api/university/quizzes/:materialId
+     * Get quiz structure for a material
+     */
+    async getQuiz(req: Request, res: Response) {
+        try {
+            const { materialId } = req.params;
+            const quiz = await quizService.getQuiz(materialId);
+            res.json({
+                success: true,
+                data: quiz,
+            });
+        } catch (error: any) {
+            res.status(404).json({
+                success: false,
+                error: error.message,
+            });
+        }
+    }
+
+    /**
+     * POST /api/university/quizzes/:id/submit
+     * Submit quiz attempt
+     */
+    async submitQuizAttempt(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+            const userId = (req as any).user.id;
+            const { answers, enrollmentId } = req.body;
+            const ipAddress = req.ip || '0.0.0.0';
+            const userAgent = req.get('User-Agent') || 'unknown';
+
+            const result = await quizService.submitAttempt({
+                userId,
+                quizId: id,
+                enrollmentId,
+                answers,
+                ipAddress,
+                userAgent
+            });
+
+            res.status(201).json({
+                success: true,
+                data: result,
+            });
+        } catch (error: any) {
+            res.status(400).json({
+                success: false,
+                error: error.message,
+            });
+        }
+
+    /**
+     * GET /api/university/security/signals
+     * Get anti-fraud signals (Admin/HR only)
+     */
+    async getSecuritySignals(req: Request, res: Response) {
+            try {
+                const signals = await integrityActionService.getSecuritySignals();
+                res.json({
+                    success: true,
+                    data: signals,
+                });
+            } catch (error: any) {
+                res.status(500).json({
+                    success: false,
+                    error: error.message,
+                });
+            }
+        }
+
+    /**
+     * POST /api/university/security/signals/:id/validate
+     * Validate a signal (Admin/HR only)
+     */
+    async validateSignal(req: Request, res: Response) {
+            try {
+                const { id } = req.params;
+                const { comment } = req.body;
+                const actorId = (req as any).user.id;
+
+                if (!comment) throw new Error('Comment is mandatory for validation');
+
+                const signal = await integrityActionService.validateSignal(id, comment, actorId);
+                res.json({
+                    success: true,
+                    data: signal,
+                });
+            } catch (error: any) {
+                res.status(400).json({
+                    success: false,
+                    error: error.message,
+                });
+            }
+        }
+
+    /**
+     * POST /api/university/security/certifications/:id/invalidate
+     * Invalidate a certification (Admin/HR only)
+     */
+    async invalidateCertification(req: Request, res: Response) {
+            try {
+                const { id } = req.params;
+                const { reason, evidenceLinks } = req.body;
+                const actorId = (req as any).user.id;
+
+                if (!reason) throw new Error('Reason is mandatory for invalidation');
+
+                const updated = await integrityActionService.invalidateCertification({
+                    enrollmentId: id,
+                    reason,
+                    evidenceLinks: evidenceLinks || [],
+                    actorId
+                });
+
+                res.json({
+                    success: true,
+                    data: updated,
+                });
+            } catch (error: any) {
+                res.status(400).json({
+                    success: false,
+                    error: error.message,
+                });
+            }
+        }
+
+    /**
+     * GET /api/university/analytics/overview
+     * Get university analytics overview (Admin/HR only)
+     */
+    async getAnalyticsOverview(req: Request, res: Response) {
+            try {
+                const overview = await universityService.getAnalyticsOverview();
+                res.json({
+                    success: true,
+                    data: overview,
+                });
+            } catch (error: any) {
+                res.status(500).json({
+                    success: false,
+                    error: error.message,
+                });
+            }
+        }
+    }
+
+    export const universityController = new UniversityController();

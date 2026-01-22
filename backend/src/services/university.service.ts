@@ -185,6 +185,65 @@ export class UniversityService {
     }
 
     /**
+     * Get available courses for user based on qualification grade
+     * 
+     * CANON: User see courses of their grade and below
+     */
+    async getAvailableCourses(userId: string) {
+        const userGrade = await prisma.userGrade.findUnique({
+            where: { user_id: userId },
+        });
+
+        if (!userGrade) {
+            throw new Error('User grade not found');
+        }
+
+        const grades: Record<string, number> = {
+            'INTERN': 1,
+            'SPECIALIST': 2,
+            'PROFESSIONAL': 3,
+            'EXPERT': 4,
+            'MASTER': 5
+        };
+
+        const userGradeLevel = grades[userGrade.current_grade] || 0;
+
+        // Get all active courses
+        const courses = await prisma.course.findMany({
+            where: { is_active: true },
+            include: {
+                academy: {
+                    select: {
+                        name: true,
+                    },
+                },
+                _count: {
+                    select: {
+                        modules: true,
+                    },
+                },
+            },
+        });
+
+        // Filter by grade level
+        return courses
+            .filter((course) => {
+                const requiredGradeLevel = grades[course.required_grade as string] || 0;
+                return requiredGradeLevel <= userGradeLevel;
+            })
+            .map((course) => ({
+                id: course.id,
+                title: course.title,
+                description: course.description,
+                academyName: course.academy?.name,
+                requiredGrade: course.required_grade,
+                recognitionMC: course.recognition_mc,
+                isMandatory: course.is_mandatory,
+                modulesCount: course._count.modules,
+            }));
+    }
+
+    /**
      * Get course by ID with modules
      */
     async getCourseById(id: string) {
@@ -245,6 +304,13 @@ export class UniversityService {
             createdBy: course.created_by,
             totalDuration,
         };
+    }
+
+    /**
+     * Alias for getCourseById to follow the plan
+     */
+    async getCourseDetails(id: string) {
+        return this.getCourseById(id);
     }
 
     /**
@@ -601,6 +667,47 @@ export class UniversityService {
             threshold: metricData.threshold,
             reason: `${targetMetric}: ${metricData.current} < ${metricData.threshold}`,
             expectedImprovement: course.expected_effect,
+        };
+    }
+
+    /**
+     * Get University Analytics Overview
+     * CANON: Read-only aggregates
+     */
+    async getAnalyticsOverview() {
+        const [
+            academiesCount,
+            coursesCount,
+            totalEnrollments,
+            completedEnrollments,
+            activeMentorships,
+            securitySignalsCount
+        ] = await Promise.all([
+            prisma.academy.count({ where: { is_active: true } }),
+            prisma.course.count({ where: { is_active: true } }),
+            prisma.enrollment.count(),
+            prisma.enrollment.count({ where: { status: 'COMPLETED' } }),
+            prisma.mentorshipPeriod.count({ where: { status: 'ACTIVE' } }),
+            prisma.antiFraudSignal.count()
+        ]);
+
+        return {
+            infrastructure: {
+                academies: academiesCount,
+                courses: coursesCount,
+            },
+            learning: {
+                totalEnrollments,
+                completedEnrollments,
+                completionRate: totalEnrollments > 0 ? (completedEnrollments / totalEnrollments) * 100 : 0,
+            },
+            mentorship: {
+                activePeriods: activeMentorships,
+            },
+            security: {
+                activeSignals: securitySignalsCount,
+            },
+            timestamp: new Date()
         };
     }
 }

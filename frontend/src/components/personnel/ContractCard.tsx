@@ -1,5 +1,5 @@
 import React from 'react';
-import { LaborContract } from '@prisma/client';
+import { LaborContract, ContractStatus } from '../../types/personnel.types';
 import { useTerminateContractMutation } from '../../api/personnelApi';
 
 interface ContractCardProps {
@@ -41,13 +41,13 @@ export const ContractCard: React.FC<ContractCardProps> = ({ contract, userRole, 
         }
     };
 
-    const statusColors = {
+    const statusColors: Record<ContractStatus, string> = {
         ACTIVE: 'bg-green-100 text-green-700',
         SUSPENDED: 'bg-gray-100 text-gray-700',
         TERMINATED: 'bg-red-100 text-red-700',
     };
 
-    const statusLabels = {
+    const statusLabels: Record<ContractStatus, string> = {
         ACTIVE: 'Активен',
         SUSPENDED: 'Приостановлен',
         TERMINATED: 'Расторгнут',

@@ -3,175 +3,219 @@
  */
 
 import React, { useState } from 'react';
-import { useGetAcademiesQuery } from '../features/university/api/universityApi';
+useGetMyCoursesQuery,
+    useGetTrainerDashboardQuery
+} from '../features/university/api/universityApi';
 import { AcademyCard } from '../features/university/components/AcademyCard';
+import { CourseCard } from '../features/university/components/CourseCard';
+import { MyCoursesList } from '../features/university/components/MyCoursesList';
+import { TrainerApplicationModal } from '../features/university/components/TrainerApplicationModal';
 import { Link } from 'react-router-dom';
+import {
+    LayoutGrid,
+    Compass,
+    Trophy,
+    Target,
+    GraduationCap,
+    ShieldCheck
+} from 'lucide-react';
+
+type ViewMode = 'academies' | 'catalog' | 'my-courses';
 
 export const UniversityPage: React.FC = () => {
-    const { data, isLoading, error } = useGetAcademiesQuery();
-    const [activeTab, setActiveTab] = useState<'academies' | 'my-courses'>('academies');
+    const [viewMode, setViewMode] = useState<ViewMode>('academies');
+    const [isAppModalOpen, setIsAppModalOpen] = useState(false);
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
-        );
-    }
+    // API Hooks
+    const academiesQuery = useGetAcademiesQuery(undefined, { skip: viewMode !== 'academies' });
+    const catalogQuery = useGetAvailableCoursesQuery(undefined, { skip: viewMode !== 'catalog' });
+    const myCoursesQuery = useGetMyCoursesQuery(undefined, { skip: viewMode !== 'my-courses' });
+    const trainerQuery = useGetTrainerDashboardQuery();
 
-    if (error) {
-        return (
-            <div className="p-6">
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                    Ошибка загрузки данных
-                </div>
-            </div>
-        );
-    }
+    const isTrainer = !!trainerQuery.data?.data;
 
-    const academies = data?.data || [];
+    const isLoading = academiesQuery.isLoading || catalogQuery.isLoading || myCoursesQuery.isLoading;
+
+    const academies = academiesQuery.data?.data || [];
+    const availableCourses = catalogQuery.data?.data || [];
+    const myCoursesData = myCoursesQuery.data?.data;
+    const activeEnrollments = myCoursesData?.active || [];
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-4xl font-bold mb-4">
-                        🎓 Корпоративный Университет Фотоматрица
-                    </h1>
-                    <p className="text-lg text-blue-100">
-                        Развивайте навыки, получайте сертификаты и зарабатывайте награды
-                    </p>
+        <div className="min-h-screen bg-[#F8FAFC]">
+            {/* Premium Header */}
+            <div className="bg-slate-900 relative overflow-hidden py-16 border-b border-white/5">
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 via-transparent to-transparent opacity-50" />
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
+
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                        <div>
+                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-4">
+                                <Trophy size={14} />
+                                Твой путь к мастерству
+                            </div>
+                            <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 tracking-tight">
+                                Корпоративный <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-blue-400">Университет</span>
+                            </h1>
+                            <p className="text-lg text-slate-400 max-w-2xl leading-relaxed">
+                                Получайте знания, подтверждайте экспертизу и развивайте карьеру
+                                вместе с лучшими специалистами MatrixGin.
+                            </p>
+                        </div>
+
+                        {/* Summary Stats & Actions */}
+                        <div className="flex flex-col gap-4">
+                            <div className="flex gap-4">
+                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl min-w-[120px]">
+                                    <div className="text-2xl font-black text-white">{academies.length || 0}</div>
+                                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Академий</div>
+                                </div>
+                                <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl min-w-[120px]">
+                                    <div className="text-2xl font-black text-white">{activeEnrollments.length}</div>
+                                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">В процессе</div>
+                                </div>
+                            </div>
+
+                            {isTrainer ? (
+                                <Link
+                                    to="/university/trainer/dashboard"
+                                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-sm transition-all shadow-lg shadow-amber-500/20"
+                                >
+                                    <ShieldCheck size={18} />
+                                    Дашборд Тренера
+                                </Link>
+                            ) : (
+                                <button
+                                    onClick={() => setIsAppModalOpen(true)}
+                                    className="flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/10 text-white font-bold text-sm transition-all backdrop-blur-sm"
+                                >
+                                    <GraduationCap size={18} />
+                                    Стать тренером
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="bg-white border-b border-gray-200">
+            {/* Premium Tabs */}
+            <div className="bg-white sticky top-0 z-30 shadow-sm border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex space-x-8">
+                    <div className="flex gap-8">
                         <button
-                            onClick={() => setActiveTab('academies')}
-                            className={`py-4 px-1 border-b-2 font-medium text-sm ${
-                                activeTab === 'academies'
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                            }`}
+                            onClick={() => setViewMode('academies')}
+                            className={`flex items-center gap-2 py-5 px-1 border-b-2 font-bold text-sm transition-all ${viewMode === 'academies'
+                                ? 'border-indigo-600 text-indigo-600'
+                                : 'border-transparent text-slate-500 hover:text-slate-800'
+                                }`}
                         >
+                            <LayoutGrid size={18} />
                             Академии
                         </button>
-                        <Link
-                            to="/university/my-courses"
-                            className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm"
+                        <button
+                            onClick={() => setViewMode('catalog')}
+                            className={`flex items-center gap-2 py-5 px-1 border-b-2 font-bold text-sm transition-all ${viewMode === 'catalog'
+                                ? 'border-indigo-600 text-indigo-600'
+                                : 'border-transparent text-slate-500 hover:text-slate-800'
+                                }`}
                         >
-                            Мои курсы
-                        </Link>
-                        <Link
-                            to="/university/trainers"
-                            className="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm"
+                            <Compass size={18} />
+                            Каталог курсов
+                        </button>
+                        <button
+                            onClick={() => setViewMode('my-courses')}
+                            className={`flex items-center gap-2 py-5 px-1 border-b-2 font-bold text-sm transition-all ${viewMode === 'my-courses'
+                                ? 'border-indigo-600 text-indigo-600'
+                                : 'border-transparent text-slate-500 hover:text-slate-800'
+                                }`}
                         >
-                            Наставники
-                        </Link>
+                            <Target size={18} />
+                            Мое обучение
+                            {activeEnrollments.length > 0 && (
+                                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-black text-white">
+                                    {activeEnrollments.length}
+                                </span>
+                            )}
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* Main Content */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <svg
-                                        className="w-6 h-6 text-blue-600"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-500">Академий</p>
-                                <p className="text-2xl font-bold text-gray-900">{academies.length}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <svg
-                                        className="w-6 h-6 text-green-600"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-500">Курсов</p>
-                                <p className="text-2xl font-bold text-gray-900">
-                                    {academies.reduce((sum, a) => sum + a.coursesCount, 0)}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-lg shadow p-6">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                                    <svg
-                                        className="w-6 h-6 text-purple-600"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            strokeWidth={2}
-                                            d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                                        />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-500">Навыков</p>
-                                <p className="text-2xl font-bold text-gray-900">
-                                    {academies.reduce((sum, a) => sum + a.skillsCount, 0)}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Academies Grid */}
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Академии</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {academies.map((academy) => (
-                            <AcademyCard key={academy.id} academy={academy} />
+            {/* Main Content Area */}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                {isLoading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <div key={i} className="h-64 bg-slate-200 animate-pulse rounded-3xl" />
                         ))}
                     </div>
-                </div>
+                ) : (
+                    <>
+                        {/* Academies View */}
+                        {viewMode === 'academies' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex items-end justify-between">
+                                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Образовательные центры</h2>
+                                    <span className="text-sm font-medium text-slate-400">Всего центров: {academies.length}</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {academies.map((academy) => (
+                                        <AcademyCard key={academy.id} academy={academy} />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Catalog View */}
+                        {viewMode === 'catalog' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex items-end justify-between">
+                                    <div>
+                                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Доступные курсы</h2>
+                                        <p className="text-slate-500 text-sm mt-1">Курсы подобраны согласно вашей текущей квалификации</p>
+                                    </div>
+                                    <span className="text-sm font-medium text-slate-400">Найдено: {availableCourses.length}</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {availableCourses.map((course) => (
+                                        <CourseCard
+                                            key={course.id}
+                                            course={course}
+                                            isEnrolled={activeEnrollments.some(e => e.courseId === course.id)}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* My Learning View */}
+                        {viewMode === 'my-courses' && (
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="flex items-end justify-between">
+                                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Твоё обучение</h2>
+                                </div>
+                                <MyCoursesList enrollments={activeEnrollments} />
+
+                                {myCoursesData && myCoursesData.completed.length > 0 && (
+                                    <div className="mt-12 opacity-60">
+                                        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                            <Trophy size={20} className="text-amber-500" />
+                                            Завершенные курсы
+                                        </h3>
+                                        <MyCoursesList enrollments={myCoursesData.completed} />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </>
+                )}
             </div>
+
+            <TrainerApplicationModal
+                isOpen={isAppModalOpen}
+                onClose={() => setIsAppModalOpen(false)}
+            />
         </div>
     );
 };

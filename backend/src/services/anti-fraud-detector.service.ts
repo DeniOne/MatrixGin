@@ -177,8 +177,8 @@ export class AntiFraudDetector {
 
         if (excessiveModules.length > 0) {
             return {
-                id: uuidv4(),
-                entity_type: entityType,
+                id: crypto.randomUUID(),
+                entity_type: entityType as 'User' | 'Course' | 'PhotoCompany' | 'Shift',
                 entity_id: entityId,
                 level: SignalLevel.MEDIUM,
                 type: SignalType.EXCESSIVE_RETESTS,
@@ -221,8 +221,8 @@ export class AntiFraudDetector {
 
         if (shiftCount < threshold) {
             return {
-                id: uuidv4(),
-                entity_type: entityType,
+                id: crypto.randomUUID(),
+                entity_type: entityType as 'User' | 'Course' | 'PhotoCompany' | 'Shift',
                 entity_id: entityId,
                 level: SignalLevel.HIGH,
                 type: SignalType.NO_PRODUCTION_ACTIVITY,
@@ -276,8 +276,8 @@ export class AntiFraudDetector {
 
         if (!isAllowed) {
             return {
-                id: uuidv4(),
-                entity_type: entityType,
+                id: crypto.randomUUID(),
+                entity_type: entityType as 'User' | 'Course' | 'PhotoCompany' | 'Shift',
                 entity_id: entityId,
                 level: SignalLevel.HIGH,
                 type: SignalType.ROLE_METRIC_MISMATCH,

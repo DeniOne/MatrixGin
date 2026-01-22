@@ -1,5 +1,5 @@
 import React from 'react';
-import { PersonnelOrder } from '@prisma/client';
+import { PersonnelOrder, OrderStatus } from '../../types/personnel.types';
 import { useSignOrderMutation, useCancelOrderMutation } from '../../api/personnelApi';
 
 interface OrderCardProps {
@@ -53,13 +53,13 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, userRole, onUpdate 
         }
     };
 
-    const statusColors = {
+    const statusColors: Record<OrderStatus, string> = {
         DRAFT: 'bg-gray-100 text-gray-700',
         SIGNED: 'bg-green-100 text-green-700',
         CANCELLED: 'bg-red-100 text-red-700',
     };
 
-    const statusLabels = {
+    const statusLabels: Record<OrderStatus, string> = {
         DRAFT: 'Черновик',
         SIGNED: 'Подписан',
         CANCELLED: 'Отменён',
