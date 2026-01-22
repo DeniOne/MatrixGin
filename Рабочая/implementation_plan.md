@@ -1,440 +1,362 @@
-# Module 33: Frontend + UX Phase — Implementation Plan
+# Module 29: Library & Archive — Implementation Plan
 
 **Дата:** 2026-01-22  
-**Фаза:** Frontend + UX  
-**Цель:** Реализовать полноценный UI для Personnel HR Records module
+**Контур:** Secure Core  
+**Критичность:** CRITICAL  
+**Блокирующий потребитель:** Module 33 (Personnel HR Records)
 
 ---
 
-## 📋 Порядок реализации
+## 📋 Цель
 
-1. **UX Flows** — HR сценарии, lifecycle
-2. **Page Map** — routing structure
-3. **API Slice** — RTK Query integration
-4. **Pages / Components** — UI implementation
-
----
-
-## 🎯 Этап 1: UX Flows
-
-### 1.1. HR Lifecycle Scenarios
-
-**Файл:** `documentation/01-modules/33-Personnel-HR-Records/UX-FLOWS.md`
-
-**Основные сценарии:**
-
-#### Сценарий 1: Наём сотрудника (Employee Onboarding)
-```
-Actor: HR_MANAGER
-Flow:
-1. Получить уведомление о новом сотруднике (employee.hired event)
-2. Открыть автоматически созданное PersonalFile
-3. Проверить статус: ONBOARDING
-4. Загрузить обязательные документы:
-   - Паспорт
-   - ИНН
-   - СНИЛС
-   - Медицинская книжка
-5. Создать трудовой договор
-6. Отправить приказ о приёме на подпись DIRECTOR
-7. После подписи → изменить статус на ACTIVE
-```
-
-#### Сценарий 2: Подписание приказа (Order Signing)
-```
-Actor: DIRECTOR
-Flow:
-1. Получить уведомление о приказе на подпись
-2. Открыть приказ
-3. Проверить содержание
-4. Подписать приказ (DIRECTOR-only action)
-5. Приказ получает статус SIGNED
-6. HR_MANAGER получает уведомление
-```
-
-#### Сценарий 3: Увольнение сотрудника (Employee Termination)
-```
-Actor: HR_MANAGER + DIRECTOR
-Flow:
-1. HR_MANAGER создаёт приказ об увольнении
-2. DIRECTOR подписывает приказ
-3. HR_MANAGER расторгает трудовой договор (DIRECTOR-only)
-4. Изменить статус PersonalFile на TERMINATED
-5. Архивировать PersonalFile (emit event → Library)
-6. PersonalFile получает статус ARCHIVED
-```
-
-#### Сценарий 4: Управление документами (Document Management)
-```
-Actor: HR_SPECIALIST
-Flow:
-1. Открыть PersonalFile
-2. Перейти на вкладку "Документы"
-3. Загрузить новый документ (drag & drop)
-4. Указать тип документа, срок действия
-5. Документ сохраняется
-6. Система показывает индикатор срока действия
-7. При истечении срока → уведомление
-```
+Реализовать **память MatrixGin** — фундаментальный модуль для:
+- Фиксации знаний, решений и норм
+- Сохранения истории без возможности переписывания
+- Обеспечения единого источника истины
+- Юридической воспроизводимости (75 лет для HR документов)
 
 ---
 
-### 1.2. User Roles & Permissions
+## 🎯 Философские инварианты
 
-**HR_SPECIALIST:**
-- ✅ Просмотр PersonalFiles своего департамента
-- ✅ Загрузка документов
-- ❌ Создание приказов
-- ❌ Изменение статуса
+> **Документ ≠ файл**  
+> Документ = смысл + контекст + ответственность + история
 
-**HR_MANAGER:**
-- ✅ Просмотр всех PersonalFiles
-- ✅ Создание приказов
-- ✅ Создание договоров
-- ✅ Изменение статуса
-- ❌ Подписание приказов
+> **Прошлое нельзя переписать**  
+> Любое решение остаётся зафиксированным
 
-**DIRECTOR:**
-- ✅ Полный доступ
-- ✅ Подписание приказов
-- ✅ Расторжение договоров
+> **Нет удаления — есть судьба**  
+> Документы: активируются → архивируются → уничтожаются (только по регламенту)
+
+> **AI никогда не является источником истины**  
+> AI: ✅ читает, ❌ не создаёт, ❌ не изменяет, ❌ не уничтожает
 
 ---
 
-## 🎯 Этап 2: Page Map
+## 📊 Порядок реализации
 
-### 2.1. Routing Structure
-
-```
-/personnel
-├── /                          → PersonnelFilesListPage
-├── /files/:id                 → PersonalFileDetailPage
-│   ├── /documents             → DocumentsTab
-│   ├── /orders                → OrdersTab
-│   ├── /contracts             → ContractsTab
-│   └── /history               → HistoryTab
-├── /orders                    → OrdersListPage
-├── /orders/new                → OrderCreatePage
-├── /orders/:id                → OrderDetailPage
-├── /contracts                 → ContractsListPage
-├── /contracts/new             → ContractCreatePage
-├── /contracts/:id             → ContractDetailPage
-└── /dashboard                 → HRDashboardPage
-```
-
-### 2.2. Page Descriptions
-
-**PersonnelFilesListPage** (`/personnel`)
-- Список всех личных дел
-- Фильтры: статус, департамент, дата создания
-- Поиск по ФИО, номеру дела
-- Быстрые действия: открыть, изменить статус
-
-**PersonalFileDetailPage** (`/personnel/files/:id`)
-- Карточка личного дела
-- Табы: Документы, Приказы, Договоры, История
-- Действия: изменить статус, архивировать
-
-**OrdersListPage** (`/personnel/orders`)
-- Реестр приказов
-- Фильтры: тип, статус, дата
-- Быстрые действия: подписать (DIRECTOR), отменить
-
-**ContractsListPage** (`/personnel/contracts`)
-- Список договоров
-- Фильтры: тип, статус, срок
-- Быстрые действия: создать доп. соглашение, расторгнуть
-
-**HRDashboardPage** (`/personnel/dashboard`)
-- Виджеты:
-  - Истекающие документы
-  - Приказы на подпись
-  - Новые сотрудники без документов
-  - Статистика по статусам
+### Phase 1: Database Layer (MUST)
+### Phase 2: Backend Services (MUST)
+### Phase 3: API Layer (MUST)
+### Phase 4: File Storage (MUST)
+### Phase 5: Integration с Module 33 (CRITICAL)
+### Phase 6: Audit & Testing (MUST)
 
 ---
 
-## 🎯 Этап 3: API Slice
+## 🎯 Phase 1: Database Layer
 
-### 3.1. RTK Query Setup
+### 1.1. Core Tables
 
-**Файл:** `frontend/src/api/personnelApi.ts`
+**`library_documents`**
+```prisma
+model LibraryDocument {
+  id                   String   @id @default(uuid())
+  title                String
+  documentType         String   // registry-driven
+  logicalOwner         String   @default("LIBRARY") // const
+  businessOwnerRole    String
+  status               DocumentStatus @default(DRAFT)
+  currentVersionId     String?
+  currentVersion       LibraryDocumentVersion? @relation("CurrentVersion", fields: [currentVersionId], references: [id])
+  
+  versions             LibraryDocumentVersion[] @relation("AllVersions")
+  links                LibraryLink[]
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@map("library_documents")
+}
+
+enum DocumentStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+  DESTROYED
+}
+```
+
+**`library_document_versions`**
+```prisma
+model LibraryDocumentVersion {
+  id                   String   @id @default(uuid())
+  documentId           String
+  document             LibraryDocument @relation("AllVersions", fields: [documentId], references: [id])
+  
+  version              String   // semver (X.Y.Z)
+  storageRef           String   // S3/MinIO path
+  checksum             String   // sha256
+  
+  createdByEmployeeId  String
+  createdAt            DateTime @default(now())
+  
+  @@unique([documentId, version])
+  @@map("library_document_versions")
+}
+```
+
+**`library_links`**
+```prisma
+model LibraryLink {
+  id                   String   @id @default(uuid())
+  documentId           String
+  document             LibraryDocument @relation(fields: [documentId], references: [id])
+  
+  linkedModule         String   // "PERSONNEL", "LEGAL", etc.
+  linkedEntityId       String
+  linkType             LinkType
+  
+  createdAt            DateTime @default(now())
+  
+  @@map("library_links")
+}
+
+enum LinkType {
+  REFERENCE      // просто ссылка
+  MANDATORY      // обязательный документ
+  EDUCATIONAL    // для обучения
+}
+```
+
+### 1.2. Constraints (MUST)
+
+- ✅ **Невозможность физического DELETE** — DB-level constraint (no DELETE grants)
+- ✅ **Только один ACTIVE version** — unique constraint + trigger
+- ✅ **DESTROYED → immutable forever** — DB-level trigger
+- ✅ **FK constraints** на Employee / OFS
+- ✅ **Все изменения → audit log**
+
+---
+
+## 🎯 Phase 2: Backend Services
+
+### 2.1. DocumentService (MUST)
 
 ```typescript
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+class DocumentService {
+  // Create document (draft by default)
+  async createDocument(dto: CreateDocumentDto, actorId: string): Promise<LibraryDocument>
+  
+  // Get document by ID
+  async getDocument(id: string, actorId: string): Promise<LibraryDocument>
+  
+  // List documents (with RBAC filtering)
+  async listDocuments(filters: DocumentFilters, actorId: string): Promise<LibraryDocument[]>
+  
+  // Archive document (ACTIVE → ARCHIVED)
+  async archiveDocument(id: string, actorId: string, reason: string): Promise<void>
+  
+  // Destroy document (ARCHIVED → DESTROYED) — Legal only
+  async destroyDocument(id: string, legalBasis: string, approvedBy: string): Promise<void>
+}
+```
 
-export const personnelApi = createApi({
-  reducerPath: 'personnelApi',
-  baseQuery: fetchBaseQuery({ baseUrl: '/api/personnel' }),
-  tagTypes: ['PersonalFile', 'Order', 'Contract', 'Document'],
-  endpoints: (builder) => ({
-    // PersonalFiles
-    getPersonalFiles: builder.query({
-      query: (params) => ({ url: '/files', params }),
-      providesTags: ['PersonalFile'],
-    }),
-    getPersonalFileById: builder.query({
-      query: (id) => `/files/${id}`,
-      providesTags: (result, error, id) => [{ type: 'PersonalFile', id }],
-    }),
-    createPersonalFile: builder.mutation({
-      query: (body) => ({ url: '/files', method: 'POST', body }),
-      invalidatesTags: ['PersonalFile'],
-    }),
-    updatePersonalFileStatus: builder.mutation({
-      query: ({ id, ...body }) => ({
-        url: `/files/${id}/status`,
-        method: 'PATCH',
-        body,
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'PersonalFile', id }],
-    }),
-    
-    // Orders
-    getOrders: builder.query({
-      query: (params) => ({ url: '/orders', params }),
-      providesTags: ['Order'],
-    }),
-    createOrder: builder.mutation({
-      query: (body) => ({ url: '/orders', method: 'POST', body }),
-      invalidatesTags: ['Order'],
-    }),
-    signOrder: builder.mutation({
-      query: ({ id, ...body }) => ({
-        url: `/orders/${id}/sign`,
-        method: 'POST',
-        body,
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Order', id }],
-    }),
-    
-    // Contracts
-    getContracts: builder.query({
-      query: (params) => ({ url: '/contracts', params }),
-      providesTags: ['Contract'],
-    }),
-    createContract: builder.mutation({
-      query: (body) => ({ url: '/contracts', method: 'POST', body }),
-      invalidatesTags: ['Contract'],
-    }),
-    terminateContract: builder.mutation({
-      query: ({ id, ...body }) => ({
-        url: `/contracts/${id}/terminate`,
-        method: 'POST',
-        body,
-      }),
-      invalidatesTags: (result, error, { id }) => [{ type: 'Contract', id }],
-    }),
-    
-    // Documents
-    getDocuments: builder.query({
-      query: (params) => ({ url: '/documents', params }),
-      providesTags: ['Document'],
-    }),
-    uploadDocument: builder.mutation({
-      query: (formData) => ({
-        url: '/documents',
-        method: 'POST',
-        body: formData,
-      }),
-      invalidatesTags: ['Document'],
-    }),
-  }),
+### 2.2. VersionService (MUST)
+
+```typescript
+class VersionService {
+  // Create new version
+  async createVersion(documentId: string, file: File, actorId: string): Promise<LibraryDocumentVersion>
+  
+  // List all versions
+  async listVersions(documentId: string): Promise<LibraryDocumentVersion[]>
+  
+  // Set active version
+  async setActiveVersion(documentId: string, versionId: string, actorId: string): Promise<void>
+  
+  // Validate checksum
+  async validateChecksum(versionId: string): Promise<boolean>
+}
+```
+
+### 2.3. LinkService (MUST)
+
+```typescript
+class LinkService {
+  // Create link to module entity
+  async createLink(documentId: string, linkedModule: string, linkedEntityId: string, linkType: LinkType): Promise<LibraryLink>
+  
+  // List links for document
+  async listLinks(documentId: string): Promise<LibraryLink[]>
+  
+  // Validate link integrity
+  async validateLinkIntegrity(linkId: string): Promise<boolean>
+}
+```
+
+---
+
+## 🎯 Phase 3: API Layer
+
+### 3.1. Required Endpoints (MUST)
+
+```
+GET    /api/library/documents
+GET    /api/library/documents/:id
+GET    /api/library/documents/:id/versions
+POST   /api/library/documents
+POST   /api/library/documents/:id/versions
+POST   /api/library/documents/:id/archive
+POST   /api/library/documents/:id/destroy        [Legal only]
+POST   /api/library/documents/:id/set-active-version
+```
+
+### 3.2. DTOs
+
+**CreateDocumentDto**
+```typescript
+class CreateDocumentDto {
+  @IsString() title: string;
+  @IsString() documentType: string; // from Registry
+  @IsString() businessOwnerRole: string;
+}
+```
+
+**CreateVersionDto**
+```typescript
+class CreateVersionDto {
+  @IsString() version: string; // semver
+  @IsNotEmpty() file: File;
+}
+```
+
+### 3.3. Guards (MUST)
+
+- `LibraryAccessGuard` — RBAC enforcement
+- `LegalOnlyGuard` — destroy action
+- `ConfidentialityGuard` — document-level access
+
+---
+
+## 🎯 Phase 4: File Storage
+
+### 4.1. Storage Rules (MUST)
+
+- ✅ **Object storage** (S3 / MinIO)
+- ✅ **storage_ref immutable** — no overwrite
+- ✅ **Checksum verification** after upload
+- ✅ **Encrypted at rest**
+- ✅ **Signed URLs** (read-only, time-limited)
+
+### 4.2. Storage Structure
+
+```
+library/
+├── documents/
+│   ├── {documentId}/
+│   │   ├── {versionId}/
+│   │   │   └── file.pdf
+```
+
+---
+
+## 🎯 Phase 5: Integration с Module 33 (CRITICAL)
+
+### 5.1. Inbound Flow (MUST)
+
+**Scenario:** Module 33 архивирует PersonalFile
+
+```typescript
+// Module 33 emits event
+emit('personal_file.archived', {
+  personalFileId: 'pf-123',
+  employeeId: 'emp-456',
+  documents: [...],
+  retentionYears: 75,
 });
 
-export const {
-  useGetPersonalFilesQuery,
-  useGetPersonalFileByIdQuery,
-  useCreatePersonalFileMutation,
-  useUpdatePersonalFileStatusMutation,
-  useGetOrdersQuery,
-  useCreateOrderMutation,
-  useSignOrderMutation,
-  useGetContractsQuery,
-  useCreateContractMutation,
-  useTerminateContractMutation,
-  useGetDocumentsQuery,
-  useUploadDocumentMutation,
-} = personnelApi;
+// Module 29 listener
+@OnEvent('personal_file.archived')
+async handlePersonalFileArchived(payload) {
+  // 1. Create Library Document
+  const doc = await this.documentService.createDocument({
+    title: `Personal File ${payload.personalFileId}`,
+    documentType: 'HR_PERSONAL_FILE', // 75 years retention
+    businessOwnerRole: 'HR_MANAGER',
+  }, 'SYSTEM');
+  
+  // 2. Upload all documents as versions
+  for (const file of payload.documents) {
+    await this.versionService.createVersion(doc.id, file, 'SYSTEM');
+  }
+  
+  // 3. Set active version
+  await this.versionService.setActiveVersion(doc.id, latestVersionId, 'SYSTEM');
+  
+  // 4. Create link to Module 33
+  await this.linkService.createLink(doc.id, 'PERSONNEL', payload.personalFileId, 'MANDATORY');
+  
+  // 5. Emit success event
+  emit('library.archiving_completed', { documentId: doc.id });
+}
 ```
+
+### 5.2. Boundary Enforcement (CRITICAL)
+
+> **Module 33 НЕ хранит долгосрочные файлы**  
+> **Library = единственный source of truth**
+
+- ✅ Employee access → only own docs
+- ✅ HR access → scoped by OFS
+- ✅ Retention = 75 years (automatic)
 
 ---
 
-## 🎯 Этап 4: Pages & Components
+## 🎯 Phase 6: Audit & Testing
 
-### 4.1. Components Hierarchy
+### 6.1. Mandatory Audit Events (MUST)
 
-```
-components/personnel/
-├── PersonalFileCard.tsx          → Карточка личного дела
-├── PersonalFileStatusBadge.tsx   → Индикатор статуса
-├── DocumentUploader.tsx          → Drag & drop загрузчик
-├── DocumentList.tsx              → Список документов
-├── DocumentCard.tsx              → Карточка документа
-├── ExpiryBadge.tsx               → Индикатор срока действия
-├── OrderForm.tsx                 → Форма создания приказа
-├── OrderCard.tsx                 → Карточка приказа
-├── ContractForm.tsx              → Форма создания договора
-├── ContractCard.tsx              → Карточка договора
-└── HRDashboardWidget.tsx         → Виджет для dashboard
-```
-
-### 4.2. Key Components
-
-#### PersonalFileCard
 ```typescript
-interface PersonalFileCardProps {
-  file: PersonalFile;
-  onStatusChange?: (newStatus: HRStatus) => void;
-  onArchive?: () => void;
+enum LibraryAuditEvent {
+  DOCUMENT_CREATED = 'library.document_created',
+  VERSION_CREATED = 'library.version_created',
+  ACTIVE_VERSION_CHANGED = 'library.active_version_changed',
+  DOCUMENT_ARCHIVED = 'library.document_archived',
+  DOCUMENT_DESTROYED = 'library.document_destroyed',
+  RESTRICTED_ACCESS = 'library.restricted_access',
 }
-
-// Features:
-// - Отображение основной информации
-// - Статус badge
-// - Быстрые действия
-// - Навигация к деталям
 ```
 
-#### DocumentUploader
-```typescript
-interface DocumentUploaderProps {
-  personalFileId: string;
-  onUploadComplete?: () => void;
-}
+### 6.2. Tests (MUST)
 
-// Features:
-// - Drag & drop
-// - File type validation
-// - Progress indicator
-// - Multiple files support
-```
-
-#### OrderForm
-```typescript
-interface OrderFormProps {
-  personalFileId: string;
-  onSubmit?: (order: Order) => void;
-}
-
-// Features:
-// - Order type selection
-// - Auto-fill employee data
-// - Preview
-// - Validation
-```
-
----
-
-### 4.3. Pages Implementation
-
-#### PersonnelFilesListPage
-```typescript
-// Features:
-// - Data table с фильтрами
-// - Search bar
-// - Status filters
-// - Department filters
-// - Pagination
-// - Быстрые действия
-```
-
-#### PersonalFileDetailPage
-```typescript
-// Features:
-// - Tabs: Documents, Orders, Contracts, History
-// - Status change dialog
-// - Archive confirmation
-// - Event timeline
-```
-
-#### HRDashboardPage
-```typescript
-// Features:
-// - Expiring documents widget
-// - Pending orders widget
-// - New employees widget
-// - Statistics charts
-```
-
----
-
-## 🎨 Design System
-
-### Colors
-- **Primary:** `#2563eb` (Blue)
-- **Success:** `#10b981` (Green)
-- **Warning:** `#f59e0b` (Orange)
-- **Danger:** `#ef4444` (Red)
-- **Info:** `#3b82f6` (Light Blue)
-
-### Status Colors
-- **ONBOARDING:** `#f59e0b` (Orange)
-- **ACTIVE:** `#10b981` (Green)
-- **SUSPENDED:** `#6b7280` (Gray)
-- **TERMINATED:** `#ef4444` (Red)
-- **ARCHIVED:** `#9ca3af` (Light Gray)
-
-### Typography
-- **Font:** Inter
-- **Headings:** 600 weight
-- **Body:** 400 weight
+- ✅ Unit tests for services
+- ✅ RBAC negative tests (unauthorized access)
+- ✅ Version immutability tests
+- ✅ Destroy without Legal → FAIL
+- ✅ HR retention tests (75 years)
+- ✅ Integration tests with Module 33
 
 ---
 
 ## ✅ Acceptance Criteria
 
-### UX Flows:
-- [ ] Все 4 основных сценария документированы
-- [ ] User roles и permissions определены
-- [ ] Edge cases описаны
+Module 29 считается **READY**, если:
 
-### Page Map:
-- [ ] Routing structure определена
-- [ ] Все страницы описаны
-- [ ] Navigation flows понятны
-
-### API Slice:
-- [ ] RTK Query setup завершён
-- [ ] Все endpoints определены
-- [ ] Cache invalidation настроена
-
-### Pages & Components:
-- [ ] Все компоненты реализованы
-- [ ] Все страницы реализованы
-- [ ] Responsive design
-- [ ] Accessibility (WCAG 2.1)
+- ✅ Все MUST пункты закрыты
+- ✅ Нет физического DELETE
+- ✅ Интеграция с Module 33 подтверждена
+- ✅ Audit покрывает все действия
+- ✅ Security checkpoints соблюдены
+- ✅ HR документы → 75 лет retention
 
 ---
 
-## 📊 План реализации
+## 🚧 Explicitly Deferred
 
-### Этап 1: UX Flows (1 час)
-1. ✅ Документировать HR lifecycle scenarios
-2. ✅ Определить user roles & permissions
-3. ✅ Описать edge cases
+- ❌ UI (document browser) — после MVP
+- ❌ Full-text search — после MVP
+- ❌ Workflow approvals — после MVP
+- ❌ AI auto-classification — после MVP
+- ❌ Knowledge graph — после MVP
 
-### Этап 2: Page Map (30 мин)
-1. ✅ Создать routing structure
-2. ✅ Описать все страницы
-3. ✅ Определить navigation flows
+---
 
-### Этап 3: API Slice (1 час)
-1. ✅ Setup RTK Query
-2. ✅ Определить endpoints
-3. ✅ Настроить cache invalidation
+## 🔒 Final Rule
 
-### Этап 4: Components (3 часа)
-1. ✅ Создать базовые компоненты
-2. ✅ Создать формы
-3. ✅ Создать карточки
+> **Если Library & Archive позволяет стереть след — это не MatrixGin.**
 
-### Этап 5: Pages (4 часа)
-1. ✅ PersonnelFilesListPage
-2. ✅ PersonalFileDetailPage
-3. ✅ OrdersListPage
-4. ✅ ContractsListPage
-5. ✅ HRDashboardPage
+Любое отклонение от этого плана делает реализацию **НЕДЕЙСТВИТЕЛЬНОЙ**.
 
 ---
 

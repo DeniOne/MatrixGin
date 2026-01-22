@@ -1819,3 +1819,80 @@ enum TemplateType {
   NDA
   PD_CONSENT
 }
+
+// Module 29: Library & Archive
+// CANON: Documents are immutable, versions are append-only
+// NO physical DELETE allowed at DB level
+
+model LibraryDocument {
+  id                String         @id @default(uuid())
+  title             String
+  documentType      String // registry-driven (HR_PERSONAL_FILE, etc.)
+  logicalOwner      String         @default("LIBRARY") // const
+  businessOwnerRole String // HR_MANAGER, LEGAL_COUNSEL, etc.
+  status            DocumentStatus @default(DRAFT)
+  currentVersionId  String?        @unique
+
+  // Relations
+  currentVersion LibraryDocumentVersion?  @relation("CurrentVersion", fields: [currentVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  versions       LibraryDocumentVersion[] @relation("AllVersions")
+  links          LibraryLink[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([documentType])
+  @@map("library_documents")
+}
+
+model LibraryDocumentVersion {
+  id         String          @id @default(uuid())
+  documentId String
+  document   LibraryDocument @relation("AllVersions", fields: [documentId], references: [id], onDelete: Cascade)
+
+  version       String // semver (X.Y.Z)
+  storageRef    String // S3/MinIO path (immutable)
+  checksum      String // sha256
+  fileSizeBytes BigInt
+  mimeType      String
+
+  createdByEmployeeId String
+  createdAt           DateTime @default(now())
+
+  // Relation for current version
+  currentVersionOf LibraryDocument? @relation("CurrentVersion")
+
+  @@unique([documentId, version])
+  @@index([documentId])
+  @@map("library_document_versions")
+}
+
+model LibraryLink {
+  id         String          @id @default(uuid())
+  documentId String
+  document   LibraryDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  linkedModule   String // "PERSONNEL", "LEGAL", "UNIVERSITY", etc.
+  linkedEntityId String // PersonalFile ID, Course ID, etc.
+  linkType       LinkType
+
+  createdAt DateTime @default(now())
+
+  @@index([documentId])
+  @@index([linkedModule, linkedEntityId])
+  @@map("library_links")
+}
+
+enum DocumentStatus {
+  DRAFT // not source of truth
+  ACTIVE // current version
+  ARCHIVED // out of circulation, but preserved
+  DESTROYED // legal event, immutable forever
+}
+
+enum LinkType {
+  REFERENCE // simple reference
+  MANDATORY // required document
+  EDUCATIONAL // for learning
+}
