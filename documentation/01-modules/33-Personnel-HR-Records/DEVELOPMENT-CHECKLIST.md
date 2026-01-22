@@ -171,32 +171,33 @@
 
 #### PersonnelFilesController
 - [ ] `GET /api/personnel/files`
-- [ ] `GET /api/personnel/files/:id`
-- [ ] `POST /api/personnel/files`
-- [ ] `PUT /api/personnel/files/:id/close`
+- [x] `GET /api/personnel/files/:id`
+- [x] `POST /api/personnel/files`
+- [x] `PATCH /api/personnel/files/:id/status`
 - [ ] `POST /api/personnel/files/:id/archive`
 
 #### PersonnelDocumentsController
-- [ ] `GET /api/personnel/files/:fileId/documents`
-- [ ] `POST /api/personnel/files/:fileId/documents`
-- [ ] `GET /api/personnel/documents/:id`
-- [ ] `DELETE /api/personnel/documents/:id`
+- [x] `GET /api/personnel/files/:fileId/documents`
+- [x] `POST /api/personnel/files/:fileId/documents`
+- [x] `GET /api/personnel/documents/:id`
+- [x] `DELETE /api/personnel/documents/:id`
+- [x] `GET /api/personnel/documents/expiring`
 
 #### PersonnelOrdersController
 - [ ] `GET /api/personnel/orders`
-- [ ] `POST /api/personnel/orders`
-- [ ] `GET /api/personnel/orders/:id`
-- [ ] `PUT /api/personnel/orders/:id`
-- [ ] `POST /api/personnel/orders/:id/approve`
-- [ ] `POST /api/personnel/orders/:id/sign`
+- [x] `POST /api/personnel/orders`
+- [x] `GET /api/personnel/orders/:id`
+- [x] `POST /api/personnel/orders/:id/sign` (DIRECTOR only)
+- [x] `POST /api/personnel/orders/:id/cancel`
 - [ ] `GET /api/personnel/orders/:id/pdf`
 
 #### LaborContractsController
 - [ ] `GET /api/personnel/contracts`
-- [ ] `POST /api/personnel/contracts`
+- [x] `POST /api/personnel/contracts`
 - [ ] `GET /api/personnel/contracts/:id`
-- [ ] `POST /api/personnel/contracts/:id/amendments`
-- [ ] `PUT /api/personnel/contracts/:id/terminate`
+- [x] `POST /api/personnel/contracts/:id/amendments`
+- [x] `POST /api/personnel/contracts/:id/terminate` (DIRECTOR only)
+- [x] `GET /api/personnel/contracts/expiring`
 
 #### DocumentGeneratorController
 - [ ] `GET /api/personnel/templates`
@@ -204,14 +205,19 @@
 - [ ] `GET /api/personnel/certificates/:employeeId`
 
 ### 2.3. DTOs
-- [ ] `CreatePersonalFileDto`
-- [ ] `PersonalFileResponseDto`
-- [ ] `UploadDocumentDto`
-- [ ] `CreateOrderDto`
-- [ ] `OrderResponseDto`
-- [ ] `CreateContractDto`
-- [ ] `ContractResponseDto`
-- [ ] `GenerateDocumentDto`
+- [x] `CreatePersonalFileDto`
+- [x] `PersonalFileResponseDto`
+- [x] `UploadDocumentDto`
+- [x] `CreateOrderDto`
+- [x] `OrderResponseDto`
+- [x] `CreateContractDto`
+- [x] `ContractResponseDto`
+- [x] `UpdateStatusDto`
+- [x] `SignOrderDto`
+- [x] `CancelOrderDto`
+- [x] `CreateAmendmentDto`
+- [x] `TerminateContractDto`
+- [x] `DocumentResponseDto`
 
 ### 2.4. Middleware & Guards
 - [ ] `PersonnelAccessGuard` — проверка доступа к личному делу
