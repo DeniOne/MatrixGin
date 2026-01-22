@@ -407,7 +407,34 @@ Auth → Employees → Tasks → Economy → Analytics → ERP
 | MES Integration | Интеграция с MES | ⏳ TODO |
 | Production Dashboard | Дашборд производства | ⏳ TODO |
 
-**Результат Phase 5:** Полноценные ERP-функции — учёт активов, управление закупками, бюджетирование.
+### 5.7 Library & Archive (Module 29)
+**Зависимости:** Phase 1, 5.8 Personnel HR Records  
+**Приоритет:** 🔴 CRITICAL
+
+| Компонент | Описание | Статус |
+|-----------|----------|--------|
+| Database Layer | LibraryDocument, LibraryDocumentVersion, LibraryLink | ✅ Done |
+| Backend Services | DocumentService, VersionService, LinkService, StorageService | ✅ Done |
+| API Layer | LibraryController (8 endpoints) | ✅ Done |
+| File Storage | S3/MinIO integration, checksum, signed URLs | ✅ Done |
+| Integration Module 33 | PersonnelArchivingListener, 75-year retention | ✅ Done |
+| Audit & Testing | Audit events, unit tests | ✅ Done |
+
+### 5.8 Personnel HR Records (Module 33)
+**Зависимости:** 1.2 Employees, 5.7 Library & Archive  
+**Приоритет:** 🔴 CRITICAL
+
+| Компонент | Описание | Статус |
+|-----------|----------|--------|
+| Database Layer | PersonalFile, PersonnelDocument, PersonnelOrder, LaborContract | ✅ Done |
+| Backend Services | PersonalFileService, PersonnelOrderService, LaborContractService | ✅ Done |
+| API Layer | PersonnelFilesController, PersonnelOrdersController, LaborContractsController | ✅ Done |
+| Domain Events | HRDomainEventService, FSM validation, RBAC | ✅ Done |
+| Integration Module 29 | Event emission (personal_file.archived) | ✅ Done |
+| Frontend Components | PersonalFileCard, OrderForm, ContractForm, HistoryTab | ✅ Done |
+| Frontend Pages | PersonnelFilesListPage, PersonalFileDetailPage | ✅ Done |
+
+**Результат Phase 5:** Полноценные ERP-функции — учёт активов, управление закупками, бюджетирование, **кадровый учёт с 75-летним архивом**.
 
 ---
 
@@ -456,15 +483,15 @@ Auth → Employees → Tasks → Economy → Analytics → ERP
 | NPS Collection | Сбор NPS | ⏳ TODO |
 | Feedback Dashboard | Дашборд обратной связи | ⏳ TODO |
 
-### 6.5 Library & Archive
+### 6.5 Participation Status & Ranks (Module 09)
 **Зависимости:** Phase 1  
 **Приоритет:** ⚪ LOW
 
 | Компонент | Описание | Статус |
 |-----------|----------|--------|
-| Document Storage | Хранение документов | ⏳ TODO |
-| Version Control | Версионирование | ⏳ TODO |
-| Search | Поиск | ⏳ TODO |
+| Status System | Статусы участия | ⏳ TODO |
+| Rank System | Ранги | ⏳ TODO |
+| Progression | Прогрессия | ⏳ TODO |
 
 ---
 
@@ -572,7 +599,7 @@ flowchart TD
 | Phase 2: Операции | 4 | 3.5 | 🟡 87% |
 | Phase 3: Мотивация | 3 | 2.5 | 🟡 83% |
 | Phase 4: Аналитика | 5 | 2 | 🟡 40% |
-| Phase 5: ERP | 6 | 0.5 | 🔴 8% |
+| Phase 5: ERP | 8 | 2 | � 25% |
 | Phase 6: Интеграции | 5 | 0.5 | 🔴 10% |
 
 ### Приоритеты на ближайший спринт
