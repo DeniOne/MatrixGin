@@ -72,7 +72,7 @@
 - [x] Event при подписании договора (CONTRACT_SIGNED)
 - [x] Event при расторжении договора (CONTRACT_TERMINATED)
 - [x] Event при изменении статуса (EMPLOYEE_TRANSFERRED, EMPLOYEE_DISMISSED)
-- [ ] Event при передаче в архив
+- [x] Event при передаче в архив (personal_file.archived → Module 29)
 
 ### 2.4 Domain Logic (CRITICAL!)
 - [x] FSM validation (hr-status-fsm.ts)

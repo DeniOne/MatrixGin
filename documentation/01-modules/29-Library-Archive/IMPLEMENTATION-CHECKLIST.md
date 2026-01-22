@@ -1,7 +1,7 @@
 # IMPLEMENTATION-CHECKLIST.md  
 ## Module 29 — Library & Archive (MatrixGin)
 
-**Статус:** IN PROGRESS  
+**Статус:** ✅ READY  
 **Контур:** Secure Core  
 **Критичность:** CRITICAL  
 **Зависимости (MUST READY):**  
@@ -28,41 +28,19 @@
 
 ### 1.1 Core tables (MUST)
 
-- [ ] `library_documents`
-  - id (UUID)
-  - title
-  - document_type (registry-driven)
-  - logical_owner = LIBRARY (const)
-  - business_owner_role
-  - status (draft / active / archived / destroyed)
-  - current_version_id
-  - created_at
-
-- [ ] `library_document_versions`
-  - id (UUID)
-  - document_id (FK)
-  - version (semver string)
-  - storage_ref
-  - checksum (sha256)
-  - created_by_employee_id
-  - created_at
-
-- [ ] `library_links`
-  - id (UUID)
-  - document_id (FK)
-  - linked_module
-  - linked_entity_id
-  - link_type (reference / mandatory / educational)
+- [x] `library_documents`
+- [x] `library_document_versions`
+- [x] `library_links`
 
 ---
 
 ### 1.2 Constraints & invariants (MUST)
 
-- [ ] Невозможность физического DELETE на уровне БД
-- [ ] Только один `active` version per document
-- [ ] `destroyed` → immutable forever
-- [ ] FK constraints на Employee / OFS
-- [ ] Все изменения фиксируются в audit log
+- [x] Невозможность физического DELETE на уровне БД
+- [x] Только один `active` version per document
+- [x] `destroyed` → immutable forever
+- [x] FK constraints на Employee / OFS
+- [x] Все изменения фиксируются в audit log
 
 ---
 
