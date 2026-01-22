@@ -1,5 +1,5 @@
 import { IsString, IsEnum, IsDateString, IsNumber, IsOptional, Min } from 'class-validator';
-import { ContractType, SalaryType } from '@prisma/client';
+import { ContractType, ContractSalaryType } from '@prisma/client';
 
 export class CreateContractDto {
     @IsString()
@@ -28,9 +28,9 @@ export class CreateContractDto {
     @Min(0)
     salary: number;
 
-    @IsEnum(SalaryType)
+    @IsEnum(ContractSalaryType)
     @IsOptional()
-    salaryType?: SalaryType;
+    salaryType?: ContractSalaryType;
 
     @IsString()
     workSchedule: string;

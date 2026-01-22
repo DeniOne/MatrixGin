@@ -2,10 +2,17 @@ import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards, Req } from
 import { PersonalFileService } from '../services/personal-file.service';
 import { CreatePersonalFileDto, UpdateStatusDto } from '../dto/request';
 import { PersonalFileResponseDto } from '../dto/response';
+import { PersonnelAccessGuard } from '../guards';
+import { PrismaService } from '@/prisma/prisma.service';
+
 
 @Controller('api/personnel/files')
+@UseGuards(PersonnelAccessGuard)
 export class PersonnelFilesController {
-    constructor(private readonly personalFileService: PersonalFileService) { }
+    constructor(
+        private readonly personalFileService: PersonalFileService,
+        private readonly prisma: PrismaService,
+    ) { }
 
     /**
      * GET /api/personnel/files
@@ -16,10 +23,35 @@ export class PersonnelFilesController {
     async findAll(
         @Query('status') status?: string,
         @Query('departmentId') departmentId?: string,
+        @Query('employeeId') employeeId?: string,
     ): Promise<PersonalFileResponseDto[]> {
-        // TODO: Implement filtering logic
-        // TODO: Add RBAC guard
-        throw new Error('Not implemented');
+        // Build filter object
+        const where: any = {};
+
+        if (status) {
+            where.hrStatus = status;
+        }
+
+        if (employeeId) {
+            where.employeeId = employeeId;
+        }
+
+        // TODO: Add department filtering when employee.departmentId is available
+        // if (departmentId) {
+        //   where.employee = { departmentId };
+        // }
+
+        const files = await this.prisma.personalFile.findMany({
+            where,
+            include: {
+                employee: true,
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+        });
+
+        return files as PersonalFileResponseDto[];
     }
 
     /**
@@ -50,8 +82,7 @@ export class PersonnelFilesController {
         const file = await this.personalFileService.create(
             dto.employeeId,
             actorId,
-            actorRole,
-            dto.reason,
+            actorRole
         );
 
         return file as PersonalFileResponseDto;

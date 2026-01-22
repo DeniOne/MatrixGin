@@ -14,7 +14,16 @@
         "resolveJsonModule": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "strictPropertyInitialization": false
+        "strictPropertyInitialization": false,
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": [
+                "./*"
+            ],
+            "@/prisma/*": [
+                "../prisma/*"
+            ]
+        }
     },
     "include": [
         "src/**/*"

@@ -1,4 +1,4 @@
-import { ContractType, ContractStatus, SalaryType } from '@prisma/client';
+import { ContractType, ContractStatus, ContractSalaryType } from '@prisma/client';
 
 export class ContractResponseDto {
     id: string;
@@ -12,7 +12,7 @@ export class ContractResponseDto {
     positionId: string;
     departmentId: string;
     salary: number;
-    salaryType: SalaryType;
+    salaryType: ContractSalaryType;
     workSchedule: string;
     probationDays: number;
     terminationDate?: Date;

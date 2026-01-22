@@ -1,11 +1,17 @@
-import { Controller, Get, Post, Param, Body, Query, Req } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, UseGuards, Req } from '@nestjs/common';
 import { PersonnelOrderService } from '../services/personnel-order.service';
 import { CreateOrderDto, SignOrderDto, CancelOrderDto } from '../dto/request';
 import { OrderResponseDto } from '../dto/response';
+import { PersonnelAccessGuard, RequireDirectorGuard } from '../guards';
+import { PrismaService } from '@/prisma/prisma.service';
 
 @Controller('api/personnel/orders')
+@UseGuards(PersonnelAccessGuard)
 export class PersonnelOrdersController {
-    constructor(private readonly orderService: PersonnelOrderService) { }
+    constructor(
+        private readonly orderService: PersonnelOrderService,
+        private readonly prisma: PrismaService,
+    ) { }
 
     /**
      * GET /api/personnel/orders
@@ -16,9 +22,37 @@ export class PersonnelOrdersController {
     async findAll(
         @Query('status') status?: string,
         @Query('orderType') orderType?: string,
+        @Query('personalFileId') personalFileId?: string,
     ): Promise<OrderResponseDto[]> {
-        // TODO: Implement filtering logic
-        throw new Error('Not implemented');
+        const where: any = {};
+
+        if (status) {
+            where.status = status;
+        }
+
+        if (orderType) {
+            where.orderType = orderType;
+        }
+
+        if (personalFileId) {
+            where.personalFileId = personalFileId;
+        }
+
+        const orders = await this.prisma.personnelOrder.findMany({
+            where,
+            include: {
+                personalFile: {
+                    include: {
+                        employee: true,
+                    },
+                },
+            },
+            orderBy: {
+                orderDate: 'desc',
+            },
+        });
+
+        return orders as OrderResponseDto[];
     }
 
     /**
@@ -69,6 +103,7 @@ export class PersonnelOrdersController {
      * RBAC: DIRECTOR
      */
     @Post(':id/sign')
+    @UseGuards(RequireDirectorGuard)
     async sign(
         @Param('id') id: string,
         @Body() dto: SignOrderDto,

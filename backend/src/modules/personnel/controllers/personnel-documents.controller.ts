@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Delete, Param, Body, Query, Req } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Query, UseGuards, Req } from '@nestjs/common';
 import { PersonnelDocumentService } from '../services/personnel-document.service';
 import { UploadDocumentDto } from '../dto/request';
 import { DocumentResponseDto } from '../dto/response';
+import { PersonnelAccessGuard } from '../guards';
+
 
 @Controller('api/personnel')
+@UseGuards(PersonnelAccessGuard)
 export class PersonnelDocumentsController {
     constructor(private readonly documentService: PersonnelDocumentService) { }
 

@@ -1,11 +1,18 @@
-import { Controller, Get, Post, Param, Body, Query, Req } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Query, UseGuards, Req } from '@nestjs/common';
 import { LaborContractService } from '../services/labor-contract.service';
 import { CreateContractDto, CreateAmendmentDto, TerminateContractDto } from '../dto/request';
 import { ContractResponseDto } from '../dto/response';
+import { PersonnelAccessGuard, RequireDirectorGuard } from '../guards';
+import { PrismaService } from '@/prisma/prisma.service';
+
 
 @Controller('api/personnel/contracts')
+@UseGuards(PersonnelAccessGuard)
 export class LaborContractsController {
-    constructor(private readonly contractService: LaborContractService) { }
+    constructor(
+        private readonly contractService: LaborContractService,
+        private readonly prisma: PrismaService,
+    ) { }
 
     /**
      * GET /api/personnel/contracts
@@ -16,9 +23,38 @@ export class LaborContractsController {
     async findAll(
         @Query('status') status?: string,
         @Query('contractType') contractType?: string,
+        @Query('personalFileId') personalFileId?: string,
     ): Promise<ContractResponseDto[]> {
-        // TODO: Implement filtering logic
-        throw new Error('Not implemented');
+        const where: any = {};
+
+        if (status) {
+            where.status = status;
+        }
+
+        if (contractType) {
+            where.contractType = contractType;
+        }
+
+        if (personalFileId) {
+            where.personalFileId = personalFileId;
+        }
+
+        const contracts = await this.prisma.laborContract.findMany({
+            where,
+            include: {
+                personalFile: {
+                    include: {
+                        employee: true,
+                    },
+                },
+                amendments: true,
+            },
+            orderBy: {
+                contractDate: 'desc',
+            },
+        });
+
+        return contracts as ContractResponseDto[];
     }
 
     /**
@@ -108,6 +144,7 @@ export class LaborContractsController {
      * RBAC: DIRECTOR
      */
     @Post(':id/terminate')
+    @UseGuards(RequireDirectorGuard)
     async terminate(
         @Param('id') id: string,
         @Body() dto: TerminateContractDto,

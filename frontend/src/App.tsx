@@ -42,6 +42,16 @@ import RegistryEntityListPage from './registry/pages/RegistryEntityListPage';
 // import RegistryEntityDetailPage from './registry/pages/RegistryEntityDetailPage';
 import { EntityPage } from './registry/pages/EntityPage';
 
+// Personnel Module
+import {
+    PersonnelLayout,
+    PersonnelFilesListPage,
+    PersonalFileDetailPage,
+    OrdersListPage,
+    ContractsListPage,
+    HRDashboardPage,
+} from './pages/personnel';
+
 // Layout wrapper that shows sidebar except on login page
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const location = useLocation();
@@ -110,6 +120,15 @@ const AppRoutes: React.FC = () => {
                         <Route path="/economy/transactions" element={<TransactionsPage />} />
                         <Route path="/economy/analytics" element={<EconomyDashboard />} />
                         <Route path="/admin/status-management" element={<StatusManagement />} />
+
+                        {/* Personnel Module routes */}
+                        <Route path="/personnel" element={<PersonnelLayout />}>
+                            <Route index element={<PersonnelFilesListPage />} />
+                            <Route path="files/:id" element={<PersonalFileDetailPage />} />
+                            <Route path="orders" element={<OrdersListPage />} />
+                            <Route path="contracts" element={<ContractsListPage />} />
+                            <Route path="dashboard" element={<HRDashboardPage />} />
+                        </Route>
                     </Routes>
                 </AppLayout>
             } />

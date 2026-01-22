@@ -1,415 +1,443 @@
-# Implementation Plan: Module 33 Phase 2 — Backend Services
+# Module 33: Frontend + UX Phase — Implementation Plan
 
-**Goal:** Implement event-sourcing service, FSM validation, and core domain logic for Personnel-HR-Records.
-
----
-
-## User Review Required
-
-> [!IMPORTANT]
-> **Critical Design Decisions:**
-> 1. **HRDomainEventService** — all juridical actions MUST emit events
-> 2. **FSM Validation** — canonical transition map prevents invalid status changes
-> 3. **Role-Based Authorization** — only authorized roles can emit specific events
-> 4. **No Direct DB Access** — all HR mutations go through domain services
+**Дата:** 2026-01-22  
+**Фаза:** Frontend + UX  
+**Цель:** Реализовать полноценный UI для Personnel HR Records module
 
 ---
 
-## Proposed Changes
+## 📋 Порядок реализации
 
-### Backend Services
+1. **UX Flows** — HR сценарии, lifecycle
+2. **Page Map** — routing structure
+3. **API Slice** — RTK Query integration
+4. **Pages / Components** — UI implementation
 
-#### [NEW] `backend/src/modules/personnel/domain/hr-status-fsm.ts`
+---
 
-**FSM Transition Map (CANONICAL)**
+## 🎯 Этап 1: UX Flows
 
-```typescript
-import { HRStatus } from '@prisma/client';
+### 1.1. HR Lifecycle Scenarios
 
-// Canonical FSM Transition Map
-export const HR_STATUS_TRANSITIONS: Record<HRStatus, HRStatus[]> = {
-  ONBOARDING: ['PROBATION', 'EMPLOYED', 'TERMINATED'],
-  PROBATION: ['EMPLOYED', 'TERMINATED'],
-  EMPLOYED: ['SUSPENDED', 'LEAVE', 'TERMINATED'],
-  SUSPENDED: ['EMPLOYED', 'TERMINATED'],
-  LEAVE: ['EMPLOYED', 'TERMINATED'],
-  TERMINATED: ['ARCHIVED'],
-  ARCHIVED: [], // Terminal state - no transitions allowed
-};
+**Файл:** `documentation/01-modules/33-Personnel-HR-Records/UX-FLOWS.md`
 
-export class HRStatusFSMError extends Error {
-  constructor(from: HRStatus, to: HRStatus) {
-    const allowed = HR_STATUS_TRANSITIONS[from];
-    super(
-      `Invalid HR status transition: ${from} → ${to}. ` +
-      `Allowed transitions: ${allowed.length > 0 ? allowed.join(', ') : 'none (terminal state)'}`
-    );
-    this.name = 'HRStatusFSMError';
-  }
-}
+**Основные сценарии:**
 
-export function validateHRStatusTransition(
-  from: HRStatus,
-  to: HRStatus
-): void {
-  const allowedTransitions = HR_STATUS_TRANSITIONS[from];
-  
-  if (!allowedTransitions.includes(to)) {
-    throw new HRStatusFSMError(from, to);
-  }
-}
+#### Сценарий 1: Наём сотрудника (Employee Onboarding)
+```
+Actor: HR_MANAGER
+Flow:
+1. Получить уведомление о новом сотруднике (employee.hired event)
+2. Открыть автоматически созданное PersonalFile
+3. Проверить статус: ONBOARDING
+4. Загрузить обязательные документы:
+   - Паспорт
+   - ИНН
+   - СНИЛС
+   - Медицинская книжка
+5. Создать трудовой договор
+6. Отправить приказ о приёме на подпись DIRECTOR
+7. После подписи → изменить статус на ACTIVE
+```
 
-export function isTerminalStatus(status: HRStatus): boolean {
-  return HR_STATUS_TRANSITIONS[status].length === 0;
-}
+#### Сценарий 2: Подписание приказа (Order Signing)
+```
+Actor: DIRECTOR
+Flow:
+1. Получить уведомление о приказе на подпись
+2. Открыть приказ
+3. Проверить содержание
+4. Подписать приказ (DIRECTOR-only action)
+5. Приказ получает статус SIGNED
+6. HR_MANAGER получает уведомление
+```
+
+#### Сценарий 3: Увольнение сотрудника (Employee Termination)
+```
+Actor: HR_MANAGER + DIRECTOR
+Flow:
+1. HR_MANAGER создаёт приказ об увольнении
+2. DIRECTOR подписывает приказ
+3. HR_MANAGER расторгает трудовой договор (DIRECTOR-only)
+4. Изменить статус PersonalFile на TERMINATED
+5. Архивировать PersonalFile (emit event → Library)
+6. PersonalFile получает статус ARCHIVED
+```
+
+#### Сценарий 4: Управление документами (Document Management)
+```
+Actor: HR_SPECIALIST
+Flow:
+1. Открыть PersonalFile
+2. Перейти на вкладку "Документы"
+3. Загрузить новый документ (drag & drop)
+4. Указать тип документа, срок действия
+5. Документ сохраняется
+6. Система показывает индикатор срока действия
+7. При истечении срока → уведомление
 ```
 
 ---
 
-#### [NEW] `backend/src/modules/personnel/domain/hr-event-validator.ts`
+### 1.2. User Roles & Permissions
 
-**Role-Based Event Authorization (CANONICAL)**
+**HR_SPECIALIST:**
+- ✅ Просмотр PersonalFiles своего департамента
+- ✅ Загрузка документов
+- ❌ Создание приказов
+- ❌ Изменение статуса
 
-```typescript
-import { HREventType } from '@prisma/client';
+**HR_MANAGER:**
+- ✅ Просмотр всех PersonalFiles
+- ✅ Создание приказов
+- ✅ Создание договоров
+- ✅ Изменение статуса
+- ❌ Подписание приказов
 
-// Role-based Event Permissions
-export const EVENT_ROLE_PERMISSIONS: Record<HREventType, string[]> = {
-  EMPLOYEE_HIRED: ['DIRECTOR', 'HR_MANAGER'],
-  EMPLOYEE_TRANSFERRED: ['DIRECTOR', 'HR_MANAGER'],
-  EMPLOYEE_PROMOTED: ['DIRECTOR', 'HR_MANAGER'],
-  EMPLOYEE_DEMOTED: ['DIRECTOR'],
-  EMPLOYEE_SUSPENDED: ['DIRECTOR'],
-  EMPLOYEE_DISMISSED: ['DIRECTOR'],
-  
-  DOCUMENT_UPLOADED: ['HR_SPECIALIST', 'HR_MANAGER', 'DIRECTOR'],
-  DOCUMENT_VERIFIED: ['HR_MANAGER', 'DIRECTOR'],
-  DOCUMENT_EXPIRED: ['SYSTEM'], // Auto-generated
-  
-  ORDER_CREATED: ['HR_SPECIALIST', 'HR_MANAGER'],
-  ORDER_SIGNED: ['DIRECTOR'], // CRITICAL: Only DIRECTOR can sign
-  ORDER_CANCELLED: ['DIRECTOR', 'HR_MANAGER'],
-  
-  CONTRACT_SIGNED: ['DIRECTOR', 'HR_MANAGER'],
-  CONTRACT_AMENDED: ['DIRECTOR', 'HR_MANAGER'],
-  CONTRACT_TERMINATED: ['DIRECTOR'],
-  
-  FILE_ARCHIVED: ['HR_MANAGER', 'DIRECTOR'],
-};
-
-export class UnauthorizedEventError extends Error {
-  constructor(eventType: HREventType, actorRole: string) {
-    const allowedRoles = EVENT_ROLE_PERMISSIONS[eventType];
-    super(
-      `Role '${actorRole}' not authorized for event '${eventType}'. ` +
-      `Allowed roles: ${allowedRoles.join(', ')}`
-    );
-    this.name = 'UnauthorizedEventError';
-  }
-}
-
-export function validateActorRole(
-  eventType: HREventType,
-  actorRole: string
-): void {
-  const allowedRoles = EVENT_ROLE_PERMISSIONS[eventType];
-  
-  if (!allowedRoles || !allowedRoles.includes(actorRole)) {
-    throw new UnauthorizedEventError(eventType, actorRole);
-  }
-}
-```
+**DIRECTOR:**
+- ✅ Полный доступ
+- ✅ Подписание приказов
+- ✅ Расторжение договоров
 
 ---
 
-#### [NEW] `backend/src/modules/personnel/services/hr-domain-event.service.ts`
+## 🎯 Этап 2: Page Map
 
-**Event-Sourcing Service**
+### 2.1. Routing Structure
+
+```
+/personnel
+├── /                          → PersonnelFilesListPage
+├── /files/:id                 → PersonalFileDetailPage
+│   ├── /documents             → DocumentsTab
+│   ├── /orders                → OrdersTab
+│   ├── /contracts             → ContractsTab
+│   └── /history               → HistoryTab
+├── /orders                    → OrdersListPage
+├── /orders/new                → OrderCreatePage
+├── /orders/:id                → OrderDetailPage
+├── /contracts                 → ContractsListPage
+├── /contracts/new             → ContractCreatePage
+├── /contracts/:id             → ContractDetailPage
+└── /dashboard                 → HRDashboardPage
+```
+
+### 2.2. Page Descriptions
+
+**PersonnelFilesListPage** (`/personnel`)
+- Список всех личных дел
+- Фильтры: статус, департамент, дата создания
+- Поиск по ФИО, номеру дела
+- Быстрые действия: открыть, изменить статус
+
+**PersonalFileDetailPage** (`/personnel/files/:id`)
+- Карточка личного дела
+- Табы: Документы, Приказы, Договоры, История
+- Действия: изменить статус, архивировать
+
+**OrdersListPage** (`/personnel/orders`)
+- Реестр приказов
+- Фильтры: тип, статус, дата
+- Быстрые действия: подписать (DIRECTOR), отменить
+
+**ContractsListPage** (`/personnel/contracts`)
+- Список договоров
+- Фильтры: тип, статус, срок
+- Быстрые действия: создать доп. соглашение, расторгнуть
+
+**HRDashboardPage** (`/personnel/dashboard`)
+- Виджеты:
+  - Истекающие документы
+  - Приказы на подпись
+  - Новые сотрудники без документов
+  - Статистика по статусам
+
+---
+
+## 🎯 Этап 3: API Slice
+
+### 3.1. RTK Query Setup
+
+**Файл:** `frontend/src/api/personnelApi.ts`
 
 ```typescript
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '@/prisma/prisma.service';
-import { HREventType, HRAggregateType } from '@prisma/client';
-import { validateActorRole } from '../domain/hr-event-validator';
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-interface EmitEventParams {
-  eventType: HREventType;
-  aggregateType: HRAggregateType;
-  aggregateId: string;
-  actorId: string;
-  actorRole: string;
-  payload: any;
-  previousState?: any;
-  newState?: any;
-  legalBasis?: string;
-}
-
-@Injectable()
-export class HRDomainEventService {
-  constructor(private prisma: PrismaService) {}
-
-  /**
-   * Emit HR domain event (append-only)
-   * CRITICAL: Validates actor role before emission
-   */
-  async emit(params: EmitEventParams): Promise<void> {
-    const {
-      eventType,
-      aggregateType,
-      aggregateId,
-      actorId,
-      actorRole,
-      payload,
-      previousState,
-      newState,
-      legalBasis,
-    } = params;
-
-    // CRITICAL: Validate actor role
-    validateActorRole(eventType, actorRole);
-
-    // Emit event (INSERT-only, immutable)
-    await this.prisma.hRDomainEvent.create({
-      data: {
-        eventType,
-        aggregateType,
-        aggregateId,
-        actorId,
-        actorRole,
-        payload,
-        previousState,
-        newState,
-        legalBasis,
-      },
-    });
-  }
-
-  /**
-   * Get all events for an aggregate (for audit)
-   */
-  async getEventsByAggregate(
-    aggregateId: string,
-    aggregateType?: HRAggregateType
-  ) {
-    return this.prisma.hRDomainEvent.findMany({
-      where: {
-        aggregateId,
-        ...(aggregateType && { aggregateType }),
-      },
-      orderBy: { occurredAt: 'asc' },
-    });
-  }
-
-  /**
-   * Replay events to reconstruct aggregate state
-   * Used for audit and state verification
-   */
-  async replayEvents(aggregateId: string): Promise<any[]> {
-    const events = await this.getEventsByAggregate(aggregateId);
+export const personnelApi = createApi({
+  reducerPath: 'personnelApi',
+  baseQuery: fetchBaseQuery({ baseUrl: '/api/personnel' }),
+  tagTypes: ['PersonalFile', 'Order', 'Contract', 'Document'],
+  endpoints: (builder) => ({
+    // PersonalFiles
+    getPersonalFiles: builder.query({
+      query: (params) => ({ url: '/files', params }),
+      providesTags: ['PersonalFile'],
+    }),
+    getPersonalFileById: builder.query({
+      query: (id) => `/files/${id}`,
+      providesTags: (result, error, id) => [{ type: 'PersonalFile', id }],
+    }),
+    createPersonalFile: builder.mutation({
+      query: (body) => ({ url: '/files', method: 'POST', body }),
+      invalidatesTags: ['PersonalFile'],
+    }),
+    updatePersonalFileStatus: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/files/${id}/status`,
+        method: 'PATCH',
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'PersonalFile', id }],
+    }),
     
-    // Return chronological event log
-    return events.map(event => ({
-      timestamp: event.occurredAt,
-      type: event.eventType,
-      actor: event.actorId,
-      role: event.actorRole,
-      payload: event.payload,
-      legalBasis: event.legalBasis,
-    }));
-  }
-}
-```
-
----
-
-#### [NEW] `backend/src/modules/personnel/services/personal-file.service.ts`
-
-**PersonalFile Service with FSM**
-
-```typescript
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '@/prisma/prisma.service';
-import { HRStatus } from '@prisma/client';
-import { validateHRStatusTransition } from '../domain/hr-status-fsm';
-import { HRDomainEventService } from './hr-domain-event.service';
-
-@Injectable()
-export class PersonalFileService {
-  constructor(
-    private prisma: PrismaService,
-    private hrEventService: HRDomainEventService
-  ) {}
-
-  /**
-   * Create PersonalFile (on employee hiring)
-   */
-  async create(employeeId: string, actorId: string, actorRole: string) {
-    // Generate unique file number
-    const fileNumber = await this.generateFileNumber();
-
-    const personalFile = await this.prisma.personalFile.create({
-      data: {
-        employeeId,
-        fileNumber,
-        hrStatus: 'ONBOARDING',
-      },
-    });
-
-    // Emit EMPLOYEE_HIRED event
-    await this.hrEventService.emit({
-      eventType: 'EMPLOYEE_HIRED',
-      aggregateType: 'PERSONAL_FILE',
-      aggregateId: personalFile.id,
-      actorId,
-      actorRole,
-      payload: {
-        employeeId,
-        fileNumber,
-      },
-      newState: { hrStatus: 'ONBOARDING' },
-    });
-
-    return personalFile;
-  }
-
-  /**
-   * Update HR status with FSM validation
-   */
-  async updateStatus(
-    id: string,
-    newStatus: HRStatus,
-    actorId: string,
-    actorRole: string,
-    reason?: string
-  ) {
-    const personalFile = await this.prisma.personalFile.findUnique({
-      where: { id },
-    });
-
-    if (!personalFile) {
-      throw new NotFoundException(`PersonalFile ${id} not found`);
-    }
-
-    // CRITICAL: Validate FSM transition
-    validateHRStatusTransition(personalFile.hrStatus, newStatus);
-
-    // Update status
-    const updated = await this.prisma.personalFile.update({
-      where: { id },
-      data: { hrStatus: newStatus },
-    });
-
-    // Emit status change event
-    const eventTypeMap: Record<HRStatus, any> = {
-      PROBATION: 'EMPLOYEE_TRANSFERRED',
-      EMPLOYED: 'EMPLOYEE_HIRED',
-      SUSPENDED: 'EMPLOYEE_SUSPENDED',
-      LEAVE: 'EMPLOYEE_TRANSFERRED',
-      TERMINATED: 'EMPLOYEE_DISMISSED',
-      ARCHIVED: 'FILE_ARCHIVED',
-      ONBOARDING: 'EMPLOYEE_HIRED',
-    };
-
-    await this.hrEventService.emit({
-      eventType: eventTypeMap[newStatus] || 'EMPLOYEE_TRANSFERRED',
-      aggregateType: 'PERSONAL_FILE',
-      aggregateId: id,
-      actorId,
-      actorRole,
-      payload: { reason },
-      previousState: { hrStatus: personalFile.hrStatus },
-      newState: { hrStatus: newStatus },
-    });
-
-    return updated;
-  }
-
-  private async generateFileNumber(): Promise<string> {
-    const count = await this.prisma.personalFile.count();
-    const year = new Date().getFullYear();
-    return `PF-${year}-${String(count + 1).padStart(5, '0')}`;
-  }
-}
-```
-
----
-
-## Verification Plan
-
-### Automated Tests
-
-**1. FSM Validation Tests**
-```typescript
-// backend/src/modules/personnel/__tests__/hr-status-fsm.test.ts
-describe('HRStatus FSM Validation', () => {
-  it('should allow ONBOARDING → EMPLOYED', () => {
-    expect(() => validateHRStatusTransition('ONBOARDING', 'EMPLOYED')).not.toThrow();
-  });
-  
-  it('should prevent EMPLOYED → ONBOARDING', () => {
-    expect(() => validateHRStatusTransition('EMPLOYED', 'ONBOARDING'))
-      .toThrow(HRStatusFSMError);
-  });
-  
-  it('should prevent transitions from ARCHIVED', () => {
-    expect(() => validateHRStatusTransition('ARCHIVED', 'EMPLOYED'))
-      .toThrow('terminal state');
-  });
-});
-```
-
-**2. Role Authorization Tests**
-```typescript
-// backend/src/modules/personnel/__tests__/hr-event-validator.test.ts
-describe('Event Role Authorization', () => {
-  it('should allow DIRECTOR to sign orders', () => {
-    expect(() => validateActorRole('ORDER_SIGNED', 'DIRECTOR')).not.toThrow();
-  });
-  
-  it('should prevent HR_SPECIALIST from signing orders', () => {
-    expect(() => validateActorRole('ORDER_SIGNED', 'HR_SPECIALIST'))
-      .toThrow(UnauthorizedEventError);
-  });
-});
-```
-
-**3. Event Emission Tests**
-```typescript
-// backend/src/modules/personnel/__tests__/hr-domain-event.service.test.ts
-describe('HRDomainEventService', () => {
-  it('should emit event with valid role', async () => {
-    await service.emit({
-      eventType: 'EMPLOYEE_HIRED',
-      aggregateType: 'PERSONAL_FILE',
-      aggregateId: 'test-id',
-      actorId: 'user-1',
-      actorRole: 'DIRECTOR',
-      payload: {},
-    });
+    // Orders
+    getOrders: builder.query({
+      query: (params) => ({ url: '/orders', params }),
+      providesTags: ['Order'],
+    }),
+    createOrder: builder.mutation({
+      query: (body) => ({ url: '/orders', method: 'POST', body }),
+      invalidatesTags: ['Order'],
+    }),
+    signOrder: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/orders/${id}/sign`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Order', id }],
+    }),
     
-    const events = await service.getEventsByAggregate('test-id');
-    expect(events).toHaveLength(1);
-  });
-  
-  it('should reject event with invalid role', async () => {
-    await expect(
-      service.emit({
-        eventType: 'ORDER_SIGNED',
-        actorRole: 'EMPLOYEE', // Not authorized!
-        // ...
-      })
-    ).rejects.toThrow(UnauthorizedEventError);
-  });
+    // Contracts
+    getContracts: builder.query({
+      query: (params) => ({ url: '/contracts', params }),
+      providesTags: ['Contract'],
+    }),
+    createContract: builder.mutation({
+      query: (body) => ({ url: '/contracts', method: 'POST', body }),
+      invalidatesTags: ['Contract'],
+    }),
+    terminateContract: builder.mutation({
+      query: ({ id, ...body }) => ({
+        url: `/contracts/${id}/terminate`,
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: (result, error, { id }) => [{ type: 'Contract', id }],
+    }),
+    
+    // Documents
+    getDocuments: builder.query({
+      query: (params) => ({ url: '/documents', params }),
+      providesTags: ['Document'],
+    }),
+    uploadDocument: builder.mutation({
+      query: (formData) => ({
+        url: '/documents',
+        method: 'POST',
+        body: formData,
+      }),
+      invalidatesTags: ['Document'],
+    }),
+  }),
 });
+
+export const {
+  useGetPersonalFilesQuery,
+  useGetPersonalFileByIdQuery,
+  useCreatePersonalFileMutation,
+  useUpdatePersonalFileStatusMutation,
+  useGetOrdersQuery,
+  useCreateOrderMutation,
+  useSignOrderMutation,
+  useGetContractsQuery,
+  useCreateContractMutation,
+  useTerminateContractMutation,
+  useGetDocumentsQuery,
+  useUploadDocumentMutation,
+} = personnelApi;
 ```
 
 ---
 
-## Estimated Effort
+## 🎯 Этап 4: Pages & Components
 
-- FSM validation: 1 hour
-- Role validator: 1 hour
-- HRDomainEventService: 2 hours
-- PersonalFileService: 2 hours
-- Tests: 2 hours
-- **Total: ~8 hours**
+### 4.1. Components Hierarchy
+
+```
+components/personnel/
+├── PersonalFileCard.tsx          → Карточка личного дела
+├── PersonalFileStatusBadge.tsx   → Индикатор статуса
+├── DocumentUploader.tsx          → Drag & drop загрузчик
+├── DocumentList.tsx              → Список документов
+├── DocumentCard.tsx              → Карточка документа
+├── ExpiryBadge.tsx               → Индикатор срока действия
+├── OrderForm.tsx                 → Форма создания приказа
+├── OrderCard.tsx                 → Карточка приказа
+├── ContractForm.tsx              → Форма создания договора
+├── ContractCard.tsx              → Карточка договора
+└── HRDashboardWidget.tsx         → Виджет для dashboard
+```
+
+### 4.2. Key Components
+
+#### PersonalFileCard
+```typescript
+interface PersonalFileCardProps {
+  file: PersonalFile;
+  onStatusChange?: (newStatus: HRStatus) => void;
+  onArchive?: () => void;
+}
+
+// Features:
+// - Отображение основной информации
+// - Статус badge
+// - Быстрые действия
+// - Навигация к деталям
+```
+
+#### DocumentUploader
+```typescript
+interface DocumentUploaderProps {
+  personalFileId: string;
+  onUploadComplete?: () => void;
+}
+
+// Features:
+// - Drag & drop
+// - File type validation
+// - Progress indicator
+// - Multiple files support
+```
+
+#### OrderForm
+```typescript
+interface OrderFormProps {
+  personalFileId: string;
+  onSubmit?: (order: Order) => void;
+}
+
+// Features:
+// - Order type selection
+// - Auto-fill employee data
+// - Preview
+// - Validation
+```
+
+---
+
+### 4.3. Pages Implementation
+
+#### PersonnelFilesListPage
+```typescript
+// Features:
+// - Data table с фильтрами
+// - Search bar
+// - Status filters
+// - Department filters
+// - Pagination
+// - Быстрые действия
+```
+
+#### PersonalFileDetailPage
+```typescript
+// Features:
+// - Tabs: Documents, Orders, Contracts, History
+// - Status change dialog
+// - Archive confirmation
+// - Event timeline
+```
+
+#### HRDashboardPage
+```typescript
+// Features:
+// - Expiring documents widget
+// - Pending orders widget
+// - New employees widget
+// - Statistics charts
+```
+
+---
+
+## 🎨 Design System
+
+### Colors
+- **Primary:** `#2563eb` (Blue)
+- **Success:** `#10b981` (Green)
+- **Warning:** `#f59e0b` (Orange)
+- **Danger:** `#ef4444` (Red)
+- **Info:** `#3b82f6` (Light Blue)
+
+### Status Colors
+- **ONBOARDING:** `#f59e0b` (Orange)
+- **ACTIVE:** `#10b981` (Green)
+- **SUSPENDED:** `#6b7280` (Gray)
+- **TERMINATED:** `#ef4444` (Red)
+- **ARCHIVED:** `#9ca3af` (Light Gray)
+
+### Typography
+- **Font:** Inter
+- **Headings:** 600 weight
+- **Body:** 400 weight
+
+---
+
+## ✅ Acceptance Criteria
+
+### UX Flows:
+- [ ] Все 4 основных сценария документированы
+- [ ] User roles и permissions определены
+- [ ] Edge cases описаны
+
+### Page Map:
+- [ ] Routing structure определена
+- [ ] Все страницы описаны
+- [ ] Navigation flows понятны
+
+### API Slice:
+- [ ] RTK Query setup завершён
+- [ ] Все endpoints определены
+- [ ] Cache invalidation настроена
+
+### Pages & Components:
+- [ ] Все компоненты реализованы
+- [ ] Все страницы реализованы
+- [ ] Responsive design
+- [ ] Accessibility (WCAG 2.1)
+
+---
+
+## 📊 План реализации
+
+### Этап 1: UX Flows (1 час)
+1. ✅ Документировать HR lifecycle scenarios
+2. ✅ Определить user roles & permissions
+3. ✅ Описать edge cases
+
+### Этап 2: Page Map (30 мин)
+1. ✅ Создать routing structure
+2. ✅ Описать все страницы
+3. ✅ Определить navigation flows
+
+### Этап 3: API Slice (1 час)
+1. ✅ Setup RTK Query
+2. ✅ Определить endpoints
+3. ✅ Настроить cache invalidation
+
+### Этап 4: Components (3 часа)
+1. ✅ Создать базовые компоненты
+2. ✅ Создать формы
+3. ✅ Создать карточки
+
+### Этап 5: Pages (4 часа)
+1. ✅ PersonnelFilesListPage
+2. ✅ PersonalFileDetailPage
+3. ✅ OrdersListPage
+4. ✅ ContractsListPage
+5. ✅ HRDashboardPage
+
+---
+
+**Автор:** Antigravity AI  
+**Дата:** 2026-01-22  
+**Статус:** Ready for implementation
