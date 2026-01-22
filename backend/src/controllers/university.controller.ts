@@ -177,14 +177,14 @@ export class UniversityController {
             // FIX 1: Trainer ownership check
             if (userRole === 'TRAINER') {
                 const course = await universityService.getCourseById(id);
-                if (course.created_by !== userId) {
+                if (course.createdBy !== userId) {
                     logger.warn('[RBAC] Access denied: updateCourse (not owner)', {
                         userId,
                         role: userRole,
                         action: 'updateCourse',
                         resource: 'course',
                         courseId: id,
-                        ownerId: course.created_by
+                        ownerId: course.createdBy
                     });
                     return res.status(403).json({
                         success: false,

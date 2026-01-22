@@ -133,8 +133,16 @@ class TelegramService {
                 const fullName = `${user.first_name} ${user.last_name}`;
                 await ctx.reply(
                     `👋 Добро пожаловать обратно, ${fullName}!\n\n` +
+                    `🎓 *MVP Learning Contour*\n\n` +
+                    `Этот бот — ваш проводник в обучении.\n\n` +
+                    `💡 *О MatrixCoin:*\n` +
+                    `MatrixCoin — единица признания. В MVP Learning Contour используется только в обучающем контексте и не влияет на доход, статус или власть.\n\n` +
+                    `📚 *Обучение:*\n` +
+                    `• Добровольное участие\n` +
+                    `• Рекомендации на основе реальных метрик PhotoCompany\n` +
+                    `• Без давления и санкций\n\n` +
                     `Используйте меню ниже для навигации:`,
-                    this.getMainMenuKeyboard()
+                    { parse_mode: 'Markdown', ...this.getMainMenuKeyboard() }
                 );
             } else {
                 await ctx.reply(
@@ -163,6 +171,29 @@ class TelegramService {
         this.bot.command('profile', async (ctx) => {
             await this.handleProfile(ctx);
         });
+
+        // MVP Learning Contour Commands
+
+        // /learning command - Show active courses and recommendations
+        this.bot.command('learning', async (ctx) => {
+            await this.handleLearning(ctx);
+        });
+
+        // /courses command - Browse available courses
+        this.bot.command('courses', async (ctx) => {
+            await this.handleCourses(ctx);
+        });
+
+        // /mycourses command - Show enrolled courses
+        this.bot.command('mycourses', async (ctx) => {
+            await this.handleMyCourses(ctx);
+        });
+
+        // /enroll command - Enroll in a course
+        this.bot.command('enroll', async (ctx) => {
+            await this.handleEnroll(ctx);
+        });
+
 
         // Handle callback queries
         this.bot.on('callback_query', async (ctx) => {
@@ -280,7 +311,8 @@ class TelegramService {
         const message =
             `💰 *Ваш баланс:*\n\n` +
             `🪙 MatrixCoin: *${wallet.mc_balance}* MC\n` +
-            `💎 GoldMatrixCoin: *${wallet.gmc_balance}* GMC\n` +
+            // GMC DISABLED in MVP Learning Contour
+            // `💎 GoldMatrixCoin: *${wallet.gmc_balance}* GMC\n` +
             `🔒 Заморожено: ${wallet.mc_frozen} MC`;
 
         await ctx.reply(message, { parse_mode: 'Markdown' });
@@ -381,6 +413,238 @@ class TelegramService {
         } catch (error) {
             console.error('Error updating task:', error);
             await ctx.reply('❌ Ошибка при обновлении статуса.');
+        }
+    }
+
+    /**
+     * MVP Learning Contour: Handle /learning command
+     * Shows active courses and PhotoCompany-based recommendations
+     * 
+     * Bot Role: viewer (reads, shows, explains)
+     */
+    private async handleLearning(ctx: Context): Promise<void> {
+        const telegramId = ctx.from?.id.toString();
+        if (!telegramId) return;
+
+        const user = await this.getUserByTelegramId(telegramId);
+        if (!user) {
+            await ctx.reply('Аккаунт не привязан. Используйте /start');
+            return;
+        }
+
+        try {
+            const { universityService } = require('./university.service');
+            const dashboard = await universityService.getStudentDashboard(user.id);
+
+            let message = `🎓 *Моё обучение*\n\n`;
+
+            // Active courses
+            if (dashboard.activeCourses.length > 0) {
+                message += `📚 *Активные курсы:*\n`;
+                for (const course of dashboard.activeCourses) {
+                    message += `• ${course.courseTitle} (${course.progress}%)\n`;
+                }
+                message += `\n`;
+            }
+
+            // Recommendations (PhotoCompany-based)
+            if (dashboard.recommendedCourses.length > 0) {
+                message += `💡 *Рекомендации (на основе PhotoCompany):*\n`;
+                for (const rec of dashboard.recommendedCourses) {
+                    message += `• ${rec.title}\n`;
+                    message += `  Причина: ${rec.reason}\n`;
+                    message += `  MC: ${rec.recognitionMC}\n`;
+                }
+            } else {
+                message += `✅ Все метрики в норме! Рекомендаций нет.`;
+            }
+
+            await ctx.reply(message, { parse_mode: 'Markdown' });
+        } catch (error) {
+            console.error('[Telegram] Error in handleLearning:', error);
+            await ctx.reply('❌ Ошибка при загрузке данных обучения');
+        }
+    }
+
+    /**
+     * MVP Learning Contour: Handle /courses command
+     * Browse available courses
+     * 
+     * Bot Role: viewer (reads, shows, explains)
+     */
+    private async handleCourses(ctx: Context): Promise<void> {
+        const telegramId = ctx.from?.id.toString();
+        if (!telegramId) return;
+
+        const user = await this.getUserByTelegramId(telegramId);
+        if (!user) {
+            await ctx.reply('Аккаунт не привязан.');
+            return;
+        }
+
+        try {
+            const { universityService } = require('./university.service');
+            const courses = await universityService.getCourses();
+
+            if (courses.length === 0) {
+                await ctx.reply('📚 Курсы пока не доступны');
+                return;
+            }
+
+            let message = `📚 *Доступные курсы:*\n\n`;
+            for (const course of courses.slice(0, 10)) {
+                message += `*${course.title}*\n`;
+                if (course.description) {
+                    message += `${course.description.substring(0, 100)}...\n`;
+                }
+                message += `MC: ${course.recognitionMC}\n`;
+                message += `ID: \`${course.id}\`\n\n`;
+            }
+
+            message += `Для записи на курс используйте:\n`;
+            message += `/enroll <course_id>`;
+
+            await ctx.reply(message, { parse_mode: 'Markdown' });
+        } catch (error) {
+            console.error('[Telegram] Error in handleCourses:', error);
+            await ctx.reply('❌ Ошибка при загрузке курсов');
+        }
+    }
+
+    /**
+     * MVP Learning Contour: Handle /mycourses command
+     * Show enrolled courses with progress
+     * 
+     * Bot Role: viewer (reads, shows, explains)
+     */
+    private async handleMyCourses(ctx: Context): Promise<void> {
+        const telegramId = ctx.from?.id.toString();
+        if (!telegramId) return;
+
+        const user = await this.getUserByTelegramId(telegramId);
+        if (!user) {
+            await ctx.reply('Аккаунт не привязан.');
+            return;
+        }
+
+        try {
+            const { enrollmentService } = require('./enrollment.service');
+            const myCourses = await enrollmentService.getMyCourses(user.id);
+
+            let message = `📖 *Мои курсы:*\n\n`;
+
+            if (myCourses.active.length > 0) {
+                message += `🔄 *Активные:*\n`;
+                for (const course of myCourses.active) {
+                    message += `• ${course.courseTitle} (${course.progress}%)\n`;
+                }
+                message += `\n`;
+            }
+
+            if (myCourses.completed.length > 0) {
+                message += `✅ *Завершённые:*\n`;
+                for (const course of myCourses.completed) {
+                    message += `• ${course.courseTitle}\n`;
+                }
+            }
+
+            if (myCourses.active.length === 0 && myCourses.completed.length === 0) {
+                message += `Вы ещё не записаны ни на один курс.\n\n`;
+                message += `Используйте /courses для просмотра доступных курсов.`;
+            }
+
+            await ctx.reply(message, { parse_mode: 'Markdown' });
+        } catch (error) {
+            console.error('[Telegram] Error in handleMyCourses:', error);
+            await ctx.reply('❌ Ошибка при загрузке ваших курсов');
+        }
+    }
+
+    /**
+     * MVP Learning Contour: Handle /enroll command
+     * Enroll user in a course
+     * 
+     * Bot Role: viewer (facilitates action, no evaluation)
+     */
+    private async handleEnroll(ctx: any): Promise<void> {
+        const telegramId = ctx.from?.id.toString();
+        if (!telegramId) return;
+
+        const user = await this.getUserByTelegramId(telegramId);
+        if (!user) {
+            await ctx.reply('Аккаунт не привязан.');
+            return;
+        }
+
+        // Extract course ID from command
+        const text = ctx.message?.text || '';
+        const parts = text.split(' ');
+
+        if (parts.length < 2) {
+            await ctx.reply(
+                '❌ Укажите ID курса:\n' +
+                '/enroll <course_id>\n\n' +
+                'Используйте /courses для просмотра доступных курсов.'
+            );
+            return;
+        }
+
+        const courseId = parts[1];
+
+        try {
+            const { enrollmentService } = require('./enrollment.service');
+            await enrollmentService.enrollInCourse(user.id, courseId);
+
+            await ctx.reply(
+                '✅ *Вы успешно записаны на курс!*\n\n' +
+                '📚 Используйте /mycourses для просмотра ваших курсов.\n\n' +
+                '💡 *Напоминание:*\n' +
+                'Обучение добровольное. Проходите курс в удобном темпе.',
+                { parse_mode: 'Markdown' }
+            );
+        } catch (error: any) {
+            console.error('[Telegram] Error in handleEnroll:', error);
+
+            if (error.message.includes('Already enrolled')) {
+                await ctx.reply('ℹ️ Вы уже записаны на этот курс.');
+            } else {
+                await ctx.reply('❌ Ошибка при записи на курс. Проверьте ID курса.');
+            }
+        }
+    }
+
+    /**
+     * MVP Learning Contour: Send course completion notification
+     * 
+     * Bot Role: notifier (informs about event)
+     * 
+     * Called by enrollment.service when course is completed
+     */
+    public async sendCourseCompletedNotification(
+        userId: string,
+        courseName: string,
+        recognitionMC: number
+    ): Promise<boolean> {
+        try {
+            const user = await prisma.user.findUnique({ where: { id: userId } });
+            if (!user?.telegram_id || !this.bot) return false;
+
+            const message =
+                `🎉 *Поздравляем!*\n\n` +
+                `Вы завершили курс:\n` +
+                `📚 *${courseName}*\n\n` +
+                `💰 *Признание:*\n` +
+                `Вам начислено ${recognitionMC} MC\n\n` +
+                `💡 *О MatrixCoin:*\n` +
+                `MC — единица признания вашего участия в обучении. Это не влияет на доход или статус.\n\n` +
+                `📖 *Следующие шаги:*\n` +
+                `Используйте /learning для просмотра рекомендаций на основе ваших метрик PhotoCompany.`;
+
+            await this.bot.telegram.sendMessage(user.telegram_id, message, { parse_mode: 'Markdown' });
+            return true;
+        } catch (error) {
+            console.error('[Telegram] Error sending course completion notification:', error);
+            return false;
         }
     }
 

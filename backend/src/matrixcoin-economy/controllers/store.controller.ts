@@ -9,6 +9,7 @@ import { Controller, Post, Body, Headers, HttpException, HttpStatus, UseGuards, 
 import { StorePurchaseService } from '../services/store-purchase.service';
 import { PurchaseStatus } from '@prisma/client';
 import { StoreEligibilityGuard } from '../guards/store-eligibility.guards';
+import { MVPLearningContourGuard } from '../../guards/mvp-learning-contour.guard';
 
 // DTO
 export class PurchaseRequestDto {
@@ -16,6 +17,7 @@ export class PurchaseRequestDto {
 }
 
 @Controller('api/store')
+@UseGuards(MVPLearningContourGuard)
 export class StoreController {
     constructor(private readonly purchaseService: StorePurchaseService) { }
 

@@ -294,6 +294,7 @@ model Employee {
   hire_date        DateTime?
   department       Department?    @relation(fields: [department_id], references: [id])
   user             User           @relation(fields: [user_id], references: [id])
+  PersonalFile     PersonalFile?
 
   @@map("employees")
 }
@@ -786,6 +787,7 @@ model Course {
   expected_effect String
   scope           CourseScope
   target_metric   TargetMetric
+  created_by      String?
   certifications  Certification[]
   modules         CourseModule[]
   academy         Academy?        @relation(fields: [academy_id], references: [id])
@@ -1514,4 +1516,306 @@ enum FeedbackType {
   HELPFUL
   NOT_APPLICABLE
   UNSURE
+}
+
+// ============================================================================
+// MODULE 33: PERSONNEL HR RECORDS (Кадровое делопроизводство)
+// ============================================================================
+// CRITICAL: Event-sourcing layer for all juridical HR actions
+// CRITICAL: Module 29 integration for long-term storage (75 years retention)
+// CRITICAL: NO DELETE on HR entities - only status-based lifecycle
+// ============================================================================
+
+// Event-Sourcing Layer (APPEND-ONLY!)
+model HRDomainEvent {
+  id            String          @id @default(uuid())
+  eventType     HREventType
+  aggregateType HRAggregateType
+  aggregateId   String
+
+  // Actor (REQUIRED for audit)
+  actorId   String
+  actorRole String
+
+  // Event data
+  payload       Json
+  previousState Json?
+  newState      Json?
+  legalBasis    String?
+
+  // Immutable timestamp
+  occurredAt DateTime @default(now())
+
+  @@index([aggregateId, eventType])
+  @@index([occurredAt])
+  @@map("hr_domain_events")
+}
+
+enum HREventType {
+  EMPLOYEE_HIRED
+  EMPLOYEE_TRANSFERRED
+  EMPLOYEE_PROMOTED
+  EMPLOYEE_DEMOTED
+  EMPLOYEE_SUSPENDED
+  EMPLOYEE_DISMISSED
+  DOCUMENT_UPLOADED
+  DOCUMENT_VERIFIED
+  DOCUMENT_EXPIRED
+  ORDER_CREATED
+  ORDER_SIGNED
+  ORDER_CANCELLED
+  CONTRACT_SIGNED
+  CONTRACT_AMENDED
+  CONTRACT_TERMINATED
+  FILE_ARCHIVED
+}
+
+enum HRAggregateType {
+  PERSONAL_FILE
+  PERSONNEL_ORDER
+  LABOR_CONTRACT
+  PERSONNEL_DOCUMENT
+}
+
+// Personal File (Личное дело)
+// IMPORTANT: Operational state only. Long-term storage in Module 29.
+model PersonalFile {
+  id         String   @id @default(uuid())
+  employeeId String   @unique
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  fileNumber String   @unique
+  hrStatus   HRStatus @default(ONBOARDING)
+
+  createdAt  DateTime  @default(now())
+  closedAt   DateTime?
+  archivedAt DateTime?
+
+  // CRITICAL: Module 29 Integration
+  // archiveId is REQUIRED when hrStatus = ARCHIVED
+  // After archiving: Module 33 = read-only, Module 29 = source of truth
+  archiveId String?
+
+  documents PersonnelDocument[]
+  orders    PersonnelOrder[]
+  contracts LaborContract[]
+
+  @@map("personal_files")
+}
+
+enum HRStatus {
+  ONBOARDING // В процессе оформления
+  PROBATION // На испытательном сроке
+  EMPLOYED // Трудоустроен
+  SUSPENDED // Отстранён
+  LEAVE // В отпуске (декрет и т.д.)
+  TERMINATED // Уволен (оперативное хранение)
+  ARCHIVED // Передано в архив (Module 29) - archiveId MUST be set
+}
+
+// Personnel Document (Документ в личном деле)
+// IMPORTANT: Module 33 stores CURRENT state only
+// Versioning and long-term storage = Module 29 ONLY
+model PersonnelDocument {
+  id             String       @id @default(uuid())
+  personalFileId String
+  personalFile   PersonalFile @relation(fields: [personalFileId], references: [id])
+
+  documentType PersonnelDocumentType
+  title        String
+  description  String?
+
+  // File reference (technical copy only)
+  fileId   String
+  fileName String
+  fileSize Int
+  mimeType String
+
+  issueDate      DateTime?
+  expiryDate     DateTime?
+  issuer         String?
+  documentNumber String?
+
+  uploadedById String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Module 29 Integration
+  libraryDocumentId String?
+
+  @@map("personnel_documents")
+}
+
+enum PersonnelDocumentType {
+  PASSPORT
+  SNILS
+  INN
+  EDUCATION_DIPLOMA
+  MILITARY_ID
+  WORK_BOOK
+  PHOTO
+  MEDICAL_BOOK
+  DRIVING_LICENSE
+  CERTIFICATE
+  REFERENCE_LETTER
+  NDA
+  PD_CONSENT
+  JOB_DESCRIPTION
+  OTHER
+}
+
+// Personnel Order (Приказ по личному составу)
+model PersonnelOrder {
+  id             String       @id @default(uuid())
+  personalFileId String
+  personalFile   PersonalFile @relation(fields: [personalFileId], references: [id])
+
+  orderType     PersonnelOrderType
+  orderNumber   String             @unique
+  orderDate     DateTime
+  effectiveDate DateTime
+
+  title   String
+  content String
+  basis   String?
+
+  fileId String?
+
+  signedById String?
+  signedAt   DateTime?
+
+  status OrderStatus @default(DRAFT)
+
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  retentionYears Int @default(75)
+
+  @@map("personnel_orders")
+}
+
+enum PersonnelOrderType {
+  HIRING
+  TRANSFER
+  VACATION
+  VACATION_CANCEL
+  BUSINESS_TRIP
+  BONUS
+  SALARY_CHANGE
+  DISCIPLINARY
+  DISCIPLINARY_REMOVE
+  DISMISSAL
+  POSITION_CHANGE
+  SCHEDULE_CHANGE
+  LEAVE_WITHOUT_PAY
+  MATERNITY_LEAVE
+  PARENTAL_LEAVE
+}
+
+enum OrderStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  SIGNED
+  CANCELLED
+}
+
+// Labor Contract (Трудовой договор)
+model LaborContract {
+  id             String       @id @default(uuid())
+  personalFileId String
+  personalFile   PersonalFile @relation(fields: [personalFileId], references: [id])
+
+  contractNumber String       @unique
+  contractDate   DateTime
+  startDate      DateTime
+  endDate        DateTime?
+  contractType   ContractType
+
+  positionId    String
+  departmentId  String
+  salary        Decimal            @db.Decimal(12, 2)
+  salaryType    ContractSalaryType @default(MONTHLY)
+  workSchedule  String
+  probationDays Int                @default(0)
+
+  fileId String?
+
+  status            ContractStatus @default(ACTIVE)
+  terminationDate   DateTime?
+  terminationReason String?
+
+  amendments ContractAmendment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("labor_contracts")
+}
+
+enum ContractType {
+  PERMANENT
+  FIXED_TERM
+  PART_TIME
+  CIVIL
+  INTERNSHIP
+}
+
+enum ContractStatus {
+  ACTIVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum ContractSalaryType {
+  MONTHLY
+  HOURLY
+  PIECEWORK
+}
+
+// Contract Amendment (Дополнительное соглашение)
+model ContractAmendment {
+  id         String        @id @default(uuid())
+  contractId String
+  contract   LaborContract @relation(fields: [contractId], references: [id])
+
+  amendmentNumber Int
+  amendmentDate   DateTime
+  effectiveDate   DateTime
+
+  changes Json
+  fileId  String?
+
+  createdAt DateTime @default(now())
+
+  @@map("contract_amendments")
+}
+
+// Document Template (Шаблон документа)
+model DocumentTemplate {
+  id           String       @id @default(uuid())
+  templateType TemplateType
+  name         String
+  description  String?
+  content      String
+  variables    Json
+  isActive     Boolean      @default(true)
+  version      Int          @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("document_templates")
+}
+
+enum TemplateType {
+  LABOR_CONTRACT
+  ORDER_HIRING
+  ORDER_DISMISSAL
+  ORDER_VACATION
+  ORDER_TRANSFER
+  CERTIFICATE_WORK
+  NDA
+  PD_CONSENT
 }

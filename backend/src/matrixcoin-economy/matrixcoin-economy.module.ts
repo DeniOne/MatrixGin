@@ -53,28 +53,36 @@ const PrismaProvider = {
     useValue: new PrismaClient()
 };
 
+// MVP Learning Contour: Store, Analytics, GMC, Auctions DISABLED
+// See: documentation/06-MVP-LEARNING-CONTOUR
+// Uncomment for full system mode (v2.0)
+
 @Module({
-    controllers: [EconomyController, StoreController, EconomyAnalyticsController],
+    controllers: [
+        EconomyController,
+        // StoreController,              // MVP: DISABLED
+        EconomyAnalyticsController,    // MVP: ENABLED (Guarded)
+    ],
     providers: [
         // Infrastructure
         PrismaProvider,
         AuditEventRepository,
         MCSnapshotRepository,
-        AuctionEventRepository,
-        GovernanceFlagRepository,
+        // AuctionEventRepository,           // MVP: DISABLED
+        // GovernanceFlagRepository,         // MVP: DISABLED
 
         // Core Services (Pure)
         StoreEligibilityService,
         StorePurchaseService,
-        AuctionEventService,
-        GMCRecognitionBridgeService,
-        EconomyGovernanceService,
-        EconomyAnalyticsService,
+        // AuctionEventService,              // MVP: DISABLED
+        // GMCRecognitionBridgeService,      // MVP: DISABLED
+        // EconomyGovernanceService,         // MVP: DISABLED
+        // EconomyAnalyticsService,          // MVP: DISABLED
 
         // Adapters (Orchestration)
         StoreAccessAdapterService,
-        AuctionAdapterService,
-        GovernanceAdapterService,
+        // AuctionAdapterService,            // MVP: DISABLED
+        // GovernanceAdapterService,         // MVP: DISABLED
 
         // Integration Boundary (Read-Only)
         EconomyIntegrationReadService
@@ -82,8 +90,8 @@ const PrismaProvider = {
     exports: [
         // Export Adapters for other modules integration
         StoreAccessAdapterService,
-        AuctionAdapterService,
-        GovernanceAdapterService,
+        // AuctionAdapterService,            // MVP: DISABLED
+        // GovernanceAdapterService,         // MVP: DISABLED
 
         // Export Read-Only Integration
         EconomyIntegrationReadService

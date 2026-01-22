@@ -220,7 +220,7 @@ export class EnrollmentService {
             const signals = antiFraudDetector.detectSignals('Course', courseId, {
                 userId,
                 courseId,
-                enrollmentData: { ...enrollment, user: await prisma.user.findUnique({ where: { id: userId }, include: { role: true } }) },
+                enrollmentData: { ...enrollment, user: await prisma.user.findUnique({ where: { id: userId }, include: { erp_role: true } }) },
                 moduleProgress: progress,
                 completionDate: new Date(),
                 // Note: PhotoCompany metrics would be fetched separately for production
@@ -232,6 +232,20 @@ export class EnrollmentService {
         } catch (error) {
             // Log error but DO NOT block completion
             console.error('[EnrollmentService] Anti-fraud detection failed', error);
+        }
+
+        // MVP Learning Contour: Send Telegram notification (NON-BLOCKING)
+        // Bot Role: notifier (informs about event)
+        try {
+            const telegramService = (await import('./telegram.service')).default;
+            await telegramService.sendCourseCompletedNotification(
+                userId,
+                enrollment.course.title,
+                enrollment.course.recognition_mc
+            );
+        } catch (error) {
+            // Log error but DO NOT block completion
+            console.error('[EnrollmentService] Telegram notification failed', error);
         }
 
         return completed;

@@ -242,6 +242,7 @@ export class UniversityService {
             recognitionMC: course.recognition_mc,
             rewardGMC: course.reward_gmc,
             isMandatory: course.is_mandatory,
+            createdBy: course.created_by,
             totalDuration,
         };
     }
@@ -267,6 +268,9 @@ export class UniversityService {
                 recognition_mc: data.rewardMC || 0,
                 reward_gmc: data.rewardGMC || 0,
                 is_mandatory: data.isMandatory || false,
+                expected_effect: 'Улучшение показателей',
+                scope: 'GENERAL',
+                target_metric: 'QUALITY',
             },
         });
     }
@@ -341,7 +345,6 @@ export class UniversityService {
         const enrollments = await prisma.enrollment.findMany({
             where: {
                 user_id: userId,
-                status: 'ACTIVE',
             },
             include: {
                 course: true,
@@ -354,13 +357,23 @@ export class UniversityService {
         return {
             currentGrade,
             visibility,
-            activeCourses: enrollments.map((e) => ({
+            enrollments: enrollments.map((e) => ({
                 id: e.id,
                 courseId: e.course_id,
                 courseTitle: e.course.title,
                 progress: e.progress,
+                status: e.status,
                 enrolledAt: e.enrolled_at,
             })),
+            activeCourses: enrollments
+                .filter(e => e.status === 'ACTIVE')
+                .map((e) => ({
+                    id: e.id,
+                    courseId: e.course_id,
+                    courseTitle: e.course.title,
+                    progress: e.progress,
+                    enrolledAt: e.enrolled_at,
+                })),
             recommendedCourses: recommendations,
             progressToNext,
         };
@@ -517,6 +530,77 @@ export class UniversityService {
             nextGrade,
             progress: 65,
             message: `Продолжайте улучшать метрики для достижения уровня ${nextGrade}`,
+        };
+    }
+
+    /**
+     * MVP Learning Contour: Get learning status for Telegram Bot
+     * 
+     * Returns simplified dashboard for Telegram display
+     */
+    async getMyLearningStatus(userId: string) {
+        const dashboard = await this.getStudentDashboard(userId);
+
+        return {
+            activeCourses: dashboard.activeCourses,
+            recommendations: dashboard.recommendedCourses,
+            currentGrade: dashboard.currentGrade,
+        };
+    }
+
+    /**
+     * MVP Learning Contour: Explain why course was recommended
+     * 
+     * CANONICAL: Every recommendation MUST be traceable to PhotoCompany metric
+     * 
+     * Returns PhotoCompany metric that triggered recommendation
+     */
+    async explainRecommendation(courseId: string, userId: string) {
+        const course = await prisma.course.findUnique({
+            where: { id: courseId },
+        });
+
+        if (!course) {
+            throw new Error('Course not found');
+        }
+
+        // TODO: Integrate with PhotoCompany service to get real metrics
+        const photocompanyMetrics = {
+            okk: 75,
+            ck: 65,
+            conversion: 55,
+            quality: 85,
+            retouchTime: 45,
+        };
+
+        // PhotoCompany metric thresholds (CANONICAL)
+        const thresholds = {
+            OKK: { threshold: 80, current: photocompanyMetrics.okk },
+            CK: { threshold: 70, current: photocompanyMetrics.ck },
+            CONVERSION: { threshold: 60, current: photocompanyMetrics.conversion },
+            QUALITY: { threshold: 90, current: photocompanyMetrics.quality },
+            RETOUCH_TIME: { threshold: 40, current: photocompanyMetrics.retouchTime },
+        };
+
+        const targetMetric = course.target_metric;
+        const metricData = thresholds[targetMetric as keyof typeof thresholds];
+
+        if (!metricData) {
+            return {
+                courseId,
+                targetMetric,
+                reason: 'Метрика не найдена',
+            };
+        }
+
+        return {
+            courseId,
+            courseName: course.title,
+            targetMetric,
+            currentValue: metricData.current,
+            threshold: metricData.threshold,
+            reason: `${targetMetric}: ${metricData.current} < ${metricData.threshold}`,
+            expectedImprovement: course.expected_effect,
         };
     }
 }

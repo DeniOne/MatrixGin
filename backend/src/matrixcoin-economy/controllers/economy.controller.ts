@@ -17,6 +17,7 @@ import {
     GovernanceAdapterService
 } from '../services/economy.adapters';
 import { EvaluateAccessDto, ParticipateAuctionDto, EconomyUsageContextDto } from '../dto/economy-api.dto';
+import { MVPLearningContourGuard } from '../../guards/mvp-learning-contour.guard';
 
 // Placeholder for real Auth Guard (Step 6/Integration)
 const MockAuthGuard = () => class { };
@@ -34,6 +35,7 @@ export class EconomyController {
      * Check if user can access store.
      */
     @Post('store/access')
+    @UseGuards(MVPLearningContourGuard)
     async checkStoreAccess(@Body() dto: EvaluateAccessDto) {
         // Strict mapping: DTO properties only
         return await this.storeAdapter.evaluateStoreAccess(
@@ -48,6 +50,7 @@ export class EconomyController {
      * Attempt to participate in an auction.
      */
     @Post('auction/participate')
+    @UseGuards(MVPLearningContourGuard)
     async participateInAuction(@Body() dto: ParticipateAuctionDto) {
         // Reconstruction of context from DTO would happen here or via pipe
         // For strictness, we assume DTO matches Context shape closely or use a Mapper
@@ -68,6 +71,7 @@ export class EconomyController {
      * Check governance rules.
      */
     @Post('governance/evaluate')
+    @UseGuards(MVPLearningContourGuard)
     async evaluateGovernance(@Body() contextDto: EconomyUsageContextDto) {
         // Date string to Date object
         const context = {

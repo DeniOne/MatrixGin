@@ -6,14 +6,23 @@
 
 import { Request, Response } from 'express';
 import { economyAnalyticsService } from '../services/analytics.service';
+// @ts-ignore
+import { Controller, UseGuards, Get, Req, Res } from '@nestjs/common';
+// @ts-ignore
+import { MVPLearningContourGuard } from '../../guards/mvp-learning-contour.guard';
 
+// @ts-ignore
+@Controller('api/economy/analytics')
+// @ts-ignore
+@UseGuards(MVPLearningContourGuard)
 export class EconomyAnalyticsController {
 
     /**
      * GET /api/economy/analytics/overview
      * Глобальные показатели системы. Доступно ролям MANAGER, EXECUTIVE (ADMIN).
      */
-    async getOverview(req: Request, res: Response) {
+    @Get('overview')
+    async getOverview(@Req() req: Request, @Res() res: Response) {
         try {
             const role = req.headers['x-user-role'] as string;
             this.checkRole(role, ['ADMIN', 'HR_MANAGER', 'BRANCH_MANAGER'], res);
@@ -30,7 +39,8 @@ export class EconomyAnalyticsController {
      * GET /api/economy/analytics/store
      * Статистика востребованности магазина. Доступно всем.
      */
-    async getStoreActivity(req: Request, res: Response) {
+    @Get('store')
+    async getStoreActivity(@Req() req: Request, @Res() res: Response) {
         try {
             const activity = await economyAnalyticsService.getStoreActivity();
             res.json(activity);
@@ -43,7 +53,8 @@ export class EconomyAnalyticsController {
      * GET /api/economy/analytics/wallet/my
      * Персональный тренд и баланс.
      */
-    async getMyTrend(req: Request, res: Response) {
+    @Get('wallet/my')
+    async getMyTrend(@Req() req: Request, @Res() res: Response) {
         try {
             const userId = req.headers['x-user-id'] as string;
             if (!userId) {
@@ -60,7 +71,8 @@ export class EconomyAnalyticsController {
      * GET /api/economy/analytics/wallet/:userId
      * Просмотр аудита сотрудника. Доступно HEAD_OF_DEPT (DEPARTMENT_HEAD).
      */
-    async getUserTrend(req: Request, res: Response) {
+    @Get('wallet/:userId')
+    async getUserTrend(@Req() req: Request, @Res() res: Response) {
         try {
             const role = req.headers['x-user-role'] as string;
             this.checkRole(role, ['ADMIN', 'DEPARTMENT_HEAD'], res);
@@ -78,7 +90,8 @@ export class EconomyAnalyticsController {
      * GET /api/economy/analytics/audit
      * Журнал аудита. Для админов - весь, для юзеров - свой.
      */
-    async getAudit(req: Request, res: Response) {
+    @Get('audit')
+    async getAudit(@Req() req: Request, @Res() res: Response) {
         try {
             const userId = req.headers['x-user-id'] as string;
             const role = req.headers['x-user-role'] as string;

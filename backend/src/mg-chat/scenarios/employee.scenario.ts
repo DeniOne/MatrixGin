@@ -56,7 +56,7 @@ export async function handleEmployeeScenario(action: string, intent: ResolvedInt
                 const dashboard = await universityService.getStudentDashboard(intent.userId);
                 const userGrade = await prisma.userGrade.findUnique({ where: { user_id: intent.userId } });
 
-                const activeCount = dashboard.enrollments.filter(e => e.status === 'IN_PROGRESS').length;
+                const activeCount = dashboard.enrollments.filter(e => e.status === 'ACTIVE').length;
                 const completedCount = dashboard.enrollments.filter(e => e.status === 'COMPLETED').length;
                 const currentGrade = userGrade?.current_grade || 'INTERN';
 
@@ -78,19 +78,20 @@ export async function handleEmployeeScenario(action: string, intent: ResolvedInt
         case 'show_my_courses':
             // Module 13: User's course list
             try {
-                const courses = await enrollmentService.getMyCourses(intent.userId);
+                const coursesObj = await enrollmentService.getMyCourses(intent.userId);
+                const allCourses = [...coursesObj.active, ...coursesObj.completed];
 
-                if (courses.length === 0) {
+                if (allCourses.length === 0) {
                     return {
                         text: '📚 МОИ КУРСЫ\n\nУ тебя пока нет активных курсов.\n\nОбратись к руководителю для назначения обучения.',
                         actions: ['employee.show_my_training']
                     };
                 }
 
-                const courseList = courses.map(c => {
-                    const status = c.status === 'COMPLETED' ? '✅' : c.status === 'IN_PROGRESS' ? '📖' : '⏸️';
+                const courseList = allCourses.map(c => {
+                    const status = c.status === 'COMPLETED' ? '✅' : c.status === 'ACTIVE' ? '📖' : '⏸️';
                     const progress = c.progress ? `${Math.round(c.progress)}%` : '0%';
-                    return `${status} ${c.course.title} (${progress})`;
+                    return `${status} ${c.courseTitle} (${progress})`;
                 }).join('\n');
 
                 return {
@@ -120,7 +121,7 @@ export async function handleEmployeeScenario(action: string, intent: ResolvedInt
                 const currentGrade = userGrade.current_grade;
                 const nextGrade = progress?.nextGrade || 'MAX';
                 const progressText = progress?.progress
-                    ? `\n\n📈 Прогресс до ${nextGrade}: ${Math.round(progress.progress)}%\n\n${progress.requirements || ''}`
+                    ? `\n\n📈 Прогресс до ${nextGrade}: ${Math.round(progress.progress)}%\n\n${progress.message || ''}`
                     : '\n\nТы на максимальном уровне! 🏆';
 
                 return {

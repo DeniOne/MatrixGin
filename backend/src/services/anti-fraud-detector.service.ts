@@ -12,7 +12,6 @@
  * Persistence is handled by separate AntiFraudSignalWriter
  */
 
-import { v4 as uuidv4 } from 'uuid';
 import { SignalLevel, SignalType, AntiFraudSignal, DetectionInput } from '../types/anti-fraud.types';
 
 export class AntiFraudDetector {
@@ -136,8 +135,8 @@ export class AntiFraudDetector {
         // Signal if no improvement or decline
         if (improvement <= 0) {
             return {
-                id: uuidv4(),
-                entity_type: entityType,
+                id: crypto.randomUUID(),
+                entity_type: entityType as 'User' | 'PhotoCompany' | 'Shift' | 'Course',
                 entity_id: entityId,
                 level: SignalLevel.MEDIUM,
                 type: SignalType.NO_RESULT_IMPROVEMENT,

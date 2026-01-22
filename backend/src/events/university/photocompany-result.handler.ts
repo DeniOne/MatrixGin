@@ -59,32 +59,37 @@ export class PhotoCompanyResultHandler {
 
             // 3. Trigger Qualification Proposal Logic
             // CANON: Only system can propose upgrades based on these metrics
-            const proposal = await qualificationService.proposeQualificationUpgrade(payload.user_id, metrics as any);
+            try {
+                const proposal = await qualificationService.proposeQualificationUpgrade(payload.user_id, metrics as any);
 
-            // 3a. Create QUALIFICATION_PROPOSED event if proposal was created
-            // CANON: Metric event → расчёт → decision event → notification
-            if (proposal) {
-                await prisma.event.create({
-                    data: {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        type: 'QUALIFICATION_PROPOSED' as any,
-                        source: 'PHOTOCOMPANY_RESULT_HANDLER',
-                        subject_id: payload.user_id,
-                        subject_type: 'user',
-                        payload: {
-                            user_id: payload.user_id,
-                            proposal_id: proposal.proposalId,
-                            new_grade: proposal.newGrade,
-                            triggered_by_shift: payload.shift_id
-                        },
-                        metadata: {
-                            source_event_id: eventId,
-                            metrics: metrics
+                // 3a. Create QUALIFICATION_PROPOSED event if proposal was created
+                // CANON: Metric event → расчёт → decision event → notification
+                if (proposal) {
+                    await prisma.event.create({
+                        data: {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            type: 'QUALIFICATION_PROPOSED' as any,
+                            source: 'PHOTOCOMPANY_RESULT_HANDLER',
+                            subject_id: payload.user_id,
+                            subject_type: 'user',
+                            payload: {
+                                user_id: payload.user_id,
+                                proposal_id: proposal.proposalId,
+                                new_grade: proposal.newGrade,
+                                triggered_by_shift: payload.shift_id
+                            },
+                            metadata: {
+                                source_event_id: eventId,
+                                metrics: metrics
+                            }
                         }
-                    }
-                });
+                    });
 
-                logger.info(`[EventFlow] Created QUALIFICATION_PROPOSED event for user ${payload.user_id}, proposal ${proposal.proposalId}`);
+                    logger.info(`[EventFlow] Created QUALIFICATION_PROPOSED event for user ${payload.user_id}, proposal ${proposal.proposalId}`);
+                }
+            } catch (qualError) {
+                // Non-blocking: Qualification proposal failed but we still mark event as processed
+                logger.warn(`[EventFlow] Qualification proposal failed for user ${payload.user_id}`, { error: qualError });
             }
 
             // 4. Mark as processed (Success)
