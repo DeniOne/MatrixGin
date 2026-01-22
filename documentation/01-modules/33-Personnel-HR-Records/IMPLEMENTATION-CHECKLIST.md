@@ -58,21 +58,27 @@
 - [ ] Взаимодействие через domain events
 
 ### 2.2 Обязательные сервисы
-- [ ] PersonalFileService
-- [ ] PersonnelDocumentService
-- [ ] PersonnelOrderService
-- [ ] LaborContractService
+- [x] PersonalFileService
+- [x] PersonnelDocumentService
+- [x] PersonnelOrderService
+- [x] LaborContractService
 - [ ] DocumentTemplateService
 - [ ] DocumentGeneratorService
-- [ ] HRDomainEventService
+- [x] HRDomainEventService
 
 ### 2.3 Event Emission Rules
-- [ ] Event при создании личного дела
-- [ ] Event при подписании приказа
-- [ ] Event при подписании договора
-- [ ] Event при расторжении договора
-- [ ] Event при закрытии личного дела
+- [x] Event при создании личного дела (EMPLOYEE_HIRED)
+- [x] Event при подписании приказа (ORDER_SIGNED)
+- [x] Event при подписании договора (CONTRACT_SIGNED)
+- [x] Event при расторжении договора (CONTRACT_TERMINATED)
+- [x] Event при изменении статуса (EMPLOYEE_TRANSFERRED, EMPLOYEE_DISMISSED)
 - [ ] Event при передаче в архив
+
+### 2.4 Domain Logic (CRITICAL!)
+- [x] FSM validation (hr-status-fsm.ts)
+- [x] Role-based event authorization (hr-event-validator.ts)
+- [x] Event separation (FACT vs STATE CHANGE)
+- [x] Replay immutability (Object.freeze)
 
 ---
 

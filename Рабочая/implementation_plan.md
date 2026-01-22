@@ -1,344 +1,336 @@
-# Implementation Plan: Module 33 Sprint 1 — Database Layer
+# Implementation Plan: Module 33 Phase 2 — Backend Services
 
-**Goal:** Implement foundational database models for Personnel-HR-Records with event-sourcing layer.
+**Goal:** Implement event-sourcing service, FSM validation, and core domain logic for Personnel-HR-Records.
 
 ---
 
 ## User Review Required
 
-> [!WARNING]
-> **Breaking Changes:**
-> - New tables will be added to production database
-> - `HRDomainEvent` table is **append-only** (NO UPDATE/DELETE constraints)
-> - Adds FK constraints to existing `Employee` table
-
 > [!IMPORTANT]
 > **Critical Design Decisions:**
-> 1. **Event-Sourcing is mandatory** — all juridical actions emit immutable events
-> 2. **HRStatus ≠ Employee.status** — separate FSM for HR lifecycle
-> 3. **AI access forbidden** — personnel data excluded from AI Core access
-> 4. **Human-only actions** — no automatic signing/termination
+> 1. **HRDomainEventService** — all juridical actions MUST emit events
+> 2. **FSM Validation** — canonical transition map prevents invalid status changes
+> 3. **Role-Based Authorization** — only authorized roles can emit specific events
+> 4. **No Direct DB Access** — all HR mutations go through domain services
 
 ---
 
 ## Proposed Changes
 
-### Database Models (Prisma)
+### Backend Services
 
-#### [NEW] [backend/prisma/schema.prisma](file:///f:/Matrix_Gin/backend/prisma/schema.prisma) — Module 33 Models
+#### [NEW] `backend/src/modules/personnel/domain/hr-status-fsm.ts`
 
-**1. HRDomainEvent (CRITICAL — Event-Sourcing)**
-```prisma
-model HRDomainEvent {
-  id              String   @id @default(uuid())
-  eventType       HREventType
-  aggregateType   HRAggregateType
-  aggregateId     String
-  
-  actorId         String
-  actorRole       String
-  
-  payload         Json
-  previousState   Json?
-  newState        Json?
-  legalBasis      String?
-  
-  occurredAt      DateTime @default(now())
-  
-  @@index([aggregateId, eventType])
-  @@index([occurredAt])
-  @@map("hr_domain_events")
+**FSM Transition Map (CANONICAL)**
+
+```typescript
+import { HRStatus } from '@prisma/client';
+
+// Canonical FSM Transition Map
+export const HR_STATUS_TRANSITIONS: Record<HRStatus, HRStatus[]> = {
+  ONBOARDING: ['PROBATION', 'EMPLOYED', 'TERMINATED'],
+  PROBATION: ['EMPLOYED', 'TERMINATED'],
+  EMPLOYED: ['SUSPENDED', 'LEAVE', 'TERMINATED'],
+  SUSPENDED: ['EMPLOYED', 'TERMINATED'],
+  LEAVE: ['EMPLOYED', 'TERMINATED'],
+  TERMINATED: ['ARCHIVED'],
+  ARCHIVED: [], // Terminal state - no transitions allowed
+};
+
+export class HRStatusFSMError extends Error {
+  constructor(from: HRStatus, to: HRStatus) {
+    const allowed = HR_STATUS_TRANSITIONS[from];
+    super(
+      `Invalid HR status transition: ${from} → ${to}. ` +
+      `Allowed transitions: ${allowed.length > 0 ? allowed.join(', ') : 'none (terminal state)'}`
+    );
+    this.name = 'HRStatusFSMError';
+  }
 }
 
-enum HREventType {
-  EMPLOYEE_HIRED
-  EMPLOYEE_TRANSFERRED
-  EMPLOYEE_PROMOTED
-  EMPLOYEE_DEMOTED
-  EMPLOYEE_SUSPENDED
-  EMPLOYEE_DISMISSED
-  DOCUMENT_UPLOADED
-  DOCUMENT_VERIFIED
-  DOCUMENT_EXPIRED
-  ORDER_CREATED
-  ORDER_SIGNED
-  ORDER_CANCELLED
-  CONTRACT_SIGNED
-  CONTRACT_AMENDED
-  CONTRACT_TERMINATED
-  FILE_ARCHIVED
+export function validateHRStatusTransition(
+  from: HRStatus,
+  to: HRStatus
+): void {
+  const allowedTransitions = HR_STATUS_TRANSITIONS[from];
+  
+  if (!allowedTransitions.includes(to)) {
+    throw new HRStatusFSMError(from, to);
+  }
 }
 
-enum HRAggregateType {
-  PERSONAL_FILE
-  PERSONNEL_ORDER
-  LABOR_CONTRACT
-  PERSONNEL_DOCUMENT
-}
-```
-
-**2. PersonalFile**
-```prisma
-model PersonalFile {
-  id            String   @id @default(uuid())
-  employeeId    String   @unique
-  employee      Employee @relation(fields: [employeeId], references: [id])
-  
-  fileNumber    String   @unique
-  hrStatus      HRStatus @default(ONBOARDING)
-  
-  createdAt     DateTime @default(now())
-  closedAt      DateTime?
-  archivedAt    DateTime?
-  archiveId     String?
-  
-  documents     PersonnelDocument[]
-  orders        PersonnelOrder[]
-  contracts     LaborContract[]
-  
-  @@map("personal_files")
-}
-
-enum HRStatus {
-  ONBOARDING
-  PROBATION
-  EMPLOYED
-  SUSPENDED
-  LEAVE
-  TERMINATED
-  ARCHIVED
-}
-```
-
-**3. PersonnelDocument**
-```prisma
-model PersonnelDocument {
-  id              String   @id @default(uuid())
-  personalFileId  String
-  personalFile    PersonalFile @relation(fields: [personalFileId], references: [id])
-  
-  documentType    PersonnelDocumentType
-  title           String
-  description     String?
-  
-  fileId          String
-  fileName        String
-  fileSize        Int
-  mimeType        String
-  
-  issueDate       DateTime?
-  expiryDate      DateTime?
-  issuer          String?
-  documentNumber  String?
-  
-  uploadedById    String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  version         Int      @default(1)
-  previousVersionId String?
-  
-  @@map("personnel_documents")
-}
-
-enum PersonnelDocumentType {
-  PASSPORT
-  SNILS
-  INN
-  EDUCATION_DIPLOMA
-  MILITARY_ID
-  WORK_BOOK
-  PHOTO
-  MEDICAL_BOOK
-  DRIVING_LICENSE
-  CERTIFICATE
-  REFERENCE_LETTER
-  NDA
-  PD_CONSENT
-  JOB_DESCRIPTION
-  OTHER
-}
-```
-
-**4. PersonnelOrder**
-```prisma
-model PersonnelOrder {
-  id              String   @id @default(uuid())
-  personalFileId  String
-  personalFile    PersonalFile @relation(fields: [personalFileId], references: [id])
-  
-  orderType       PersonnelOrderType
-  orderNumber     String   @unique
-  orderDate       DateTime
-  effectiveDate   DateTime
-  
-  title           String
-  content         String
-  basis           String?
-  
-  fileId          String?
-  
-  signedById      String?
-  signedAt        DateTime?
-  
-  status          OrderStatus @default(DRAFT)
-  
-  createdById     String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  retentionYears  Int      @default(75)
-  
-  @@map("personnel_orders")
-}
-
-enum PersonnelOrderType {
-  HIRING
-  TRANSFER
-  VACATION
-  VACATION_CANCEL
-  BUSINESS_TRIP
-  BONUS
-  SALARY_CHANGE
-  DISCIPLINARY
-  DISCIPLINARY_REMOVE
-  DISMISSAL
-  POSITION_CHANGE
-  SCHEDULE_CHANGE
-  LEAVE_WITHOUT_PAY
-  MATERNITY_LEAVE
-  PARENTAL_LEAVE
-}
-
-enum OrderStatus {
-  DRAFT
-  PENDING_APPROVAL
-  APPROVED
-  SIGNED
-  CANCELLED
-}
-```
-
-**5. LaborContract**
-```prisma
-model LaborContract {
-  id              String   @id @default(uuid())
-  personalFileId  String
-  personalFile    PersonalFile @relation(fields: [personalFileId], references: [id])
-  
-  contractNumber  String   @unique
-  contractDate    DateTime
-  startDate       DateTime
-  endDate         DateTime?
-  contractType    ContractType
-  
-  positionId      String
-  departmentId    String
-  salary          Decimal  @db.Decimal(12, 2)
-  salaryType      SalaryType @default(MONTHLY)
-  workSchedule    String
-  probationDays   Int      @default(0)
-  
-  fileId          String?
-  
-  status          ContractStatus @default(ACTIVE)
-  terminationDate DateTime?
-  terminationReason String?
-  
-  amendments      ContractAmendment[]
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  @@map("labor_contracts")
-}
-
-enum ContractType {
-  PERMANENT
-  FIXED_TERM
-  PART_TIME
-  CIVIL
-  INTERNSHIP
-}
-
-enum ContractStatus {
-  ACTIVE
-  SUSPENDED
-  TERMINATED
-}
-
-enum SalaryType {
-  MONTHLY
-  HOURLY
-  PIECEWORK
-}
-```
-
-**6. ContractAmendment**
-```prisma
-model ContractAmendment {
-  id              String   @id @default(uuid())
-  contractId      String
-  contract        LaborContract @relation(fields: [contractId], references: [id])
-  
-  amendmentNumber Int
-  amendmentDate   DateTime
-  effectiveDate   DateTime
-  
-  changes         Json
-  fileId          String?
-  
-  createdAt       DateTime @default(now())
-  
-  @@map("contract_amendments")
-}
-```
-
-**7. DocumentTemplate**
-```prisma
-model DocumentTemplate {
-  id              String   @id @default(uuid())
-  templateType    TemplateType
-  name            String
-  description     String?
-  content         String
-  variables       Json
-  isActive        Boolean  @default(true)
-  version         Int      @default(1)
-  
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  @@map("document_templates")
-}
-
-enum TemplateType {
-  LABOR_CONTRACT
-  ORDER_HIRING
-  ORDER_DISMISSAL
-  ORDER_VACATION
-  ORDER_TRANSFER
-  CERTIFICATE_WORK
-  NDA
-  PD_CONSENT
+export function isTerminalStatus(status: HRStatus): boolean {
+  return HR_STATUS_TRANSITIONS[status].length === 0;
 }
 ```
 
 ---
 
-### Migrations
+#### [NEW] `backend/src/modules/personnel/domain/hr-event-validator.ts`
 
-#### [NEW] `backend/prisma/migrations/XXX_create_personnel_module/migration.sql`
+**Role-Based Event Authorization (CANONICAL)**
 
-- Create all Module 33 tables
-- Add FK constraints to `Employee`
-- Add indexes for performance
-- **Add constraint: NO UPDATE/DELETE on `hr_domain_events`**
+```typescript
+import { HREventType } from '@prisma/client';
 
-#### [NEW] `backend/prisma/seed-personnel.ts`
+// Role-based Event Permissions
+export const EVENT_ROLE_PERMISSIONS: Record<HREventType, string[]> = {
+  EMPLOYEE_HIRED: ['DIRECTOR', 'HR_MANAGER'],
+  EMPLOYEE_TRANSFERRED: ['DIRECTOR', 'HR_MANAGER'],
+  EMPLOYEE_PROMOTED: ['DIRECTOR', 'HR_MANAGER'],
+  EMPLOYEE_DEMOTED: ['DIRECTOR'],
+  EMPLOYEE_SUSPENDED: ['DIRECTOR'],
+  EMPLOYEE_DISMISSED: ['DIRECTOR'],
+  
+  DOCUMENT_UPLOADED: ['HR_SPECIALIST', 'HR_MANAGER', 'DIRECTOR'],
+  DOCUMENT_VERIFIED: ['HR_MANAGER', 'DIRECTOR'],
+  DOCUMENT_EXPIRED: ['SYSTEM'], // Auto-generated
+  
+  ORDER_CREATED: ['HR_SPECIALIST', 'HR_MANAGER'],
+  ORDER_SIGNED: ['DIRECTOR'], // CRITICAL: Only DIRECTOR can sign
+  ORDER_CANCELLED: ['DIRECTOR', 'HR_MANAGER'],
+  
+  CONTRACT_SIGNED: ['DIRECTOR', 'HR_MANAGER'],
+  CONTRACT_AMENDED: ['DIRECTOR', 'HR_MANAGER'],
+  CONTRACT_TERMINATED: ['DIRECTOR'],
+  
+  FILE_ARCHIVED: ['HR_MANAGER', 'DIRECTOR'],
+};
 
-- Seed basic document templates (NDA, PD_CONSENT, LABOR_CONTRACT)
-- Seed test PersonalFile for existing employees (dev only)
+export class UnauthorizedEventError extends Error {
+  constructor(eventType: HREventType, actorRole: string) {
+    const allowedRoles = EVENT_ROLE_PERMISSIONS[eventType];
+    super(
+      `Role '${actorRole}' not authorized for event '${eventType}'. ` +
+      `Allowed roles: ${allowedRoles.join(', ')}`
+    );
+    this.name = 'UnauthorizedEventError';
+  }
+}
+
+export function validateActorRole(
+  eventType: HREventType,
+  actorRole: string
+): void {
+  const allowedRoles = EVENT_ROLE_PERMISSIONS[eventType];
+  
+  if (!allowedRoles || !allowedRoles.includes(actorRole)) {
+    throw new UnauthorizedEventError(eventType, actorRole);
+  }
+}
+```
+
+---
+
+#### [NEW] `backend/src/modules/personnel/services/hr-domain-event.service.ts`
+
+**Event-Sourcing Service**
+
+```typescript
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@/prisma/prisma.service';
+import { HREventType, HRAggregateType } from '@prisma/client';
+import { validateActorRole } from '../domain/hr-event-validator';
+
+interface EmitEventParams {
+  eventType: HREventType;
+  aggregateType: HRAggregateType;
+  aggregateId: string;
+  actorId: string;
+  actorRole: string;
+  payload: any;
+  previousState?: any;
+  newState?: any;
+  legalBasis?: string;
+}
+
+@Injectable()
+export class HRDomainEventService {
+  constructor(private prisma: PrismaService) {}
+
+  /**
+   * Emit HR domain event (append-only)
+   * CRITICAL: Validates actor role before emission
+   */
+  async emit(params: EmitEventParams): Promise<void> {
+    const {
+      eventType,
+      aggregateType,
+      aggregateId,
+      actorId,
+      actorRole,
+      payload,
+      previousState,
+      newState,
+      legalBasis,
+    } = params;
+
+    // CRITICAL: Validate actor role
+    validateActorRole(eventType, actorRole);
+
+    // Emit event (INSERT-only, immutable)
+    await this.prisma.hRDomainEvent.create({
+      data: {
+        eventType,
+        aggregateType,
+        aggregateId,
+        actorId,
+        actorRole,
+        payload,
+        previousState,
+        newState,
+        legalBasis,
+      },
+    });
+  }
+
+  /**
+   * Get all events for an aggregate (for audit)
+   */
+  async getEventsByAggregate(
+    aggregateId: string,
+    aggregateType?: HRAggregateType
+  ) {
+    return this.prisma.hRDomainEvent.findMany({
+      where: {
+        aggregateId,
+        ...(aggregateType && { aggregateType }),
+      },
+      orderBy: { occurredAt: 'asc' },
+    });
+  }
+
+  /**
+   * Replay events to reconstruct aggregate state
+   * Used for audit and state verification
+   */
+  async replayEvents(aggregateId: string): Promise<any[]> {
+    const events = await this.getEventsByAggregate(aggregateId);
+    
+    // Return chronological event log
+    return events.map(event => ({
+      timestamp: event.occurredAt,
+      type: event.eventType,
+      actor: event.actorId,
+      role: event.actorRole,
+      payload: event.payload,
+      legalBasis: event.legalBasis,
+    }));
+  }
+}
+```
+
+---
+
+#### [NEW] `backend/src/modules/personnel/services/personal-file.service.ts`
+
+**PersonalFile Service with FSM**
+
+```typescript
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '@/prisma/prisma.service';
+import { HRStatus } from '@prisma/client';
+import { validateHRStatusTransition } from '../domain/hr-status-fsm';
+import { HRDomainEventService } from './hr-domain-event.service';
+
+@Injectable()
+export class PersonalFileService {
+  constructor(
+    private prisma: PrismaService,
+    private hrEventService: HRDomainEventService
+  ) {}
+
+  /**
+   * Create PersonalFile (on employee hiring)
+   */
+  async create(employeeId: string, actorId: string, actorRole: string) {
+    // Generate unique file number
+    const fileNumber = await this.generateFileNumber();
+
+    const personalFile = await this.prisma.personalFile.create({
+      data: {
+        employeeId,
+        fileNumber,
+        hrStatus: 'ONBOARDING',
+      },
+    });
+
+    // Emit EMPLOYEE_HIRED event
+    await this.hrEventService.emit({
+      eventType: 'EMPLOYEE_HIRED',
+      aggregateType: 'PERSONAL_FILE',
+      aggregateId: personalFile.id,
+      actorId,
+      actorRole,
+      payload: {
+        employeeId,
+        fileNumber,
+      },
+      newState: { hrStatus: 'ONBOARDING' },
+    });
+
+    return personalFile;
+  }
+
+  /**
+   * Update HR status with FSM validation
+   */
+  async updateStatus(
+    id: string,
+    newStatus: HRStatus,
+    actorId: string,
+    actorRole: string,
+    reason?: string
+  ) {
+    const personalFile = await this.prisma.personalFile.findUnique({
+      where: { id },
+    });
+
+    if (!personalFile) {
+      throw new NotFoundException(`PersonalFile ${id} not found`);
+    }
+
+    // CRITICAL: Validate FSM transition
+    validateHRStatusTransition(personalFile.hrStatus, newStatus);
+
+    // Update status
+    const updated = await this.prisma.personalFile.update({
+      where: { id },
+      data: { hrStatus: newStatus },
+    });
+
+    // Emit status change event
+    const eventTypeMap: Record<HRStatus, any> = {
+      PROBATION: 'EMPLOYEE_TRANSFERRED',
+      EMPLOYED: 'EMPLOYEE_HIRED',
+      SUSPENDED: 'EMPLOYEE_SUSPENDED',
+      LEAVE: 'EMPLOYEE_TRANSFERRED',
+      TERMINATED: 'EMPLOYEE_DISMISSED',
+      ARCHIVED: 'FILE_ARCHIVED',
+      ONBOARDING: 'EMPLOYEE_HIRED',
+    };
+
+    await this.hrEventService.emit({
+      eventType: eventTypeMap[newStatus] || 'EMPLOYEE_TRANSFERRED',
+      aggregateType: 'PERSONAL_FILE',
+      aggregateId: id,
+      actorId,
+      actorRole,
+      payload: { reason },
+      previousState: { hrStatus: personalFile.hrStatus },
+      newState: { hrStatus: newStatus },
+    });
+
+    return updated;
+  }
+
+  private async generateFileNumber(): Promise<string> {
+    const count = await this.prisma.personalFile.count();
+    const year = new Date().getFullYear();
+    return `PF-${year}-${String(count + 1).padStart(5, '0')}`;
+  }
+}
+```
 
 ---
 
@@ -346,91 +338,78 @@ enum TemplateType {
 
 ### Automated Tests
 
-**1. Migration Test**
-```bash
-# Run from backend directory
-npx prisma migrate dev --name create_personnel_module
-npx prisma generate
-```
-**Expected:** Migration succeeds, all tables created
-
-**2. Seed Test**
-```bash
-npm run seed:personnel
-```
-**Expected:** Templates created successfully
-
-**3. Event Immutability Test**
+**1. FSM Validation Tests**
 ```typescript
-// backend/src/modules/personnel/__tests__/hr-event.immutability.test.ts
-describe('HRDomainEvent Immutability', () => {
-  it('should prevent UPDATE on hr_domain_events', async () => {
-    const event = await prisma.hRDomainEvent.create({...});
-    await expect(
-      prisma.hRDomainEvent.update({ where: { id: event.id }, data: {...} })
-    ).rejects.toThrow(); // Should fail due to DB constraint
+// backend/src/modules/personnel/__tests__/hr-status-fsm.test.ts
+describe('HRStatus FSM Validation', () => {
+  it('should allow ONBOARDING → EMPLOYED', () => {
+    expect(() => validateHRStatusTransition('ONBOARDING', 'EMPLOYED')).not.toThrow();
   });
   
-  it('should prevent DELETE on hr_domain_events', async () => {
-    const event = await prisma.hRDomainEvent.create({...});
-    await expect(
-      prisma.hRDomainEvent.delete({ where: { id: event.id } })
-    ).rejects.toThrow(); // Should fail due to DB constraint
+  it('should prevent EMPLOYED → ONBOARDING', () => {
+    expect(() => validateHRStatusTransition('EMPLOYED', 'ONBOARDING'))
+      .toThrow(HRStatusFSMError);
+  });
+  
+  it('should prevent transitions from ARCHIVED', () => {
+    expect(() => validateHRStatusTransition('ARCHIVED', 'EMPLOYED'))
+      .toThrow('terminal state');
   });
 });
 ```
 
-**Run:** `npm test -- hr-event.immutability.test.ts`
-
-**4. HRStatus FSM Test**
+**2. Role Authorization Tests**
 ```typescript
-// backend/src/modules/personnel/__tests__/hr-status.fsm.test.ts
-describe('HRStatus FSM Transitions', () => {
-  it('should allow ONBOARDING → EMPLOYED', async () => {
-    // Valid transition
+// backend/src/modules/personnel/__tests__/hr-event-validator.test.ts
+describe('Event Role Authorization', () => {
+  it('should allow DIRECTOR to sign orders', () => {
+    expect(() => validateActorRole('ORDER_SIGNED', 'DIRECTOR')).not.toThrow();
   });
   
-  it('should prevent EMPLOYED → ONBOARDING', async () => {
-    // Invalid transition, should throw
+  it('should prevent HR_SPECIALIST from signing orders', () => {
+    expect(() => validateActorRole('ORDER_SIGNED', 'HR_SPECIALIST'))
+      .toThrow(UnauthorizedEventError);
   });
 });
 ```
 
-**Run:** `npm test -- hr-status.fsm.test.ts`
-
-### Manual Verification
-
-**1. Check Database Schema**
-```bash
-npx prisma studio
-```
-- Open `hr_domain_events` table
-- Verify columns: `eventType`, `aggregateId`, `actorId`, `occurredAt`
-- Verify indexes exist
-
-**2. Check Employee Relation**
-```sql
-SELECT * FROM personal_files 
-JOIN employees ON personal_files.employee_id = employees.id 
-LIMIT 5;
-```
-**Expected:** FK relationship works
-
----
-
-## Rollback Plan
-
-If migration fails:
-```bash
-npx prisma migrate resolve --rolled-back XXX_create_personnel_module
+**3. Event Emission Tests**
+```typescript
+// backend/src/modules/personnel/__tests__/hr-domain-event.service.test.ts
+describe('HRDomainEventService', () => {
+  it('should emit event with valid role', async () => {
+    await service.emit({
+      eventType: 'EMPLOYEE_HIRED',
+      aggregateType: 'PERSONAL_FILE',
+      aggregateId: 'test-id',
+      actorId: 'user-1',
+      actorRole: 'DIRECTOR',
+      payload: {},
+    });
+    
+    const events = await service.getEventsByAggregate('test-id');
+    expect(events).toHaveLength(1);
+  });
+  
+  it('should reject event with invalid role', async () => {
+    await expect(
+      service.emit({
+        eventType: 'ORDER_SIGNED',
+        actorRole: 'EMPLOYEE', // Not authorized!
+        // ...
+      })
+    ).rejects.toThrow(UnauthorizedEventError);
+  });
+});
 ```
 
 ---
 
 ## Estimated Effort
 
-- Prisma models: 2 hours
-- Migration + constraints: 1 hour
-- Seed data: 30 min
+- FSM validation: 1 hour
+- Role validator: 1 hour
+- HRDomainEventService: 2 hours
+- PersonalFileService: 2 hours
 - Tests: 2 hours
-- **Total: ~6 hours**
+- **Total: ~8 hours**

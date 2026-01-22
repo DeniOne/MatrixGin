@@ -124,37 +124,48 @@
 ### 2.1. Services
 
 #### PersonalFileService
-- [ ] `create(employeeId)` — создание личного дела при приёме
+- [x] `create(employeeId)` — создание личного дела при приёме
 - [ ] `findAll(filter)` — список дел с фильтрацией
-- [ ] `findById(id)` — получение дела с документами
-- [ ] `close(id, reason)` — закрытие дела (увольнение)
+- [x] `findById(id)` — получение дела с документами
+- [x] `updateStatus(id, newStatus, reason)` — обновление статуса с FSM validation
 - [ ] `archive(id)` — передача в архив (Module 29)
 
 #### PersonnelDocumentService
-- [ ] `upload(fileId, documentType, file)` — загрузка документа
-- [ ] `findByFile(fileId)` — документы в деле
+- [x] `upload(fileId, documentType, file)` — загрузка документа
+- [x] `findByFile(fileId)` — документы в деле
 - [ ] `download(id)` — скачивание файла
-- [ ] `delete(id)` — удаление с аудитом
-- [ ] `checkExpiring(days)` — поиск истекающих документов
+- [x] `delete(id)` — удаление с аудитом
+- [x] `checkExpiring(days)` — поиск истекающих документов
 
 #### PersonnelOrderService
-- [ ] `create(order)` — создание приказа
-- [ ] `generateNumber(type)` — автогенерация номера
+- [x] `create(order)` — создание приказа
+- [x] `generateNumber(type)` — автогенерация номера
 - [ ] `approve(id)` — согласование
-- [ ] `sign(id, signerId)` — подписание
-- [ ] `cancel(id, reason)` — отмена
+- [x] `sign(id, signerId)` — подписание
+- [x] `cancel(id, reason)` — отмена
 - [ ] `generatePdf(id)` — генерация PDF
 
 #### LaborContractService
-- [ ] `create(contract)` — создание договора
-- [ ] `createAmendment(contractId, changes)` — доп. соглашение
-- [ ] `terminate(id, reason, date)` — расторжение
-- [ ] `findExpiring(days)` — истекающие срочные договоры
+- [x] `create(contract)` — создание договора
+- [x] `createAmendment(contractId, changes)` — доп. соглашение
+- [x] `terminate(id, reason, date)` — расторжение
+- [x] `findExpiring(days)` — истекающие срочные договоры
 
 #### DocumentGeneratorService
 - [ ] `generateFromTemplate(templateType, data)` — генерация документа
 - [ ] `renderToPdf(html)` — конвертация в PDF
 - [ ] `getVariables(templateType)` — получение переменных шаблона
+
+#### HRDomainEventService (CRITICAL!)
+- [x] `emit(eventType, aggregateId, actorId, payload)` — эмиссия событий
+- [x] `getEventsByAggregate(aggregateId)` — получение событий для аудита
+- [x] `replayEvents(aggregateId)` — воспроизведение событий (READ-ONLY)
+
+### 2.2. Domain Logic (CRITICAL!)
+- [x] `hr-status-fsm.ts` — FSM validation с каноническим transition map
+- [x] `hr-event-validator.ts` — role-based event authorization
+- [x] `validateHRStatusTransition()` — валидация переходов статусов
+- [x] `validateActorRole()` — валидация ролей для событий
 
 ### 2.2. Controllers
 
