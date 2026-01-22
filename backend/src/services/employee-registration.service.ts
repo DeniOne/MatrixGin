@@ -1,5 +1,6 @@
 import { Context, Markup } from 'telegraf';
 import telegramService from './telegram.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { prisma } from '../config/prisma';
 
@@ -57,8 +58,11 @@ interface RegistrationRequest {
 
 export class EmployeeRegistrationService {
     private static instance: EmployeeRegistrationService;
+    private eventEmitter: EventEmitter2;
 
-    private constructor() {}
+    private constructor(eventEmitter?: EventEmitter2) {
+        this.eventEmitter = eventEmitter || new EventEmitter2();
+    }
 
     public static getInstance(): EmployeeRegistrationService {
         if (!EmployeeRegistrationService.instance) {
@@ -108,14 +112,14 @@ export class EmployeeRegistrationService {
                 )
                 RETURNING id, telegram_id
             `;
-            
+
             if (result.length === 0) {
                 throw new Error('Failed to create registration request');
             }
         }
 
         // Send welcome message with registration button
-        const welcomeMessage = 
+        const welcomeMessage =
             `🎉 Приветствуем Тебя в системе MatrixGin!\n\n` +
             `Добро пожаловать в нашу команду! Для завершения регистрации в системе, ` +
             `пожалуйста, нажми на кнопку ниже и пройди простой процесс регистрации.\n\n` +
@@ -210,7 +214,7 @@ export class EmployeeRegistrationService {
 
         const photo = ctx.message.photo[ctx.message.photo.length - 1];
         const fileId = photo.file_id;
-        
+
         // In production, upload to S3/storage service
         const photoUrl = `telegram://photo/${fileId}`;
 
@@ -259,10 +263,10 @@ export class EmployeeRegistrationService {
             WHERE id = ${registration.id}::uuid
         `;
 
-        await this.saveStepHistory(registration.id, 'FULL_NAME', { 
-            first_name: firstName, 
-            last_name: lastName, 
-            middle_name: middleName 
+        await this.saveStepHistory(registration.id, 'FULL_NAME', {
+            first_name: firstName,
+            last_name: lastName,
+            middle_name: middleName
         });
 
         await ctx.reply(
@@ -381,9 +385,9 @@ export class EmployeeRegistrationService {
             WHERE id = ${registration.id}::uuid
         `;
 
-        await this.saveStepHistory(registration.id, 'RES_ADDRESS', { 
+        await this.saveStepHistory(registration.id, 'RES_ADDRESS', {
             residential_address: address,
-            addresses_match: false 
+            addresses_match: false
         });
 
         await this.promptPhoneStep(ctx);
@@ -726,11 +730,11 @@ export class EmployeeRegistrationService {
         const today = new Date();
         let age = today.getFullYear() - birthDate.getFullYear();
         const monthDiff = today.getMonth() - birthDate.getMonth();
-        
+
         if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
             age--;
         }
-        
+
         return age;
     }
 
@@ -749,7 +753,7 @@ export class EmployeeRegistrationService {
 
         if (!bot) return;
 
-        const message = 
+        const message =
             `📋 *Новая заявка на регистрацию сотрудника*\n\n` +
             `👤 ${registration.last_name} ${registration.first_name} ${registration.middle_name || ''}\n` +
             `📧 ${registration.email}\n` +
@@ -772,6 +776,7 @@ export class EmployeeRegistrationService {
 
     /**
      * Approve registration and create user account
+     * CRITICAL: Emits employee.onboarded event for Module 33 integration
      */
     async approveRegistration(registrationId: string, reviewedByUserId: string): Promise<void> {
         const registration = await prisma.$queryRaw<any[]>`
@@ -783,6 +788,12 @@ export class EmployeeRegistrationService {
         }
 
         const reg = registration[0];
+
+        // Idempotency check: prevent duplicate approval
+        if (reg.status === 'APPROVED') {
+            console.warn(`[EmployeeRegistrationService] Registration ${registrationId} already approved`);
+            throw new Error('Registration already approved');
+        }
 
         // Create user account
         const user = await prisma.user.create({
@@ -801,7 +812,7 @@ export class EmployeeRegistrationService {
         });
 
         // Create employee record
-        await prisma.employee.create({
+        const employee = await prisma.employee.create({
             data: {
                 user_id: user.id,
                 department_id: reg.department_id,
@@ -810,7 +821,7 @@ export class EmployeeRegistrationService {
             }
         });
 
-        // Update registration status
+        // Update registration status (transactional guard)
         await prisma.$executeRaw`
             UPDATE employee_registration_requests
             SET status = 'APPROVED'::registration_status,
@@ -818,6 +829,20 @@ export class EmployeeRegistrationService {
                 reviewed_at = NOW()
             WHERE id = ${registrationId}::uuid
         `;
+
+        // CRITICAL: Emit employee.onboarded event
+        // This triggers:
+        // 1. EmployeeOnboardedListener (Module 33) -> PersonalFile creation
+        // 2. UniversityOnboardingListener (Module 13) -> Learning context initialization
+        this.eventEmitter.emit('employee.onboarded', {
+            employeeId: employee.id,
+            userId: user.id,
+            onboardedAt: new Date(),
+            onboardedBy: reviewedByUserId,
+            onboardedByRole: 'HR_MANAGER'
+        });
+
+        console.log(`[EmployeeRegistrationService] employee.onboarded event emitted for employee ${employee.id}`);
 
         // Notify employee about approval
         const bot = telegramService.getBot();
@@ -839,8 +864,8 @@ export class EmployeeRegistrationService {
      * Reject registration
      */
     async rejectRegistration(
-        registrationId: string, 
-        reviewedByUserId: string, 
+        registrationId: string,
+        reviewedByUserId: string,
         reason: string
     ): Promise<void> {
         const registration = await prisma.$queryRaw<any[]>`

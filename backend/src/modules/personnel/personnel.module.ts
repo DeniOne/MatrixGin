@@ -29,7 +29,7 @@ import {
 
 // Listeners
 import {
-    EmployeeHiredListener,
+    EmployeeOnboardedListener,
     EmployeeBeforeDeleteListener,
     LibraryArchivingCompletedListener,
     LibraryArchivingFailedListener,
@@ -58,7 +58,7 @@ import {
         PersonnelAccessGuard,
         RequireDirectorGuard,
         // Listeners
-        EmployeeHiredListener,
+        EmployeeOnboardedListener,
         EmployeeBeforeDeleteListener,
         LibraryArchivingCompletedListener,
         LibraryArchivingFailedListener,
