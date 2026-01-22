@@ -23,11 +23,13 @@ MatrixGin должен трансформироваться из **систем�
   - **Frontend**: Status Management Admin UI and Profile badges.
 - **Verification**: ✅ Module 09 implementation and build passed.
 
-## GAP-анализ модулей (Updated)
+## GAP-анализ модулей (Updated 2026-01-22)
 
 | Модуль | Статус | Приоритет |
 |--------|--------|-----------|
 | 09 Status & Ranks | ✅ CLOSED | DONE |
+| 33 Personnel HR Records | 🟡 Database Layer ✅ | Sprint 1 (Backend Services next) |
+| 29 Library & Archive | 📋 Spec готов | Sprint 2-3 |
 | 07 Telegram Bot | 🔴 16+ новых интентов | Sprint 5-6 |
 | 06 Corporate University | ⚠️ Виджет "Моё обучение" | Sprint 7-8 |
 

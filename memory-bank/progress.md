@@ -26,6 +26,8 @@
 | 08 | MatrixCoin Economy | 🔒 CANONICAL | ❌ НЕ ТРОГАТЬ |
 | 09 | Status & Ranks | ✅ CLOSED | ❌ Не требует |
 | 10 | Analytics | ✅ CLOSED | ❌ Не требует |
+| 29 | Library & Archive | 🟡 IN PROGRESS | 📋 Spec + Checklist готовы |
+| 33 | Personnel HR Records | 🟡 IN PROGRESS | ✅ Database Layer (Sprint 1) |
 
 ## 🌱 Phase 5: Motivational Organism
 
