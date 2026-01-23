@@ -24,17 +24,23 @@ MatrixGin должен трансформироваться из **систем�
 - **Language Migration (Frontend)**: ✅ **COMPLETED 2026-01-24**.
   - Frontend UI fully translated to Russian (Foundation, Manager Hub, Profile, Wallet).
   - Scripts `generate-translation-registry.ts` and `apply-translation.ts` added to `backend/scripts`.
-- **Verification**: ✅ Module 09 implementation and build passed.
+- **Module 13: Corporate University (Foundation)**: ✅ **COMPLETED 2026-01-24**.
+  - Implemented **Canon v2.2 Foundation Gate**.
+  - Single Source of Truth: `FoundationAcceptance` model.
+  - Backend Guards: `FoundationGuard` enforces strict access control.
+  - Frontend Immersion UI: Isolated Layout, 5 Blocks, Decision Gate.
+  - Migration: Script `migrate:foundation` successfully backfilled audit logs.
 
-## GAP-анализ модулей (Updated 2026-01-22)
+## GAP-анализ модулей (Updated 2026-01-24)
 
 | Модуль | Статус | Приоритет |
 |--------|--------|-----------|
+| 13 Corporate University (Foundation) | ✅ CLOSED | DONE |
 | 09 Status & Ranks | ✅ CLOSED | DONE |
 | 33 Personnel HR Records | 🟡 Database Layer ✅ | Sprint 1 (Backend Services next) |
 | 29 Library & Archive | 📋 Spec готов | Sprint 2-3 |
 | 07 Telegram Bot | 🔴 16+ новых интентов | Sprint 5-6 |
-| 06 Corporate University | ⚠️ Виджет "Моё обучение" | Sprint 7-8 |
+| 06 Corporate University (Applied) | ⚠️ Виджет "Моё обучение" | Sprint 7-8 |
 
 ## Active Decisions
 - MatrixCoin Economy (Module 08) = **CANONICAL** — НЕ ТРОГАТЬ
