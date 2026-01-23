@@ -46,14 +46,14 @@ const QuestTracker: React.FC = () => {
         }
     };
 
-    if (loadingQuests) return <div className="loader">Loading quests...</div>;
-    if (errorQuests) return <div className="error">Failed to load quests.</div>;
+    if (loadingQuests) return <div className="loader">Загрузка квестов...</div>;
+    if (errorQuests) return <div className="error">Ошибка загрузки квестов.</div>;
 
     const questList: Quest[] = (quests as any) || [];
 
     return (
         <div className="quest-tracker">
-            <h2>Active Quests</h2>
+            <h2>Активные квесты</h2>
             <div className="quest-list">
                 {questList.map(q => (
                     <div key={q.id} className="quest-card">
@@ -62,17 +62,17 @@ const QuestTracker: React.FC = () => {
                             <h3>{q.title}</h3>
                             {q.description && <p>{q.description}</p>}
                             <p className="rewards">
-                                Rewards: {q.reward_mc || 0} MC, {q.reward_gmc || 0} GMC
+                                Награды: {q.reward_mc || 0} MC, {q.reward_gmc || 0} GMC
                             </p>
                         </div>
                         {activeQuestId === q.id && progress ? (
                             <div className="progress-section">
-                                <p>Status: {progress.status}</p>
+                                <p>Статус: {progress.status}</p>
                                 {/* Here you could render detailed progress JSON */}
                                 <button onClick={() => handleAbandon(q.id)} className="abandon-btn">Abandon</button>
                             </div>
                         ) : (
-                            <button onClick={() => handleStart(q.id)} className="start-btn">Start Quest</button>
+                            <button onClick={() => handleStart(q.id)} className="start-btn">Начать квест</button>
                         )}
                     </div>
                 ))}

@@ -36,23 +36,23 @@ export const GovernanceDashboard: React.FC = () => {
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
-            <h1 className="text-2xl font-bold mb-6">Registry Governance Observability</h1>
+            <h1 className="text-2xl font-bold mb-6">Наблюдаемость реестра</h1>
 
             <Tabs items={[
                 {
                     key: '1',
-                    label: 'Visibility Snapshot (Active Rules)',
+                    label: 'Снимок видимости (Активные правила)',
                     children: (
-                        <Card title="Current Visibility Rules (Read-Only)">
+                        <Card title="Текущие правила видимости (Только чтение)">
                             <Table
                                 dataSource={rules}
                                 rowKey={(r) => r.scope + r.targetPattern}
                                 pagination={false}
                                 columns={[
-                                    { title: 'Scope', dataIndex: 'scope', render: (t) => <Tag color="blue">{t}</Tag> },
-                                    { title: 'Target Pattern', dataIndex: 'targetPattern', render: (t) => <code className="bg-gray-100 p-1">{t}</code> },
-                                    { title: 'Role Condition', dataIndex: 'roleCondition' },
-                                    { title: 'Effect', dataIndex: 'effect', render: (t) => <Tag color={t === 'EXCLUDE' ? 'red' : 'green'}>{t}</Tag> },
+                                    { title: 'Область', dataIndex: 'scope', render: (t) => <Tag color="blue">{t}</Tag> },
+                                    { title: 'Целевой паттерн', dataIndex: 'targetPattern', render: (t) => <code className="bg-gray-100 p-1">{t}</code> },
+                                    { title: 'Условие роли', dataIndex: 'roleCondition' },
+                                    { title: 'Эффект', dataIndex: 'effect', render: (t) => <Tag color={t === 'EXCLUDE' ? 'red' : 'green'}>{t}</Tag> },
                                 ]}
                             />
                         </Card>
@@ -60,13 +60,13 @@ export const GovernanceDashboard: React.FC = () => {
                 },
                 {
                     key: '2',
-                    label: 'Projection Map (Diagnostic)',
+                    label: 'Карта проекции (Диагностика)',
                     children: (
                         <div className="space-y-4">
-                            <Card title="Projection Diagnostics">
+                            <Card title="Диагностика проекции">
                                 <div className="flex gap-4 items-end mb-4">
                                     <div className="w-64">
-                                        <label className="block text-sm font-medium mb-1">Entity Type URN</label>
+                                        <label className="block text-sm font-medium mb-1">URN типа сущности</label>
                                         <input
                                             className="w-full border p-2 rounded"
                                             value={entityType}
@@ -74,27 +74,27 @@ export const GovernanceDashboard: React.FC = () => {
                                         />
                                     </div>
                                     <div className="w-48">
-                                        <label className="block text-sm font-medium mb-1">Simulated Role</label>
+                                        <label className="block text-sm font-medium mb-1">Симулированная роль</label>
                                         <Select
                                             className="w-full"
                                             value={role}
                                             onChange={setRole}
                                             options={[
-                                                { value: 'REGISTRY_ADMIN', label: 'Admin' },
-                                                { value: 'REGISTRY_USER', label: 'User' },
-                                                { value: 'GUEST', label: 'Guest' },
+                                                { value: 'REGISTRY_ADMIN', label: 'Админ' },
+                                                { value: 'REGISTRY_USER', label: 'Пользователь' },
+                                                { value: 'GUEST', label: 'Гость' },
                                             ]}
                                         />
                                     </div>
                                     <Button type="primary" onClick={fetchProjectionMap} loading={loading}>
-                                        Analyze Projection
+                                        Анализ проекции
                                     </Button>
                                 </div>
 
                                 {projectionMap && (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="border rounded p-4 bg-white">
-                                            <h3 className="font-bold text-green-700 mb-2">Visible Attributes ({projectionMap.visible_attributes.length})</h3>
+                                            <h3 className="font-bold text-green-700 mb-2">Видимые атрибуты ({projectionMap.visible_attributes.length})</h3>
                                             <ul className="list-disc pl-5">
                                                 {projectionMap.visible_attributes.map((a: any) => (
                                                     <li key={a.code}>{a.code} ({a.data_type})</li>
@@ -102,7 +102,7 @@ export const GovernanceDashboard: React.FC = () => {
                                             </ul>
                                         </div>
                                         <div className="border rounded p-4 bg-red-50">
-                                            <h3 className="font-bold text-red-700 mb-2">Hidden / Pruned ({projectionMap.hidden_attributes.length})</h3>
+                                            <h3 className="font-bold text-red-700 mb-2">Скрытые / Обрезанные ({projectionMap.hidden_attributes.length})</h3>
                                             <ul className="list-disc pl-5">
                                                 {projectionMap.hidden_attributes.map((a: any) => (
                                                     <li key={a.code} className="text-red-600 font-mono">{a.code}</li>
@@ -119,7 +119,7 @@ export const GovernanceDashboard: React.FC = () => {
 
             {/* Added Policy Simulator Tab */}
             <div className="mt-8 border-t pt-6">
-                <h2 className="text-xl font-bold mb-4">Policy Simulator (Safe Mode)</h2>
+                <h2 className="text-xl font-bold mb-4">Симулятор политик (Безопасный режим)</h2>
                 <PolicySimulator />
             </div>
         </div>
@@ -152,26 +152,26 @@ const PolicySimulator: React.FC = () => {
     };
 
     return (
-        <Card title="Run 'What If' Analysis">
+        <Card title="Запустить анализ 'Что если'">
             <div className="flex gap-4 items-end mb-4">
                 <div className="w-1/4">
-                    <label className="block text-sm font-medium">Target Entity</label>
+                    <label className="block text-sm font-medium">Целевая сущность</label>
                     <input className="border p-2 w-full" value={entityType} onChange={e => setEntityType(e.target.value)} />
                 </div>
                 <div className="w-1/4">
-                    <label className="block text-sm font-medium">Simulated Role</label>
-                    <Select className="w-full" value={role} onChange={setRole} options={[{ value: 'REGISTRY_USER', label: 'User' }, { value: 'REGISTRY_ADMIN', label: 'Admin' }]} />
+                    <label className="block text-sm font-medium">Симулированная роль</label>
+                    <Select className="w-full" value={role} onChange={setRole} options={[{ value: 'REGISTRY_USER', label: 'Пользователь' }, { value: 'REGISTRY_ADMIN', label: 'Админ' }]} />
                 </div>
             </div>
 
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded mb-4">
-                <h4 className="font-bold text-yellow-800 mb-2">Simulate Adding Rule:</h4>
+                <h4 className="font-bold text-yellow-800 mb-2">Симуляция правила:</h4>
                 <div className="flex gap-2">
-                    <Select value={overlayRule.scope} onChange={v => setOverlayRule({ ...overlayRule, scope: v })} options={[{ value: 'ATTRIBUTE', label: 'Attribute' }, { value: 'RELATIONSHIP', label: 'Relationship' }]} />
-                    <input className="border p-1" placeholder="Target Pattern" value={overlayRule.targetPattern} onChange={e => setOverlayRule({ ...overlayRule, targetPattern: e.target.value })} />
-                    <input className="border p-1" placeholder="Role Condition" value={overlayRule.roleCondition} onChange={e => setOverlayRule({ ...overlayRule, roleCondition: e.target.value })} />
+                    <Select value={overlayRule.scope} onChange={v => setOverlayRule({ ...overlayRule, scope: v })} options={[{ value: 'ATTRIBUTE', label: 'Атрибут' }, { value: 'RELATIONSHIP', label: 'Relationship' }]} />
+                    <input className="border p-1" placeholder="Целевой паттерн" value={overlayRule.targetPattern} onChange={e => setOverlayRule({ ...overlayRule, targetPattern: e.target.value })} />
+                    <input className="border p-1" placeholder="Условие роли" value={overlayRule.roleCondition} onChange={e => setOverlayRule({ ...overlayRule, roleCondition: e.target.value })} />
                     <Select value={overlayRule.effect} onChange={v => setOverlayRule({ ...overlayRule, effect: v })} options={[{ value: 'EXCLUDE', label: 'EXCLUDE' }]} />
-                    <Button type="primary" onClick={handleSimulate}>Simulate Diff</Button>
+                    <Button type="primary" onClick={handleSimulate}>Симуляция разницы</Button>
                 </div>
             </div>
 
@@ -189,7 +189,7 @@ const PolicySimulator: React.FC = () => {
                         <ul className="list-disc pl-5">
                             {diff.removed_visible_attributes.map((a: string) => <li key={a} className="font-mono">{a}</li>)}
                         </ul>
-                        {diff.removed_visible_attributes.length === 0 && <span className="text-gray-400 text-sm">No changes detected</span>}
+                        {diff.removed_visible_attributes.length === 0 && <span className="text-gray-400 text-sm">Изменений не обнаружено</span>}
                     </div>
                 </div>
             )}

@@ -36,18 +36,18 @@ const ProductionOrdersPage: React.FC = () => {
             key: 'product_type',
         },
         {
-            title: 'Qty',
+            title: 'Кол-во',
             dataIndex: 'quantity',
             key: 'quantity',
         },
         {
-            title: 'Source',
+            title: 'Источник',
             dataIndex: 'source_type',
             key: 'source_type',
             render: (source: string) => <Tag>{source}</Tag>
         },
         {
-            title: 'Status',
+            title: 'Статус',
             dataIndex: 'status',
             key: 'status',
             render: (status: string) => {
@@ -59,7 +59,7 @@ const ProductionOrdersPage: React.FC = () => {
             }
         },
         {
-            title: 'Created At',
+            title: 'Создано',
             dataIndex: 'created_at',
             key: 'created_at',
             render: (val: string) => new Date(val).toLocaleDateString()
@@ -67,7 +67,7 @@ const ProductionOrdersPage: React.FC = () => {
     ];
 
     return (
-        <Card title="Production Orders" extra={<Button onClick={fetchOrders}>Refresh</Button>}>
+        <Card title="Production Orders" extra={<Button onClick={fetchOrders}>Обновить</Button>}>
             <Table
                 dataSource={orders}
                 columns={columns}

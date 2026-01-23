@@ -43,7 +43,7 @@ function RegistrationDetailModal({ registrationId, onClose }: Props) {
             {registration.photo_url ? (
               <img
                 src={registration.photo_url}
-                alt="Profile"
+                alt="Профиль"
                 className="w-32 h-32 rounded-lg object-cover border-2 border-gray-200"
               />
             ) : (

@@ -50,7 +50,7 @@ const RegistryEntityCreatePage: React.FC = () => {
                     <div className="mb-6 p-4 bg-red-900/20 border border-red-900/50 rounded-lg flex items-start gap-3 text-red-400 text-sm">
                         <AlertCircle className="w-5 h-5 shrink-0" />
                         <div>
-                            <p className="font-bold">Error</p>
+                            <p className="font-bold">Ошибка</p>
                             <p className="text-xs mt-1 opacity-80">
                                 {(error as any)?.data?.message || 'Creation failed.'}
                             </p>

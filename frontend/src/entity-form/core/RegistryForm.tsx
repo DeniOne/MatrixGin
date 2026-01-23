@@ -32,7 +32,7 @@ export const RegistryForm: React.FC<RegistryFormProps> = ({
 
     if (isLoading) return <Spin tip="Loading form definition..." />;
     if (error) return <Alert type="error" message={error} />;
-    if (!card) return <Alert type="warning" message="Entity not found" />;
+    if (!card) return <Alert type="warning" message="Сущность не найдена" />;
 
     // 2. Resolve View Definition
     const viewDef = card.views[viewName];

@@ -100,7 +100,7 @@ const SoftBadgesPage: React.FC = () => {
                         </div>
                         <div>
                             <div className="text-sm font-medium opacity-80 uppercase tracking-wider">Текущий уровень</div>
-                            <div className="text-4xl font-bold">Level 5</div>
+                            <div className="text-4xl font-bold">Уровень 5</div>
                             <div className="text-sm opacity-90 mt-1">Гуру коммуникации</div>
                         </div>
                     </div>

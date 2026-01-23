@@ -88,7 +88,7 @@ const SoftPracticesPage: React.FC = () => {
                     <p className="text-white/90 text-sm">Вы в ударе! Продолжайте в том же духе.</p>
                 </div>
                 <div className="text-right">
-                    <div className="text-3xl font-bold">Level 5</div>
+                    <div className="text-3xl font-bold">Уровень 5</div>
                     <div className="text-xs opacity-80">Мастер привычек</div>
                 </div>
             </div>

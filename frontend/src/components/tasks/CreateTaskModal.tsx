@@ -43,7 +43,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
             <div className="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-700">
-                    <h2 className="text-xl font-bold text-white">Create New Task</h2>
+                    <h2 className="text-xl font-bold text-white">Создать задачу</h2>
                     <button
                         onClick={onClose}
                         className="text-gray-400 hover:text-white transition-colors"
@@ -63,14 +63,14 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
                     {/* Title */}
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Title *
+                            Заголовок *
                         </label>
                         <input
                             type="text"
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                             className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            placeholder="Enter task title"
+                            placeholder="Введите заголовок задачи"
                             required
                         />
                     </div>
@@ -78,14 +78,14 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
                     {/* Description */}
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Description *
+                            Описание *
                         </label>
                         <textarea
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             rows={5}
                             className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                            placeholder="Enter task description"
+                            placeholder="Введите описание задачи"
                             required
                         />
                     </div>
@@ -93,24 +93,24 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
                     {/* Priority */}
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Priority
+                            Приоритет
                         </label>
                         <select
                             value={formData.priority}
                             onChange={(e) => setFormData({ ...formData, priority: e.target.value as TaskPriority })}
                             className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            <option value={TaskPriority.LOW}>Low</option>
-                            <option value={TaskPriority.MEDIUM}>Medium</option>
-                            <option value={TaskPriority.HIGH}>High</option>
-                            <option value={TaskPriority.URGENT}>Urgent</option>
+                            <option value={TaskPriority.LOW}>Низкий</option>
+                            <option value={TaskPriority.MEDIUM}>Средний</option>
+                            <option value={TaskPriority.HIGH}>Высокий</option>
+                            <option value={TaskPriority.URGENT}>Срочно</option>
                         </select>
                     </div>
 
                     {/* Due Date */}
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Due Date (Optional)
+                            Срок (опционально)
                         </label>
                         <input
                             type="date"
@@ -127,7 +127,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
                             onClick={onClose}
                             className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
                         >
-                            Cancel
+                            Отмена
                         </button>
                         <button
                             type="submit"

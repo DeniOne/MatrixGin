@@ -10,16 +10,16 @@ interface GraphToolbarProps {
 }
 
 const MODES: { value: GraphMode; label: string; icon: string }[] = [
-    { value: 'STRUCTURE', label: 'Structure', icon: '🏛️' },
-    { value: 'FUNCTION', label: 'Function', icon: '⚡' },
+    { value: 'STRUCTURE', label: 'Структура', icon: '🏛️' },
+    { value: 'FUNCTION', label: 'Функция', icon: '⚡' },
     { value: 'CPK', label: 'CPK', icon: '📦' },
     { value: 'KNOWLEDGE', label: 'Knowledge', icon: '🎓' },
 ];
 
 const OVERLAYS: { value: OverlayType; label: string }[] = [
-    { value: 'LIFECYCLE', label: 'Lifecycle (Drafts)' },
-    { value: 'SIGNAL_HEAT', label: 'Signal Heat' },
-    { value: 'SCENARIO_DELTA', label: 'Scenario Diff' },
+    { value: 'LIFECYCLE', label: 'ЖЦ (Черновики)' },
+    { value: 'SIGNAL_HEAT', label: 'Тепловая карта сигналов' },
+    { value: 'SCENARIO_DELTA', label: 'Разница сценариев' },
 ];
 
 export const GraphToolbar: React.FC<GraphToolbarProps> = ({
@@ -33,7 +33,7 @@ export const GraphToolbar: React.FC<GraphToolbarProps> = ({
             {/* Mode Switcher */}
             <div className="bg-white rounded-lg shadow-md p-1 flex flex-col gap-1 border border-slate-200">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 py-1">
-                    Lens
+                    Линза
                 </span>
                 {MODES.map((mode) => (
                     <button
@@ -55,7 +55,7 @@ export const GraphToolbar: React.FC<GraphToolbarProps> = ({
             {/* Overlay Toggles */}
             <div className="bg-white rounded-lg shadow-md p-1 flex flex-col gap-1 border border-slate-200">
                 <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 py-1">
-                    Overlays
+                    Наложения
                 </span>
                 {OVERLAYS.map((overlay) => {
                     const isActive = activeOverlays.includes(overlay.value);

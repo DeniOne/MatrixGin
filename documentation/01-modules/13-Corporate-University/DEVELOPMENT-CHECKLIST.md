@@ -7,6 +7,11 @@
 > [!NOTE]
 > Чеклист соответствует [implementation_plan.md](file:///C:/Users/DeniOne/.gemini/antigravity/brain/d119139d-6a71-4d50-89ff-9f1c906ac0e0/implementation_plan.md) и [MODULE-SPEC.md](./MODULE-SPEC.md)
 
+[PREREQUISITE]
+- FOUNDATIONAL IMMERSION MVP Checklist = PASS
+- FoundationAcceptance enforced backend-side
+- APPLIED University недоступен без acceptance
+
 ---
 
 ## Component 1: Database Schema

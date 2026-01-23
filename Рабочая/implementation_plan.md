@@ -1,52 +1,116 @@
-# Implementation Plan: Phase 4 - Trainer Accreditation & Mentorship
+# Implementation Plan: Corporate University Canon v2.2
 
-Этот этап фокусируется на "Институте Тренерства". Мы превращаем квалифицированных сотрудников в наставников, внедряем систему аккредитации и удобный дашборд для управления обучением новичков.
+**Goal:** Implement the "Foundational Immersion" admission gate and strictly enforce the separation between Foundational (Admission) and Applied (Education) layers.
+
+> [!IMPORTANT]
+> **Canon v2.2 Compliance:**
+> - **Foundation != Education.** It is a mandatory admission gate.
+> - **Binary Acceptance.** `ACCEPTED` / `NOT_ACCEPTED`. No partial states.
+> - **Hard Blocking.** Backend must enforce access control via Guards. UI is untrusted.
 
 ## User Review Required
 
+> [!WARNING]
+> **Blocking Change:**
+> - New users will be **LOCKED** out of all Applied University features, KPI accrual, and Role Contracts until they explicitly accept the Foundation.
+> - **Trainee Role:** Now explicitly requires [FoundationAcceptance](file:///f:/Matrix_Gin/backend/src/services/enrollment.service.ts#464-546). No "auto-trainee" bypass.
+> - **Migration:** Existing users will default to `is_foundational_accepted = false`.
+
 > [!IMPORTANT]
-> **Авторизация**: Доступ к Trainer Dashboard будет ограничен только сотрудникам со статусом `TRAINER`, `ACCREDITED` и выше.
-> 
-> **Награды**: За успешное доведение стажера до конца испытательного срока (60 дней) тренер получает автоматическую награду в MC. GMC награды заблокированы на уровне канонов.
+> **Backfill Protocol (Strict)**
+> To migrate existing trusted users, we must NOT use silent SQL updates.
+> 1.  **Explicit Script**: Must be run via `npm run migrate:foundation`.
+> 2.  **Audit Trail**: Every backfilled user gets a `FoundationAuditLog` entry (Event: `MIGRATION_BACKFILL`).
+> 3.  **Fixed Version**: Backfills must explicitly target a version (e.g., `v1.0-legacy`).
+> 4.  **Reasoning**: Reason must be recorded in metadata (e.g., "Legacy Trust Migration").
 
 ## Proposed Changes
 
-### 1. Backend Refinements
+### Phase 1: Foundation Data Layer (Single Source of Truth)
 
-#### [MODIFY] [trainer.service.ts](file:///f:/Matrix_Gin/backend/src/services/trainer.service.ts)
-- Добавление метода `getTrainerDashboardData(trainerId)`: агрегация статистики (NPS, доход, список активных учеников) в один DTO.
-- Усиление логики [assignTrainer](file:///f:/Matrix_Gin/backend/src/services/trainer.service.ts#164-209): автоматическая отправка уведомления ученику о назначении наставника.
+#### [MODIFY] [schema.prisma](file:///f:/Matrix_Gin/backend/prisma/schema.prisma)
+1.  **FoundationAcceptance Model:**
+    *   `person_id` (Unique, direct link to User/Person)
+    *   `version` (String, e.g., "v1.0")
+    *   `decision` (Enum: ACCEPTED | NOT_ACCEPTED | REVOKED)
+    *   `accepted_at` (DateTime)
+    *   `valid_until` (DateTime?)
+2.  **Audit Log (`FoundationAuditLog`):**
+    *   Append-only log of all attempts, blocks, and decisions.
+3.  **Employee Model Cleanup:**
+    *   **REMOVE** `is_foundational_accepted` field from [Employee](file:///f:/Matrix_Gin/backend/src/services/role-matrix.service.ts#205-218) model to prevent "dual source of truth" desync.
+    *   **REMOVE** `foundational_accepted_at` from [Employee](file:///f:/Matrix_Gin/backend/src/services/role-matrix.service.ts#205-218).
+    *   *Rationale:* All checks must query [FoundationAcceptance](file:///f:/Matrix_Gin/backend/src/services/enrollment.service.ts#464-546) directly.
 
-#### [MODIFY] [university.controller.ts](file:///f:/Matrix_Gin/backend/src/controllers/university.controller.ts)
-- Новые эндпоинты:
-  - `GET /api/university/trainers/dashboard` — данные для личного кабинета тренера.
-  - `GET /api/university/trainers/candidates` — список заявок на аккредитацию (для HR/Admin).
+### Phase 2: Backend Guards & Enforcement (The "Law")
 
-### 2. Frontend (Trainer UI)
+#### [CREATE] [foundation.guard.ts](file:///f:/Matrix_Gin/backend/src/guards/foundation.guard.ts)
+*   Global Guard Logic:
+    1.  Fetch [FoundationAcceptance](file:///f:/Matrix_Gin/backend/src/services/enrollment.service.ts#464-546) for user.
+    2.  fetch `ActiveFoundationVersion` (Config/Env).
+    3.  **Check 1:** If record missing OR status != ACCEPTED → **403**.
+    4.  **Check 2 (Version Mismatch):** If `acceptance.version != activeVersion` → **403 (Re-immersion Required)**.
+    5.  Log `FOUNDATION_BLOCK` event.
 
-#### [NEW] [TrainerDashboardPage.tsx](file:///f:/Matrix_Gin/frontend/src/pages/university/TrainerDashboardPage.tsx)
-- Статистические карточки (Рейтинг, Успешные стажеры, NPS).
-- Таблица "Мои подопечные" с прогресс-барами их курсов.
-- Кнопка "Завершить наставничество" с формой оценки результата.
+### Phase 3: Foundational Immersion Content (NOT Courses)
 
-#### [NEW] [TrainerApplicationModal.tsx](file:///f:/Matrix_Gin/frontend/src/features/university/components/TrainerApplicationModal.tsx)
-- Форма выбора специализации (Фотограф, Продажи, Дизайнер).
-- Справка о требованиях к кандидату.
+#### [MODIFY] [seed.ts](file:///f:/Matrix_Gin/backend/prisma/seed.ts)
+*   **DO NOT** seed these as [Course](file:///f:/Matrix_Gin/backend/src/services/university.service.ts#130-186) entities.
+*   **DO NOT** use [Enrollment](file:///f:/Matrix_Gin/backend/src/services/enrollment.service.ts#427-445) model for them.
+*   **Implementation:**
+    *   Define Foundational Blocks in a separate config or dedicated [FoundationBlock](file:///f:/Matrix_Gin/backend/src/config/foundation.constants.ts#19-26) model (if dynamic) or hardcoded constant in code.
+    *   Structure:
+        *   [id](file:///f:/Matrix_Gin/backend/src/middleware/foundation.middleware.ts#9-58): LAW_CONSTITUTION, LAW_CODEX, ...
+        *   `type`: BLOCK (not course)
+        *   `mandatory`: true
+    *   *Rationale:* Keep "Admission" and "Education" domains physically separate in DB.
 
-### 3. Management UI
+### Phase 4: Trainee & University Split
 
-#### [MODIFY] [UniversityPage.tsx](file:///f:/Matrix_Gin/frontend/src/pages/UniversityPage.tsx)
-- Добавление вкладки "Управление" (только для HR/Admin).
-- Список кандидатов с кнопками "Аккредитовать" / "Отклонить".
+#### [MODIFY] [university.service.ts](file:///f:/Matrix_Gin/backend/src/services/university.service.ts)
+*   **Split Catalog:**
+    *   If `!accepted` → Show ONLY Foundational Immersion.
+    *   If `accepted` → Show Applied Faculties & Courses.
+
+#### [MODIFY] [enrollment.service.ts](file:///f:/Matrix_Gin/backend/src/services/enrollment.service.ts)
+*   **Immersion Flow:**
+    *   Track progress of 5 blocks.
+    *   On completion of all 5 + explicit "I ACCEPT" → Create [FoundationAcceptance](file:///f:/Matrix_Gin/backend/src/services/enrollment.service.ts#464-546).
+
+### Phase 5: Migration & Backfill
+
+#### [CREATE] [backfill-foundation.ts](file:///f:/Matrix_Gin/backend/scripts/backfill-foundation.ts)
+*   **Script:** `npm run migrate:foundation`.
+*   **Audit:** Logs `MIGRATION_BACKFILL` for every user.
+*   **Safety:** Does not overwrite existing `ACCEPTED` states.
+
+### Phase 6: Frontend Immersion UI (Strict Shell)
+
+#### [CREATE] [foundation.api.ts](file:///f:/Matrix_Gin/frontend/src/services/foundation.api.ts)
+*   Endpoints: `/status`, `/block-viewed`, `/decision`.
+*   Error Handling: Global interceptor for 403.
+
+#### [CREATE] [FoundationLayout.tsx](file:///f:/Matrix_Gin/frontend/src/layouts/FoundationLayout.tsx)
+*   Dedicated layout with no sidebar/navigation.
+*   Enforces "Immersion Mode".
+
+#### [CREATE] [FoundationPages](file:///f:/Matrix_Gin/frontend/src/pages/foundation/)
+*   `StartPage`: Context & Warning.
+*   `BlockPage`: Dynamic block content (1..5).
+*   `DecisionPage`: Checkbox & Accept/Decline.
+*   `ResultPage`: Redirect or Logout.
 
 ## Verification Plan
 
 ### Automated Tests
-1. Проверка [assignTrainer](file:///f:/Matrix_Gin/backend/src/services/trainer.service.ts#164-209): убедиться, что `trainees_total` инкрементируется.
-2. Проверка [createTrainingResult](file:///f:/Matrix_Gin/backend/src/services/trainer.service.ts#210-279): симуляция 61 дня ретеншена и проверка начисления MC.
+1.  **Guard Test:** Attempt to access Applied Course without acceptance → **403**.
+2.  **Guard Test:** Attempt to credit Wallet without acceptance → **403**.
+3.  **Immersion Flow:** Complete 4/5 blocks → Acceptance fails. Complete 5/5 + Decision → Acceptance succeeds.
+4.  **Trainee Test:** Try to create Trainee RoleContract without acceptance → **Fail**.
 
 ### Manual Verification
-1. Зайти под обычным пользователем, подать заявку на тренера.
-2. Под админом подтвердить заявку (Accredit).
-3. Убедиться, что у пользователя появилась вкладка "Дашборд тренера".
-4. Назначить тренера стажеру, убедиться что в дашборде тренера появился новый ученик.
+1.  **New User Journey:**
+    *   Login → See only Immersion.
+    *   Try to bypass URL to /applied → Access Denied.
+    *   Complete Immersion → Access Granted.
+2.  **Audit Log Check:** Verify `FOUNDATION_BLOCK` events are logged when bypass is attempted.

@@ -119,10 +119,10 @@ export const StartGrowthWeb3D: React.FC<StartGrowthWeb3DProps> = ({ quality, spe
     };
 
     const nodes: GrowthNode[] = useMemo(() => [
-        { id: 'q', label: 'Quality', value: quality, color: '#f87171', position: getPos(quality, 90) }, // Top
-        { id: 's', label: 'Speed', value: speed, color: '#fbbf24', position: getPos(speed, 0) },   // Right
-        { id: 'sl', label: 'Sales', value: sales, color: '#34d399', position: getPos(sales, 270) }, // Bottom
-        { id: 'tm', label: 'Team', value: team, color: '#60a5fa', position: getPos(team, 180) },    // Left
+        { id: 'q', label: 'Качество', value: quality, color: '#f87171', position: getPos(quality, 90) }, // Top
+        { id: 's', label: 'Скорость', value: speed, color: '#fbbf24', position: getPos(speed, 0) },   // Right
+        { id: 'sl', label: 'Продажи', value: sales, color: '#34d399', position: getPos(sales, 270) }, // Bottom
+        { id: 'tm', label: 'Команда', value: team, color: '#60a5fa', position: getPos(team, 180) },    // Left
     ], [quality, speed, sales, team]);
 
     return (
@@ -130,7 +130,7 @@ export const StartGrowthWeb3D: React.FC<StartGrowthWeb3DProps> = ({ quality, spe
             {/* Instruction Overlay (Read-Only) */}
             <div className="absolute top-2 left-2 z-10 pointer-events-none">
                 <span className="text-xs text-slate-400 bg-slate-800/50 px-2 py-1 rounded">
-                    Use mouse to rotate • Read-Only
+                    Используйте мышь для вращения • Только чтение
                 </span>
             </div>
 

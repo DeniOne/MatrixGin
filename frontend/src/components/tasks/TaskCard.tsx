@@ -82,7 +82,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                         {task.assigneeId && (
                             <div className="flex items-center gap-1">
                                 <User className="w-4 h-4" />
-                                Assigned
+                                Назначено
                             </div>
                         )}
                         {task.mcReward && (
@@ -104,7 +104,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                         ) : (
                             <CheckCircle className="w-4 h-4" />
                         )}
-                        Complete
+                        Завершить
                     </button>
                 )}
             </div>

@@ -56,7 +56,7 @@ const LeaderboardPage: React.FC = () => {
 
     return (
         <div className="leaderboard-page">
-            <h1 className="page-title">Leaderboard</h1>
+            <h1 className="page-title">Таблица лидеров</h1>
             <div className="filters">
                 <select
                     value={selectedMetric}
@@ -85,10 +85,10 @@ const LeaderboardPage: React.FC = () => {
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>Avatar</th>
-                        <th>Name</th>
-                        <th>Score</th>
-                        <th>Status</th>
+                        <th>Аватар</th>
+                        <th>Название</th>
+                        <th>Баллы</th>
+                        <th>Статус</th>
                     </tr>
                 </thead>
                 <tbody>

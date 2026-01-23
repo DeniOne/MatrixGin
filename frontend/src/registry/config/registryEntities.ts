@@ -23,8 +23,8 @@ export const REGISTRY_ENTITIES: EntityConfig[] = [
   // Security
   { id: 'policy-rule', label: 'Policy Rules', domain: 'Security' },
   { id: 'retention-policy', label: 'Retention Policies', domain: 'Security' },
-  { id: 'role', label: 'Roles', domain: 'Security' },
-  { id: 'permission', label: 'Permissions', domain: 'Security' },
+  { id: 'role', label: 'Роли', domain: 'Security' },
+  { id: 'permission', label: 'Права', domain: 'Security' },
   { id: 'role-permission', label: 'Role Permissions', domain: 'Security' },
   { id: 'access-scope', label: 'Access Scopes', domain: 'Security' },
 
@@ -52,8 +52,8 @@ export const REGISTRY_ENTITIES: EntityConfig[] = [
 
   // Value / CPK
   { id: 'cpk', label: 'CPK (Value Products)', domain: 'Value' },
-  { id: 'cpk-hierarchy', label: 'CPK Hierarchy', domain: 'Value' },
-  { id: 'cpk-owner', label: 'CPK Owners', domain: 'Value' },
+  { id: 'cpk-hierarchy', label: 'Иерархия ЦПК', domain: 'Value' },
+  { id: 'cpk-owner', label: 'Владельцы ЦПК', domain: 'Value' },
 
   // Process
   { id: 'task-type', label: 'Task Types', domain: 'Process' },

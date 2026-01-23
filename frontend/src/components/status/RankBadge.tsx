@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { getRankName } from '../../features/auth/roleTranslations';
+
 interface RankBadgeProps {
     code: string;
     description: string;
@@ -19,7 +21,7 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ code, description, gmcBala
     return (
         <div className="inline-flex items-center gap-2">
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}>
-                {code}
+                {getRankName(code)}
             </span>
             <span className="text-sm text-gray-600">{description}</span>
             <span className="text-xs text-gray-500">({gmcBalance} GMC)</span>

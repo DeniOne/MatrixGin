@@ -33,7 +33,7 @@ export const HistoryTimeline: React.FC<HistoryTimelineProps> = ({ entityUrn }) =
 
     return (
         <div className="mt-8">
-            <h3 className="text-lg font-bold mb-4">Audit History</h3>
+            <h3 className="text-lg font-bold mb-4">История аудита</h3>
             <Timeline mode="left">
                 {events.map(ev => (
                     <Timeline.Item
@@ -47,7 +47,7 @@ export const HistoryTimeline: React.FC<HistoryTimelineProps> = ({ entityUrn }) =
                                     <Tag color="blue">{ev.action}</Tag> by {ev.actor_urn}
                                 </div>
                                 <Button size="small" onClick={() => handleViewSnapshot(ev.id)}>
-                                    View Snapshot
+                                    Просмотр снимка
                                 </Button>
                             </div>
                         </Card>
@@ -57,7 +57,7 @@ export const HistoryTimeline: React.FC<HistoryTimelineProps> = ({ entityUrn }) =
 
             <Modal
                 open={!!selectedSnapshotId}
-                title="Historical Snapshot (Read-Only)"
+                title="Исторический снимок"
                 width={800}
                 onCancel={() => { setSelectedSnapshotId(null); setSnapshotData(null); }}
                 footer={null}

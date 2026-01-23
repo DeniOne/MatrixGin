@@ -62,14 +62,14 @@ export const EntityGraphViewer: React.FC<EntityGraphViewerProps> = ({ urn, viewT
     }, [urn, viewType, snapshotId]);
 
     if (loading) return <div>Loading Graph...</div>;
-    if (!graph) return <div>No Data</div>;
+    if (!graph) return <div>Нет данных</div>;
 
     const getNode = (urn: string) => graph.nodes.find(n => n.urn === urn);
 
     return (
         <div className="border rounded bg-white p-4 overflow-hidden">
             <h3 className="text-sm font-bold text-gray-500 mb-2">
-                Server-Defined View: {viewType.toUpperCase()}
+                Серверный вид: {viewType.toUpperCase()}
             </h3>
             <svg width={width} height={height} className="bg-gray-50 border">
                 {/* Edges */}

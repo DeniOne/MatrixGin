@@ -36,7 +36,7 @@ export const PersonalFileCard: React.FC<PersonalFileCardProps> = ({
 
                     <div className="text-sm text-gray-600 space-y-1">
                         <div>
-                            <span className="font-medium">Employee ID:</span> {file.employeeId}
+                            <span className="font-medium">ID Сотрудника:</span> {file.employeeId}
                         </div>
                         <div>
                             <span className="font-medium">Создано:</span>{' '}

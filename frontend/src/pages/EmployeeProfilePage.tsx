@@ -22,6 +22,8 @@ import { StatusBadge } from '../components/status/StatusBadge';
 import { RankBadge } from '../components/status/RankBadge';
 import { StatusHistory } from '../components/status/StatusHistory';
 
+import { getRoleName } from '../features/auth/roleTranslations';
+
 const EmployeeProfilePage: React.FC = () => {
     const { user } = useAuth();
     const { data: wallet } = useGetWalletQuery();
@@ -46,7 +48,7 @@ const EmployeeProfilePage: React.FC = () => {
                 <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
                     <div className="w-32 h-32 rounded-full border-4 border-indigo-500/30 bg-gray-800 flex items-center justify-center overflow-hidden">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                            <img src={user.avatar} alt="Аватар" className="w-full h-full object-cover" />
                         ) : (
                             <User className="w-16 h-16 text-gray-600" />
                         )}
@@ -59,11 +61,11 @@ const EmployeeProfilePage: React.FC = () => {
                         <div className="flex flex-wrap justify-center md:justify-start gap-4 text-gray-400">
                             <span className="flex items-center gap-1.5 bg-gray-800/50 px-3 py-1 rounded-full text-xs font-bold border border-gray-700">
                                 <Briefcase className="w-3 h-3 text-indigo-400" />
-                                {user?.role || 'Photon'}
+                                {getRoleName(user?.role)}
                             </span>
                             <span className="flex items-center gap-1.5 bg-gray-800/50 px-3 py-1 rounded-full text-xs font-bold border border-gray-700">
                                 <Award className="w-3 h-3 text-amber-400" />
-                                Department ID: {user?.departmentId || 'Unassigned'}
+                                ID Департамента: {user?.departmentId || 'Не назначен'}
                             </span>
                         </div>
                     </div>

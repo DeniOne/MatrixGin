@@ -12,6 +12,22 @@ export class TransactionService {
     async createTransaction(dto: CreateTransactionRequestDto, senderId?: string): Promise<TransactionResponseDto> {
         // Start a transaction to ensure atomicity
         return await prisma.$transaction(async (tx) => {
+            // CANON v2.2: Economy Guard - Check Foundation Acceptance
+            const checkAcceptance = async (uid: string, role: string) => {
+                const acceptance = await tx.foundationAcceptance.findUnique({ where: { person_id: uid } });
+                const ACTIVE_VERSION = 'v1.0'; // TODO: Config
+
+                if (!acceptance || acceptance.decision !== 'ACCEPTED') {
+                    throw new Error(`FOUNDATION_REQUIRED: ${role} ${uid} cannot participate in economy without Foundation Acceptance.`);
+                }
+                if (acceptance.version !== ACTIVE_VERSION) {
+                    throw new Error(`FOUNDATION_VERSION_MISMATCH: ${role} ${uid} has outdated Foundation version.`);
+                }
+            };
+
+            if (senderId) await checkAcceptance(senderId, 'Sender');
+            if (dto.recipientId) await checkAcceptance(dto.recipientId, 'Recipient');
+
             // 1. Validate Sender Balance (if spending or transferring)
             if (senderId && (dto.type === TransactionType.SPEND || dto.type === TransactionType.TRANSFER)) {
                 const senderWallet = await tx.wallet.findUnique({ where: { user_id: senderId } });

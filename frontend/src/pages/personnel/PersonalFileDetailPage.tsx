@@ -98,7 +98,7 @@ export const PersonalFileDetailPage: React.FC = () => {
                         </div>
                         <div className="text-sm text-gray-600 space-y-1">
                             <div>
-                                <span className="font-medium">Employee ID:</span> {file.employeeId}
+                                <span className="font-medium">ID Сотрудника:</span> {file.employeeId}
                             </div>
                             <div>
                                 <span className="font-medium">Создано:</span>{' '}

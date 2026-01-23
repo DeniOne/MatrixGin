@@ -31,7 +31,7 @@ const ExecutiveAIRecommendationsPage: React.FC = () => {
                 </div>
                 <div className="px-6 py-3 bg-gray-900 border border-gray-800 rounded-2xl flex items-center gap-4">
                     <div className="flex flex-col">
-                        <span className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Confidence Index</span>
+                        <span className="text-[9px] text-gray-500 font-black uppercase tracking-widest">Индекс доверия</span>
                         <span className="text-xl font-black text-white">94%</span>
                     </div>
                     <div className="w-16 h-1.5 bg-gray-800 rounded-full overflow-hidden">

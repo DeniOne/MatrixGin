@@ -112,7 +112,7 @@ export const ContractForm: React.FC<ContractFormProps> = ({
             <div className="grid grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Должность ID *
+                        ID Должности *
                     </label>
                     <input
                         type="text"
@@ -126,7 +126,7 @@ export const ContractForm: React.FC<ContractFormProps> = ({
 
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Департамент ID *
+                        ID Департамента *
                     </label>
                     <input
                         type="text"

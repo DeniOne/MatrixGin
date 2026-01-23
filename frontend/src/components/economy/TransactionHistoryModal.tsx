@@ -43,7 +43,7 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({ isOpe
             <div className="bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[80vh] flex flex-col">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-700">
-                    <h2 className="text-2xl font-bold text-white">Transaction History</h2>
+                    <h2 className="text-2xl font-bold text-white">История транзакций</h2>
                     <button
                         onClick={onClose}
                         className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
@@ -56,32 +56,32 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({ isOpe
                 <div className="p-6 border-b border-gray-700 flex gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-2">
-                            Type
+                            Тип
                         </label>
                         <select
                             value={filters.type || ''}
                             onChange={(e) => setFilters({ ...filters, type: e.target.value as TransactionType || undefined })}
                             className="px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            <option value="">All Types</option>
-                            <option value={TransactionType.REWARD}>Reward</option>
-                            <option value={TransactionType.TRANSFER}>Transfer</option>
-                            <option value={TransactionType.PURCHASE}>Purchase</option>
-                            <option value={TransactionType.PENALTY}>Penalty</option>
-                            <option value={TransactionType.REFUND}>Refund</option>
+                            <option value="">Все типы</option>
+                            <option value={TransactionType.REWARD}>Награда</option>
+                            <option value={TransactionType.TRANSFER}>Перевод</option>
+                            <option value={TransactionType.PURCHASE}>Покупка</option>
+                            <option value={TransactionType.PENALTY}>Штраф</option>
+                            <option value={TransactionType.REFUND}>Возврат</option>
                         </select>
                     </div>
 
                     <div>
                         <label className="block text-sm font-medium text-gray-400 mb-2">
-                            Currency
+                            Валюта
                         </label>
                         <select
                             value={filters.currency || ''}
                             onChange={(e) => setFilters({ ...filters, currency: e.target.value as Currency || undefined })}
                             className="px-3 py-2 bg-gray-900 border border-gray-700 rounded-md text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            <option value="">All Currencies</option>
+                            <option value="">Все валюты</option>
                             <option value={Currency.MC}>MC</option>
                             <option value={Currency.GMC}>GMC</option>
                         </select>
@@ -96,11 +96,11 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({ isOpe
                         </div>
                     ) : error ? (
                         <div className="text-center py-12">
-                            <p className="text-red-500">Failed to load transactions</p>
+                            <p className="text-red-500">Не удалось загрузить транзакции</p>
                         </div>
                     ) : !data || data.data.length === 0 ? (
                         <div className="text-center py-12">
-                            <p className="text-gray-400">No transactions found</p>
+                            <p className="text-gray-400">Транзакции не найдены</p>
                         </div>
                     ) : (
                         <div className="space-y-3">
@@ -138,7 +138,7 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({ isOpe
                 {data && data.total > filters.limit && (
                     <div className="p-6 border-t border-gray-700 flex items-center justify-between">
                         <div className="text-sm text-gray-400">
-                            Showing {((filters.page - 1) * filters.limit) + 1} to {Math.min(filters.page * filters.limit, data.total)} of {data.total} transactions
+                            Показано {((filters.page - 1) * filters.limit) + 1} to {Math.min(filters.page * filters.limit, data.total)} из {data.total} транзакций
                         </div>
                         <div className="flex gap-2">
                             <button
@@ -146,14 +146,14 @@ const TransactionHistoryModal: React.FC<TransactionHistoryModalProps> = ({ isOpe
                                 disabled={filters.page === 1}
                                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-md transition-colors"
                             >
-                                Previous
+                                Назад
                             </button>
                             <button
                                 onClick={() => setFilters({ ...filters, page: filters.page + 1 })}
                                 disabled={filters.page * filters.limit >= data.total}
                                 className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-md transition-colors"
                             >
-                                Next
+                                Вперед
                             </button>
                         </div>
                     </div>

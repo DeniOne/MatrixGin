@@ -95,7 +95,7 @@ export const transformData = (
                         id: `own-${dept.id}-${funcId}`,
                         source: dept.id,
                         target: funcId,
-                        label: 'OWNS',
+                        label: 'ВЛАДЕЕТ',
                         type: 'default',
                         style: { stroke: '#64748b', strokeDasharray: '4' },
                     });

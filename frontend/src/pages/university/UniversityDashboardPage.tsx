@@ -61,7 +61,7 @@ const AcademyCard: React.FC<AcademyCardProps> = ({
 const UniversityDashboardPage: React.FC = () => {
     const academies = [
         {
-            title: 'PhotoCraft Academy',
+            title: 'Академия PhotoCraft',
             description: 'Техника съемки, свет, композиция, обработка',
             icon: GraduationCap,
             path: '/photocraft',
@@ -70,7 +70,7 @@ const UniversityDashboardPage: React.FC = () => {
             color: 'bg-blue-600'
         },
         {
-            title: 'Sales Excellence Academy',
+            title: 'Академия Продаж',
             description: 'Психология продаж, переговоры, кросс-продажи',
             icon: TrendingUp,
             path: '/sales',
@@ -79,7 +79,7 @@ const UniversityDashboardPage: React.FC = () => {
             color: 'bg-green-600'
         },
         {
-            title: 'Service & Customer Care Academy',
+            title: 'Академия Сервиса',
             description: 'Сервис, работа с клиентами, решение конфликтов',
             icon: Heart,
             path: '/service', // Note: Assuming /service route based on context, though spec said Sales & Service might be combined or separate. Using /sales based on sidebar, but let's keep separate cards if needed or link to same. Wait, sidebar had /sales. Let's use /sales for now or distinct if spec implies. Spec says "Sales & Service" is one faculty usually, but image shows them separate? Image shows "Sales Excellence" and "Service & Customer Care". Let's follow image.
@@ -88,7 +88,7 @@ const UniversityDashboardPage: React.FC = () => {
             color: 'bg-pink-600'
         },
         {
-            title: 'Values & Culture Academy',
+            title: 'Академия Ценностей',
             description: 'Миссия, этика, командная работа',
             icon: Users,
             path: '/culture',
@@ -97,7 +97,7 @@ const UniversityDashboardPage: React.FC = () => {
             color: 'bg-purple-600'
         },
         {
-            title: 'Soft Skills Academy',
+            title: 'Академия Soft Skills',
             description: 'Эмоциональный интеллект, тайм-менеджмент, коммуникации',
             icon: Brain,
             path: '/personal',
@@ -106,7 +106,7 @@ const UniversityDashboardPage: React.FC = () => {
             color: 'bg-yellow-500'
         },
         {
-            title: 'Equipment & Tech Academy',
+            title: 'Академия Технологий',
             description: 'Оборудование, ПО, IT-безопасность',
             icon: Cpu,
             path: '/tech',
@@ -115,7 +115,7 @@ const UniversityDashboardPage: React.FC = () => {
             color: 'bg-indigo-600'
         },
         {
-            title: 'Leadership & Management Academy',
+            title: 'Академия Лидерства',
             description: 'Управление, финансы, стратегия',
             icon: Briefcase,
             path: '/mgmt',

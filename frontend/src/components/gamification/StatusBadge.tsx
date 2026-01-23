@@ -94,7 +94,7 @@ const StatusBadge: React.FC = () => {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <Trophy className="w-5 h-5 text-yellow-500" />
-                    <span className="text-sm font-medium text-gray-400">Status</span>
+                    <span className="text-sm font-medium text-gray-400">Статус</span>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(status.status)}`}>
                     {getStatusLabel(status.status)}
@@ -102,7 +102,7 @@ const StatusBadge: React.FC = () => {
             </div>
 
             <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-400">Rank</span>
+                <span className="text-sm font-medium text-gray-400">Ранг</span>
                 <span className={`text-sm font-bold ${getRankColor(status.rank)}`}>
                     {getRankLabel(status.rank)}
                 </span>
@@ -110,7 +110,7 @@ const StatusBadge: React.FC = () => {
 
             <div>
                 <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-400">Progress to Next Status</span>
+                    <span className="text-xs text-gray-400">Прогресс до следующего статуса</span>
                     <span className="text-xs font-medium text-white">
                         {status.progressPercent.toFixed(1)}%
                     </span>
@@ -133,7 +133,7 @@ const StatusBadge: React.FC = () => {
 
             {status.privileges && status.privileges.length > 0 && (
                 <div className="pt-3 border-t border-gray-700">
-                    <div className="text-xs font-medium text-gray-400 mb-2">Privileges</div>
+                    <div className="text-xs font-medium text-gray-400 mb-2">Привилегии</div>
                     <div className="flex flex-wrap gap-1">
                         {status.privileges.map((privilege, index) => (
                             <span

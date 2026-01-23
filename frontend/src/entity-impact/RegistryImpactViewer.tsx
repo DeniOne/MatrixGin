@@ -49,7 +49,7 @@ export const RegistryImpactViewer: React.FC<RegistryImpactViewerProps> = ({ enti
                 });
 
                 if (!res.ok) {
-                    throw new Error('Failed to fetch impact report');
+                    throw new Error('Не удалось получить отчет о влиянии');
                 }
 
                 const data = await res.json();
@@ -77,7 +77,7 @@ export const RegistryImpactViewer: React.FC<RegistryImpactViewerProps> = ({ enti
     return (
         <div className="impact-viewer space-y-4">
             {/* Summary Panel */}
-            <Card title="Impact Summary" size="small">
+            <Card title="Сводка влияния" size="small">
                 <div className="flex gap-4">
                     {Object.entries(report.summary).map(([sev, count]) => (
                         <Badge key={sev} count={count} color={severityColors[sev]} showZero>
@@ -90,20 +90,20 @@ export const RegistryImpactViewer: React.FC<RegistryImpactViewerProps> = ({ enti
             </Card>
 
             {/* Impact List */}
-            <Card title="Affected Entities" size="small">
+            <Card title="Затронутые сущности" size="small">
                 <List
                     itemLayout="horizontal"
                     dataSource={report.impacts}
                     renderItem={item => (
                         <List.Item
-                            actions={[<a key="view" onClick={() => navigate(`/app/entities/${item.entityType}/${item.id}`)}>View Details <ArrowRightOutlined /></a>]}
+                            actions={[<a key="view" onClick={() => navigate(`/app/entities/${item.entityType}/${item.id}`)}>Подробнее <ArrowRightOutlined /></a>]}
                         >
                             <List.Item.Meta
                                 avatar={<Tag color={severityColors[item.severity]}>{item.severity.toUpperCase()}</Tag>}
                                 title={<Text strong>{item.label}</Text>}
                                 description={
                                     <div className="text-xs text-gray-500">
-                                        Type: {item.impactType} | Relation: {item.relation} | Path: {item.path.join(' -> ')}
+                                        Тип: {item.impactType} | Relation: {item.relation} | Path: {item.path.join(' -> ')}
                                     </div>
                                 }
                             />

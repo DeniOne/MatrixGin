@@ -1,0 +1,73 @@
+{
+    "discipline_meta": {
+        "id": "ORG_POL_001",
+        "title": "Организационная политика: Внутренняя Конституция Фотоматрицы",
+        "faculty": "Корпоративная культура и этика",
+        "target_audience": [
+            "Все сотрудники",
+            "Новые сотрудники (Onboarding)"
+        ],
+        "business_goal": "Синхронизация гибридной команды, устранение операционного хаоса, защита ценностей компании.",
+        "learning_objectives": [
+            "Принять философию 'Я — Фотоматрица!'",
+            "Понимать правила взаимодействия в гибридной команде (Человек + AI)",
+            "Применять Золотой Стандарт (ЗСФ) для выявления и устранения потерь",
+            "Использовать Формулы состояний для выхода из кризисных ситуаций",
+            "Овладеть навыком Законченной Работы Сотрудника (ЗРС)",
+            "Ориентироваться в системе материальной (MC) и статусном мотивации"
+        ],
+        "kpi_links": [
+            "Снижение операционных потерь",
+            "Соблюдение регламентов (100%)",
+            "Скорость принятия решений"
+        ],
+        "total_duration_estimate": "90 minutes",
+        "enforcement": {
+            "mandatory": true,
+            "required_for": [
+                "onboarding",
+                "status_promotion"
+            ],
+            "blocking": [
+                "rank_upgrade",
+                "management_access"
+            ]
+        }
+    },
+    "modules": [
+        {
+            "id": "M1",
+            "title": "ДНК Компании: Философия и Люди",
+            "lessons": [
+                "LESSON_1_PHILOSOPHY.md"
+            ]
+        },
+        {
+            "id": "M2",
+            "title": "Операционный Двигатель: Золотой Стандарт",
+            "lessons": [
+                "LESSON_2_OPERATIONAL_ENGINE.md"
+            ]
+        },
+        {
+            "id": "M3",
+            "title": "Технология Выживания и Роста",
+            "lessons": [
+                "LESSON_3_CONDITIONS_OF_EXISTENCE.md",
+                "LESSON_4_FINISHED_STAFF_WORK.md"
+            ]
+        },
+        {
+            "id": "M4",
+            "title": "Экономика Успеха: MC и Статусы",
+            "lessons": [
+                "LESSON_5_MOTIVATION_AND_STATUSES.md"
+            ]
+        }
+    ],
+    "assessment": {
+        "type": "Summative",
+        "file": "ASSESSMENT_CONSTITUTION.md",
+        "passing_score": 85
+    }
+}

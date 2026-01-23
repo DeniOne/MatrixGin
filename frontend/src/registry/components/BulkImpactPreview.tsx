@@ -21,7 +21,7 @@ export const BulkImpactPreview: React.FC<BulkImpactPreviewProps> = ({ summary, d
                     {summary.canCommit ? 'Operation Allowed' : 'Operation Blocked'}
                 </h4>
                 <div className="flex gap-4 mt-2 text-sm">
-                    <span className="font-semibold text-red-600">Blocking: {summary.totalBlocking}</span>
+                    <span className="font-semibold text-red-600">Блокирующий: {summary.totalBlocking}</span>
                     <span className="font-semibold text-yellow-600">Warnings: {summary.totalWarning}</span>
                     <span className="text-blue-600">Info: {summary.totalInfo}</span>
                 </div>

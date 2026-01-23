@@ -14,8 +14,8 @@ const AchievementsGallery: React.FC = () => {
     const { data: earned, isLoading: loadingEarned, error: errorEarned } = useGetAchievementsQuery();
     const { data: available, isLoading: loadingAvailable, error: errorAvailable } = useGetAvailableAchievementsQuery();
 
-    if (loadingEarned || loadingAvailable) return <div className="loader">Loading achievements...</div>;
-    if (errorEarned || errorAvailable) return <div className="error">Failed to load achievements.</div>;
+    if (loadingEarned || loadingAvailable) return <div className="loader">Загрузка достижений...</div>;
+    if (errorEarned || errorAvailable) return <div className="error">Ошибка загрузки достижений.</div>;
 
     const earnedIds = new Set((earned || []).map(ua => ua.achievement_id));
 
@@ -30,7 +30,7 @@ const AchievementsGallery: React.FC = () => {
                 <h3>{achievement.name}</h3>
                 {achievement.description && <p>{achievement.description}</p>}
                 {unlocked && achievement.earned_at && (
-                    <span className="earned-at">Earned: {new Date(achievement.earned_at).toLocaleDateString()}</span>
+                    <span className="earned-at">Получено: {new Date(achievement.earned_at).toLocaleDateString()}</span>
                 )}
             </div>
         </div>
@@ -38,11 +38,11 @@ const AchievementsGallery: React.FC = () => {
 
     return (
         <div className="achievements-gallery">
-            <h2>Your Achievements</h2>
+            <h2>Ваши достижения</h2>
             <div className="grid">
                 {(earned || []).map(ua => renderAchievement(ua.achievement, true))}
             </div>
-            <h2>All Achievements</h2>
+            <h2>Все достижения</h2>
             <div className="grid">
                 {(available as Achievement[]).map(a => renderAchievement(a, earnedIds.has(a.id)))}
             </div>

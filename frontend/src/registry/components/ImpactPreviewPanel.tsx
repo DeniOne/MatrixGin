@@ -18,20 +18,20 @@ export const ImpactPreviewPanel: React.FC<ImpactPreviewPanelProps> = ({ report, 
 
     return (
         <div className="rounded-md bg-white p-4 shadow-lg ring-1 ring-black/5">
-            <h3 className="text-base font-semibold leading-6 text-gray-900 mb-4">Impact Analysis Preview</h3>
+            <h3 className="text-base font-semibold leading-6 text-gray-900 mb-4">Предпросмотр влияния</h3>
 
             <div className="grid grid-cols-3 gap-4 mb-4 text-center">
                 <div className="bg-red-50 p-2 rounded">
                     <span className="block text-xl font-bold text-red-700">{summary.blocking}</span>
-                    <span className="text-xs text-red-600 uppercase">Blocking</span>
+                    <span className="text-xs text-red-600 uppercase">Блокирующий</span>
                 </div>
                 <div className="bg-yellow-50 p-2 rounded">
                     <span className="block text-xl font-bold text-yellow-700">{summary.warning}</span>
-                    <span className="text-xs text-yellow-600 uppercase">Warning</span>
+                    <span className="text-xs text-yellow-600 uppercase">Внимание</span>
                 </div>
                 <div className="bg-blue-50 p-2 rounded">
                     <span className="block text-xl font-bold text-blue-700">{summary.info}</span>
-                    <span className="text-xs text-blue-600 uppercase">Info</span>
+                    <span className="text-xs text-blue-600 uppercase">Информация</span>
                 </div>
             </div>
 
@@ -56,7 +56,7 @@ export const ImpactPreviewPanel: React.FC<ImpactPreviewPanelProps> = ({ report, 
                     disabled={isSubmitting}
                     className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                 >
-                    Cancel
+                    Отмена
                 </button>
                 <button
                     onClick={onConfirm}

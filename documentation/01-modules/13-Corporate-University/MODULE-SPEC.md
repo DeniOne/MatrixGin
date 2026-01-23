@@ -15,22 +15,45 @@ status: PRODUCTION_READY
 
 ---
 
-## 1. СИСТЕМНАЯ РОЛЬ
+## 1. СТРУКТУРА МОДУЛЯ (DUAL LAYER)
 
-```
-Университет
- → развивает навыки
- → повышает управляемость результата
- → расширяет потолок квалификации
- → влияет на доступные коэффициенты
- → деньги появляются ТОЛЬКО через результат (PhotoCompany)
+### 1.1 FOUNDATIONAL IMMERSION (Admission Gate)
+**Статус:** MANDATORY PREREQUISITE  
+**Тип:** Admission Subsystem (NOT Education)  
+
+> [!CRITICAL]
+> **FOUNDATIONAL != COURSE**
+> - Не является "курсом" или "уроком"
+> - Не использует сущности `Course`, `Enrollment`, `Academy`
+> - Результат: бинарный (`ACCEPTED` / `NOT_ACCEPTED`)
+> - **Блокирует доступ** ко всему APPLIED слою пока не пройден
+
+**Состав:**
+1. **Immersion (Core)** — Конституция, Кодекс, Этика (Hard Gate)
+2. **Expanded** — углубленные материалы (Optional)
+
+### 1.2 APPLIED LAYER (Professional Education)
+**Статус:** ACCESS RESTRICTED (Requires FoundationAcceptance)  
+**Тип:** Skill Development & Result Management  
+
+**Состав:**
+- Факультеты и Академии
+- Курсы (`Course`) и Программы
+- Развитие навыков и специализаций
+- Влияние на коэффициенты (через результат)
 ```
 
 > [!CAUTION]
 > **КАНОН:**
 > - Курс НИКОГДА не начисляет деньги
-> - Курс МОЖЕТ: открыть допуск, расширить диапазон, снять ограничения, подготовить к ролям
+> - Курс МОЖЕТ:
+- расширить квалификационный диапазон
+- подготовить к роли
+- быть prerequisite для RoleContract
 
+Курс НЕ МОЖЕТ:
+- давать FoundationAcceptance
+- заменять FOUNDATIONAL IMMERSION
 ---
 
 ## 2. ГРАНИЦЫ И ЗАВИСИМОСТИ
@@ -60,18 +83,26 @@ status: PRODUCTION_READY
 
 ## 3. СУЩНОСТИ ДАННЫХ (DATA MODEL)
 
-### 3.1 Базовые сущности
+### 3.1 FOUNDATIONAL DOMAIN (Admission)
+- `FoundationAcceptance` (System State)
+- `FoundationAuditLog` (Compliance)
+- `FoundationVersion` (Governance)
 
+> **Constraint:** Эти сущности управляют доступом. Они НЕ связаны с контентом курсов.
+
+### 3.2 APPLIED DOMAIN (Education)
 - `Academy`
-- `Course` ⭐ (ключевая)
+- `Course` ⭐ (Core Entity of Applied Layer)
 - `CourseModule`
 - `Material`
 - `Enrollment`
-- `ModuleProgress`
 - `Certification`
-- `QualificationSnapshot`
 
-### 3.2 Course (обязательные поля)
+> **Constraint:** `Course` используется **ТОЛЬКО** в APPLIED LAYER.
+> Он **не может** создавать FoundationAcceptance или заменять собой Immersion.
+
+
+### 3.3 Course Entity Specification
 
 ```prisma
 model Course {

@@ -28,10 +28,10 @@ const TaskDetailsPage: React.FC = () => {
                     className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
                 >
                     <ArrowLeft className="w-5 h-5" />
-                    Back to Tasks
+                    Вернуться к задачам
                 </button>
                 <div className="bg-red-900/20 border border-red-800 rounded-lg p-6 text-red-400">
-                    Task not found
+                    Задача не найдена
                 </div>
             </div>
         );
@@ -77,7 +77,7 @@ const TaskDetailsPage: React.FC = () => {
                     className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
                 >
                     <ArrowLeft className="w-5 h-5" />
-                    Back to Tasks
+                    Вернуться к задачам
                 </button>
 
                 <div className="flex items-center gap-3">
@@ -96,7 +96,7 @@ const TaskDetailsPage: React.FC = () => {
                         className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
                     >
                         <Edit2 className="w-5 h-5" />
-                        Edit
+                        Редактировать
                     </button>
                 </div>
             </div>
@@ -118,9 +118,9 @@ const TaskDetailsPage: React.FC = () => {
 
                     {/* Comments Section (Placeholder) */}
                     <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                        <h2 className="text-lg font-semibold text-white mb-4">Comments</h2>
+                        <h2 className="text-lg font-semibold text-white mb-4">Комментарии</h2>
                         <div className="text-center py-8 text-gray-500">
-                            No comments yet
+                            Нет комментариев
                         </div>
                     </div>
                 </div>
@@ -129,29 +129,29 @@ const TaskDetailsPage: React.FC = () => {
                 <div className="space-y-6">
                     {/* Status */}
                     <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                        <h3 className="text-sm font-medium text-gray-400 mb-3">Status</h3>
+                        <h3 className="text-sm font-medium text-gray-400 mb-3">Статус</h3>
                         <select
                             value={task.status}
                             onChange={(e) => handleStatusChange(e.target.value as TaskStatus)}
                             className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
-                            <option value={TaskStatus.TODO}>To Do</option>
-                            <option value={TaskStatus.IN_PROGRESS}>In Progress</option>
-                            <option value={TaskStatus.REVIEW}>Review</option>
-                            <option value={TaskStatus.DONE}>Done</option>
-                            <option value={TaskStatus.ARCHIVED}>Archived</option>
+                            <option value={TaskStatus.TODO}>Нужно сделать</option>
+                            <option value={TaskStatus.IN_PROGRESS}>В работе</option>
+                            <option value={TaskStatus.REVIEW}>Проверка</option>
+                            <option value={TaskStatus.DONE}>Готово</option>
+                            <option value={TaskStatus.ARCHIVED}>Архив</option>
                         </select>
                     </div>
 
                     {/* Details */}
                     <div className="bg-gray-800 p-6 rounded-xl border border-gray-700 space-y-4">
-                        <h3 className="text-sm font-medium text-gray-400 mb-3">Details</h3>
+                        <h3 className="text-sm font-medium text-gray-400 mb-3">Подробнее</h3>
 
                         {task.dueDate && (
                             <div className="flex items-center gap-3">
                                 <Calendar className="w-5 h-5 text-gray-500" />
                                 <div>
-                                    <div className="text-xs text-gray-500">Due Date</div>
+                                    <div className="text-xs text-gray-500">Срок</div>
                                     <div className="text-sm text-white">
                                         {new Date(task.dueDate).toLocaleDateString()}
                                     </div>
@@ -163,8 +163,8 @@ const TaskDetailsPage: React.FC = () => {
                             <div className="flex items-center gap-3">
                                 <User className="w-5 h-5 text-gray-500" />
                                 <div>
-                                    <div className="text-xs text-gray-500">Assignee</div>
-                                    <div className="text-sm text-white">Assigned</div>
+                                    <div className="text-xs text-gray-500">Исполнитель</div>
+                                    <div className="text-sm text-white">Назначено</div>
                                 </div>
                             </div>
                         )}
@@ -173,7 +173,7 @@ const TaskDetailsPage: React.FC = () => {
                             <div className="flex items-center gap-3">
                                 <Tag className="w-5 h-5 text-yellow-500" />
                                 <div>
-                                    <div className="text-xs text-gray-500">Reward</div>
+                                    <div className="text-xs text-gray-500">Награда</div>
                                     <div className="text-sm text-yellow-400 font-semibold">
                                         +{task.mcReward} MC
                                     </div>
@@ -184,7 +184,7 @@ const TaskDetailsPage: React.FC = () => {
                         <div className="flex items-center gap-3">
                             <Clock className="w-5 h-5 text-gray-500" />
                             <div>
-                                <div className="text-xs text-gray-500">Created</div>
+                                <div className="text-xs text-gray-500">Создано</div>
                                 <div className="text-sm text-white">
                                     {new Date(task.createdAt).toLocaleDateString()}
                                 </div>
@@ -195,7 +195,7 @@ const TaskDetailsPage: React.FC = () => {
                             <div className="flex items-center gap-3">
                                 <CheckCircle className="w-5 h-5 text-green-500" />
                                 <div>
-                                    <div className="text-xs text-gray-500">Completed</div>
+                                    <div className="text-xs text-gray-500">Завершено</div>
                                     <div className="text-sm text-white">
                                         {new Date(task.completedAt).toLocaleDateString()}
                                     </div>
@@ -207,7 +207,7 @@ const TaskDetailsPage: React.FC = () => {
                     {/* Tags */}
                     {task.tags && task.tags.length > 0 && (
                         <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
-                            <h3 className="text-sm font-medium text-gray-400 mb-3">Tags</h3>
+                            <h3 className="text-sm font-medium text-gray-400 mb-3">Теги</h3>
                             <div className="flex flex-wrap gap-2">
                                 {task.tags.map((tag, index) => (
                                     <span

@@ -23,7 +23,7 @@ export const FsmBar: React.FC<FsmBarProps> = ({ fsm, currentState, onTransition,
     return (
         <div className="bg-white border-b border-gray-200 px-4 py-3 sm:flex sm:items-center sm:justify-between sm:px-6">
             <div className="flex items-center space-x-3">
-                <span className="text-sm font-medium text-gray-500">Current Status:</span>
+                <span className="text-sm font-medium text-gray-500">Текущий статус:</span>
                 <span className={twMerge(
                     "inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset",
                     currentState === 'active' ? "bg-green-50 text-green-700 ring-green-600/20" :

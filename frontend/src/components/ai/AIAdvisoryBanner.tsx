@@ -9,8 +9,8 @@ const AIAdvisoryBanner: React.FC = () => {
             </div>
             <div className="flex-1">
                 <h3 className="text-sm font-bold text-indigo-100 flex items-center gap-2">
-                    AI Advisory Layer
-                    <span className="text-[10px] bg-indigo-500/30 px-1.5 py-0.5 rounded text-indigo-300 uppercase font-black tracking-widest">Read-Only</span>
+                    Слой AI-советов
+                    <span className="text-[10px] bg-indigo-500/30 px-1.5 py-0.5 rounded text-indigo-300 uppercase font-black tracking-widest">Только чтение</span>
                 </h3>
                 <p className="text-xs text-indigo-300/80 mt-1 leading-relaxed">
                     Этот раздел содержит рекомендации, сгенерированные AI MatrixGin.

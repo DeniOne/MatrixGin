@@ -44,7 +44,7 @@ export const UniversalEntityForm: React.FC<Props> = ({ entityType, entityUrn, mo
             }
 
         } catch (e: any) {
-            notification.error({ message: 'Failed to load form', description: e.message });
+            notification.error({ message: 'Ошибка загрузки формы', description: e.message });
         } finally {
             setLoading(false);
         }
@@ -59,21 +59,21 @@ export const UniversalEntityForm: React.FC<Props> = ({ entityType, entityUrn, mo
                     type: entityType, // or projection.entity_type
                     attributes: values
                 });
-                notification.success({ message: 'Entity Created' });
+                notification.success({ message: 'Сущность создана' });
                 navigate(-1); // Go back
             } else {
                 await axios.put(`/api/registry/entities/${entityUrn}`, {
                     attributes: values
                 });
-                notification.success({ message: 'Entity Updated' });
+                notification.success({ message: 'Сущность обновлена' });
             }
         } catch (e: any) {
-            notification.error({ message: 'Operation Failed', description: e.response?.data?.message || e.message });
+            notification.error({ message: 'Ошибка операции', description: e.response?.data?.message || e.message });
         }
     };
 
     if (loading) return <Spin size="large" />;
-    if (!projection) return <div>No Form Data</div>;
+    if (!projection) return <div>Нет данных формы</div>;
 
     return (
         <Card title={projection.title}>
@@ -88,7 +88,7 @@ export const UniversalEntityForm: React.FC<Props> = ({ entityType, entityUrn, mo
                                     name={field.code}
                                     label={field.label}
                                     required={field.required}
-                                    rules={[{ required: field.required, message: 'Required' }]}
+                                    rules={[{ required: field.required, message: 'Обязательно' }]}
                                     tooltip={field.description}
                                 >
                                     {/* Delegate to FieldRenderer which now handles Static Text too */}
@@ -109,7 +109,7 @@ export const UniversalEntityForm: React.FC<Props> = ({ entityType, entityUrn, mo
 
                 {mode !== 'VIEW' && (
                     <div className="flex justify-end gap-2 mt-4">
-                        <Button onClick={() => navigate(-1)}>Cancel</Button>
+                        <Button onClick={() => navigate(-1)}>Отмена</Button>
                         <Button type="primary" htmlType="submit">
                             {mode === 'CREATE' ? 'Create' : 'Save Changes'}
                         </Button>
@@ -117,7 +117,7 @@ export const UniversalEntityForm: React.FC<Props> = ({ entityType, entityUrn, mo
                 )}
                 {mode === 'VIEW' && (
                     <div className="flex justify-end gap-2 mt-4">
-                        <Button onClick={() => navigate(-1)}>Back</Button>
+                        <Button onClick={() => navigate(-1)}>Назад</Button>
                     </div>
                 )}
             </Form>

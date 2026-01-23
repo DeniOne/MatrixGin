@@ -12,7 +12,7 @@ const WalletWidget: React.FC = () => {
         return (
             <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg">
                 <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-                <span className="text-sm text-gray-400">Loading...</span>
+                <span className="text-sm text-gray-400">Загрузка...</span>
             </div>
         );
     }
@@ -55,7 +55,7 @@ const WalletWidget: React.FC = () => {
                     <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50">
                         <div className="p-4 space-y-3">
                             <div>
-                                <div className="text-xs text-gray-400 mb-1">MatrixCoin Balance</div>
+                                <div className="text-xs text-gray-400 mb-1">Баланс MatrixCoin</div>
                                 <div className="flex items-center justify-between">
                                     <span className="text-lg font-bold text-yellow-500">
                                         {wallet.mcBalance.toLocaleString()} MC
@@ -63,13 +63,13 @@ const WalletWidget: React.FC = () => {
                                 </div>
                                 {wallet.mcFrozen && wallet.mcFrozen > 0 && (
                                     <div className="text-xs text-gray-500 mt-1">
-                                        Frozen: {wallet.mcFrozen.toLocaleString()} MC
+                                        Заморожено: {wallet.mcFrozen.toLocaleString()} MC
                                     </div>
                                 )}
                             </div>
 
                             <div className="border-t border-gray-700 pt-3">
-                                <div className="text-xs text-gray-400 mb-1">GoldenMatrixCoin Balance</div>
+                                <div className="text-xs text-gray-400 mb-1">Баланс GoldenMatrixCoin</div>
                                 <div className="flex items-center justify-between">
                                     <span className="text-lg font-bold text-purple-500">
                                         {wallet.gmcBalance.toLocaleString()} GMC
@@ -84,7 +84,7 @@ const WalletWidget: React.FC = () => {
                                 }}
                                 className="w-full mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors"
                             >
-                                View Transaction History
+                                Посмотреть историю транзакций
                             </button>
                         </div>
                     </div>

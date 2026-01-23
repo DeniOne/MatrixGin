@@ -136,7 +136,7 @@ export const RelationField: React.FC<FieldProps> = ({
         return (
             <Form.Item label={attribute.ui.label}>
                 <span className="text-red-500">
-                    Relation definition not found for: {attribute.name}
+                    Определение связи не найдено для: {attribute.name}
                 </span>
             </Form.Item>
         );

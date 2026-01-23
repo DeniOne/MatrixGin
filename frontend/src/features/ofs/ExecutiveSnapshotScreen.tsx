@@ -95,22 +95,22 @@ export const ExecutiveSnapshotScreen: React.FC = () => {
 
                 <SignalBlock
                     title="Structural Stability"
-                    data={isInsufficient ? { level: 'GRAY', summary: 'Data unavailable' } : snapshot.indicators.structural_stability}
+                    data={isInsufficient ? { level: 'GRAY', summary: 'Данные недоступны' } : snapshot.indicators.structural_stability}
                 />
 
                 <SignalBlock
                     title="Functional Coverage"
-                    data={isInsufficient ? { level: 'GRAY', summary: 'Data unavailable' } : snapshot.indicators.functional_coverage}
+                    data={isInsufficient ? { level: 'GRAY', summary: 'Данные недоступны' } : snapshot.indicators.functional_coverage}
                 />
 
                 <SignalBlock
-                    title="CPK Alignment"
-                    data={isInsufficient ? { level: 'GRAY', summary: 'Data unavailable' } : snapshot.indicators.cpk_alignment}
+                    title="Соответствие ЦПК"
+                    data={isInsufficient ? { level: 'GRAY', summary: 'Данные недоступны' } : snapshot.indicators.cpk_alignment}
                 />
 
                 <SignalBlock
                     title="Intellectual Support"
-                    data={isInsufficient ? { level: 'GRAY', summary: 'Data unavailable' } : snapshot.indicators.intellectual_support}
+                    data={isInsufficient ? { level: 'GRAY', summary: 'Данные недоступны' } : snapshot.indicators.intellectual_support}
                 />
 
             </div>

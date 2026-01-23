@@ -45,6 +45,25 @@ export class EnrollmentService {
             }
         }
 
+        // CANON v2: Foundation Check
+        // CANON v2.2: Foundation Check (Data Source: FoundationAcceptance)
+        if (course.type === 'APPLIED') {
+            const acceptance = await prisma.foundationAcceptance.findUnique({
+                where: { person_id: userId }
+            });
+
+            // TODO: Config active version
+            const ACTIVE_VERSION = 'v1.0';
+
+            if (!acceptance || acceptance.decision !== 'ACCEPTED') {
+                throw new Error('FOUNDATION_REQUIRED: You must accept the Foundation to enroll in Applied courses.');
+            }
+
+            if (acceptance.version !== ACTIVE_VERSION) {
+                throw new Error('FOUNDATION_VERSION_MISMATCH: Re-immersion required.');
+            }
+        }
+
         // Check if already enrolled
         const existing = await prisma.enrollment.findUnique({
             where: {
@@ -282,6 +301,10 @@ export class EnrollmentService {
             },
         });
 
+        // CANON v2.2: Foundation Completion is DECOUPLED from Course Completion.
+        // Immersion Blocks are not courses.
+        // Logic moved to FoundationService.
+
         // CANON: Register recognition (NOT direct MC award)
         // Decoupled via RewardService
         await this.registerRecognition(userId, enrollment.course);
@@ -423,7 +446,7 @@ export class EnrollmentService {
     private async registerRecognition(userId: string, course: any) {
         const { rewardService } = require('./reward.service');
 
-        // Register Eligibility Event (Decoupled Reward Logic)
+        // CANON: Register Eligibility Event (Decoupled Reward Logic)
         // CANON: Course = recognition (MC), NOT money
         if (course.recognition_mc > 0) {
             await rewardService.registerEligibility(
@@ -436,6 +459,89 @@ export class EnrollmentService {
 
         // NOTE: GMC rewards remain blocked by checkCanon in the RewardEngine
         // or explicitly ignored here per canonical rules.
+    }
+
+    /**
+     * Check if user has passed ALL mandatory foundational courses.
+     * If yes, flip the flag and log audit.
+     */
+    private async checkFoundationAcceptance(userId: string) {
+        // 1. Get mandatory foundational courses
+        const mandatoryFoundational = await prisma.course.findMany({
+            where: {
+                type: 'FOUNDATIONAL',
+                is_mandatory: true,
+                is_active: true
+            },
+            select: { id: true }
+        });
+
+        if (mandatoryFoundational.length === 0) return; // No mandatory foundation? Edge case.
+
+        // 2. Get user's completed courses
+        const completedEnrollments = await prisma.enrollment.findMany({
+            where: {
+                user_id: userId,
+                status: 'COMPLETED',
+                course: {
+                    type: 'FOUNDATIONAL'
+                }
+            },
+            select: { course_id: true }
+        });
+
+        const completedIds = new Set(completedEnrollments.map(e => e.course_id));
+        const allPassed = mandatoryFoundational.every(c => completedIds.has(c.id));
+
+        if (allPassed) {
+            const employee = await prisma.employee.findUnique({
+                where: { user_id: userId },
+                select: { is_foundational_accepted: true }
+            });
+
+            // Idempotency: only if not already accepted
+            if (!employee?.is_foundational_accepted) {
+                // Update Employee
+                await prisma.employee.update({
+                    where: { user_id: userId },
+                    data: {
+                        is_foundational_accepted: true,
+                        foundational_accepted_at: new Date()
+                    }
+                });
+
+                // Create Audit Log
+                const { FoundationAuditService } = require('./foundation-audit.service');
+                // Note: In a real app we'd inject this, but for now lazy requiring to avoid circular deps if any
+                // Ideally this method should be part of a proper module structure
+
+                // Since we can't easily inject a service into an already instantiated class in this file structure
+                // We will use prisma directly here or assume FoundationAuditService is available via import
+
+                // Let's use direct prisma call or import the service instance if exported (it's not exported as instance)
+                // We'll write to DB directly for the audit log here to be safe and simple within this file
+
+                await prisma.foundationAuditLog.create({
+                    data: {
+                        user_id: userId,
+                        accepted_by: 'SYSTEM',
+                        basis_courses: JSON.stringify(mandatoryFoundational.map(c => c.id)),
+                        metadata: JSON.stringify({ reason: 'All mandatory foundational courses completed' })
+                    }
+                });
+
+                // Emit event
+                await prisma.event.create({
+                    data: {
+                        type: 'FOUNDATIONAL_ACCEPTED' as any, // Cast as any if enum not yet updated in types
+                        source: 'enrollment_service',
+                        subject_id: userId,
+                        subject_type: 'user',
+                        payload: {}
+                    }
+                });
+            }
+        }
     }
 }
 

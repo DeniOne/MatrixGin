@@ -139,7 +139,7 @@ const OFSGraphContent = () => {
     if (loading) {
         return (
             <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-400 font-mono animate-pulse">
-                LOADING GRAPH DATA...
+                ЗАГРУЗКА ДАННЫХ...
             </div>
         );
     }
@@ -147,12 +147,12 @@ const OFSGraphContent = () => {
     if (!loading && dataNodes.length === 0) {
         return (
             <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 text-slate-400 font-mono gap-2">
-                <span>INSUFFICIENT DATA</span>
+                <span>НЕДОСТАТОЧНО ДАННЫХ</span>
                 <button
                     onClick={() => window.location.reload()}
                     className="text-xs text-blue-500 hover:underline"
                 >
-                    Retry
+                    Повторить
                 </button>
             </div>
         );
@@ -196,7 +196,7 @@ const OFSGraphContent = () => {
                     <Panel position="top-left" className="m-4">
                         <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-md border border-slate-200">
                             <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                            <span className="text-xs font-semibold text-slate-600">Focus Mode</span>
+                            <span className="text-xs font-semibold text-slate-600">Фокус-режим</span>
                             <button
                                 onClick={handleResetFocus}
                                 className="ml-2 p-0.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600"

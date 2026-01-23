@@ -28,7 +28,7 @@ export const TableRenderer: React.FC = () => {
 
     if (!viewDef) {
         if (loading) return null; // Wait for definition
-        return <Alert type="warning" message="No view definition found" showIcon />;
+        return <Alert type="warning" message="Определение представления не найдено" showIcon />;
     }
 
     const columns = ColumnFactory.createColumns(viewDef);

@@ -197,6 +197,7 @@ model User {
   qualification_level          QualificationLevel?          @relation(fields: [qualification_level_id], references: [id])
   erp_role                     Role?                        @relation(fields: [role_id], references: [id])
   wallet                       Wallet?
+  foundation_acceptance        FoundationAcceptance?
 
   @@map("users")
 }
@@ -787,6 +788,7 @@ model Course {
   updated_at      DateTime        @updatedAt
   expected_effect String
   scope           CourseScope
+  type            DisciplineType  @default(APPLIED)
   target_metric   TargetMetric
   created_by      String?
   certifications  Certification[]
@@ -1084,6 +1086,8 @@ model QualificationSnapshot {
   @@index([created_at])
   @@map("qualification_snapshots")
 }
+
+
 
 model RegistryEntity {
   urn             String   @id
@@ -1598,6 +1602,11 @@ enum CourseScope {
   GENERAL
 }
 
+enum DisciplineType {
+  FOUNDATIONAL
+  APPLIED
+}
+
 enum ProductionOrderStatus {
   DRAFT
   PLANNED
@@ -2018,4 +2027,43 @@ enum LinkType {
   REFERENCE // simple reference
   MANDATORY // required document
   EDUCATIONAL // for learning
+}
+
+// ==========================================================================
+// MODULE 13: CORPORATE UNIVERSITY - FOUNDATION LAYER (ADMISSION)
+// CANON 2.2: Single Source of Truth for Admission
+// ==========================================================================
+
+enum FoundationDecision {
+  ACCEPTED
+  NOT_ACCEPTED
+  REVOKED
+}
+
+model FoundationAcceptance {
+  id            String             @id @default(uuid())
+  person_id     String             @unique // One acceptance per person (User)
+  version       String             // "v1.0", "v2.2" - binds acceptance to specific Canon version
+  decision      FoundationDecision
+  accepted_at   DateTime           @default(now())
+  valid_until   DateTime?
+  
+  user          User               @relation(fields: [person_id], references: [id])
+
+  @@map("foundation_acceptances")
+}
+
+model FoundationAuditLog {
+  id                   String   @id @default(uuid())
+  user_id              String
+  event_type           String   // BLOCK_VIEWED, DECISION_MADE, BLOCKED_ACCESS
+  timestamp            DateTime @default(now())
+  metadata             Json?    // version, context, IP, etc.
+  
+  // Optional link to acceptance if decision was made
+  foundation_version   String?
+
+  @@index([user_id])
+  @@index([timestamp])
+  @@map("foundation_audit_logs")
 }

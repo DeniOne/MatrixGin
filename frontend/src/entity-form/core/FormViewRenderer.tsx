@@ -48,7 +48,7 @@ export const FormViewRenderer: React.FC<FormViewRendererProps> = ({ viewDef, onS
         if (!attribute) {
             return (
                 <div key={fieldDef.field} className="text-red-500 text-xs p-2 border border-dashed border-red-300 rounded">
-                    Field "{fieldDef.field}" not found in entity card
+                    Поле "{fieldDef.field}" не найдено в карточке сущности
                 </div>
             );
         }

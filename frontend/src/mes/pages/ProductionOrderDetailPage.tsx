@@ -43,16 +43,16 @@ const ProductionOrderDetailPage: React.FC = () => {
         }
     };
 
-    if (!order) return <div>Loading...</div>;
+    if (!order) return <div>Загрузка...</div>;
 
     return (
         <div style={{ padding: 24 }}>
             <Card title={`Order ${order.product_type} (${order.status})`} loading={loading}>
                 <Descriptions bordered>
                     <Descriptions.Item label="ID">{order.id}</Descriptions.Item>
-                    <Descriptions.Item label="Quantity">{order.quantity}</Descriptions.Item>
-                    <Descriptions.Item label="Source">{order.source_type}</Descriptions.Item>
-                    <Descriptions.Item label="Status"><Tag color="blue">{order.status}</Tag></Descriptions.Item>
+                    <Descriptions.Item label="Количество">{order.quantity}</Descriptions.Item>
+                    <Descriptions.Item label="Источник">{order.source_type}</Descriptions.Item>
+                    <Descriptions.Item label="Статус"><Tag color="blue">{order.status}</Tag></Descriptions.Item>
                 </Descriptions>
             </Card>
 
@@ -73,10 +73,10 @@ const ProductionOrderDetailPage: React.FC = () => {
                     </TabPane>
                     <TabPane tab="Quality & Defects" key="2">
                         <Button type="primary" onClick={() => setIsQCModalVisible(true)} style={{ marginBottom: 16 }}>
-                            Register Quality Check
+                            Проверка качества реестра
                         </Button>
 
-                        <h3>Checks</h3>
+                        <h3>Проверки</h3>
                         <List
                             dataSource={order.quality_checks || []}
                             renderItem={item => (
@@ -87,7 +87,7 @@ const ProductionOrderDetailPage: React.FC = () => {
                             )}
                         />
 
-                        <h3>Defects</h3>
+                        <h3>Дефекты</h3>
                         <List
                             dataSource={order.defects || []}
                             renderItem={item => (
@@ -102,26 +102,26 @@ const ProductionOrderDetailPage: React.FC = () => {
             </div>
 
             <Modal
-                title="Register Quality Check"
+                title="Проверка качества реестра"
                 open={isQCModalVisible}
                 onCancel={() => setIsQCModalVisible(false)}
                 onOk={() => qcForm.submit()}
             >
                 <Form form={qcForm} onFinish={handleQCSubmit} layout="vertical">
-                    <Form.Item name="check_type" label="Type" initialValue="VISUAL">
+                    <Form.Item name="check_type" label="Тип" initialValue="VISUAL">
                         <Select>
-                            <Select.Option value="VISUAL">Visual</Select.Option>
-                            <Select.Option value="MEASUREMENT">Measurement</Select.Option>
-                            <Select.Option value="FUNCTIONAL">Functional</Select.Option>
+                            <Select.Option value="VISUAL">Визуальный</Select.Option>
+                            <Select.Option value="MEASUREMENT">Измерение</Select.Option>
+                            <Select.Option value="FUNCTIONAL">Функциональный</Select.Option>
                         </Select>
                     </Form.Item>
-                    <Form.Item name="result" label="Result" initialValue="PASS">
+                    <Form.Item name="result" label="Результат" initialValue="PASS">
                         <Radio.Group>
                             <Radio value="PASS">PASS</Radio>
                             <Radio value="FAIL">FAIL</Radio>
                         </Radio.Group>
                     </Form.Item>
-                    <Form.Item name="comments" label="Comments">
+                    <Form.Item name="comments" label="Комментарии">
                         <Input.TextArea />
                     </Form.Item>
                 </Form>

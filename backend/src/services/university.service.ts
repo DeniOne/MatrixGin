@@ -225,9 +225,23 @@ export class UniversityService {
             },
         });
 
-        // Filter by grade level
+        // CANON v2.2: Foundation Visibility Guard
+        // If not accepted, user sees NO Applied courses.
+        const acceptance = await prisma.foundationAcceptance.findUnique({
+            where: { person_id: userId }
+        });
+
+        const isAccepted = acceptance?.decision === 'ACCEPTED';
+        // TODO: Version check if needed
+
+        // Filter by grade level AND Foundation status
         return courses
             .filter((course) => {
+                // Foundation Filter: Hide APPLIED if not accepted
+                if (course.type === 'APPLIED' && !isAccepted) {
+                    return false;
+                }
+
                 const requiredGradeLevel = grades[course.required_grade as string] || 0;
                 return requiredGradeLevel <= userGradeLevel;
             })
@@ -504,6 +518,15 @@ export class UniversityService {
 
         if (!user) {
             throw new Error('User not found');
+        }
+
+        // CANON v2.2: Foundation Check
+        const acceptance = await prisma.foundationAcceptance.findUnique({
+            where: { person_id: userId }
+        });
+
+        if (!acceptance || acceptance.decision !== 'ACCEPTED') {
+            return []; // No applied recommendations until Foundation is accepted
         }
 
         // TODO: Integrate with PhotoCompany service to get real metrics

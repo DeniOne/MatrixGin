@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { getStatusName } from '../../features/auth/roleTranslations';
+
 interface StatusBadgeProps {
     code: string;
     description: string;
@@ -18,7 +20,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ code, description }) =
     return (
         <div className="inline-flex items-center gap-2">
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${colorClass}`}>
-                {code}
+                {getStatusName(code)}
             </span>
             <span className="text-sm text-gray-600">{description}</span>
         </div>

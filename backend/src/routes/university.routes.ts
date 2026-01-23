@@ -8,11 +8,16 @@ import { universityController } from '../controllers/university.controller';
 import { enrollmentController } from '../controllers/enrollment.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { requireRole } from '../middleware/roles.middleware';
+import { foundationMiddleware } from '../middleware/foundation.middleware';
 
 const router = Router();
 
 // All routes require authentication
 router.use(authenticate);
+
+// CANON v2.2: HARD BLOCK for all Applied University features
+// Foundational Immersion flows must be in a separate router or explicitly excluded
+router.use(foundationMiddleware);
 
 // ===== Academy Routes =====
 

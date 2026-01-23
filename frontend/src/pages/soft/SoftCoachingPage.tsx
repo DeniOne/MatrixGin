@@ -175,7 +175,7 @@ const SoftCoachingPage: React.FC = () => {
                         </h2>
                         <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
                             <div className="flex items-center mb-3">
-                                <img src={coaches[0].image} alt="Coach" className="w-10 h-10 rounded-full mr-3 border-2 border-white/20" />
+                                <img src={coaches[0].image} alt="Коуч" className="w-10 h-10 rounded-full mr-3 border-2 border-white/20" />
                                 <div>
                                     <div className="font-bold text-sm">Елена Смирнова</div>
                                     <div className="text-xs opacity-70">Review прогресса</div>

@@ -201,7 +201,7 @@ export const UniversitySecurityDashboard: React.FC = () => {
                                             <Text strong>Метаданные сессии:</Text>
                                             <Paragraph className="mt-2 text-xs text-slate-400 font-mono">
                                                 IP: {record.context.metadata?.ipAddress || 'unknown'}<br />
-                                                Score: {record.context.confidenceScore}
+                                                Баллы: {record.context.confidenceScore}
                                             </Paragraph>
                                         </Col>
                                     </Row>

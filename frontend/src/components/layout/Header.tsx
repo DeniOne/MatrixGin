@@ -40,7 +40,7 @@ const Header: React.FC = () => {
 
                     <div className="h-10 w-10 rounded-full bg-gray-700 flex items-center justify-center border border-gray-600">
                         {user?.avatar ? (
-                            <img src={user.avatar} alt="User" className="h-10 w-10 rounded-full object-cover" />
+                            <img src={user.avatar} alt="Пользователь" className="h-10 w-10 rounded-full object-cover" />
                         ) : (
                             <UserIcon className="w-6 h-6 text-gray-400" />
                         )}
@@ -49,7 +49,7 @@ const Header: React.FC = () => {
                     <button
                         onClick={handleLogout}
                         className="p-2 text-gray-400 hover:text-red-400 rounded-full hover:bg-gray-800 transition-colors ml-2"
-                        title="Logout"
+                        title="Выйти"
                     >
                         <LogOut className="w-5 h-5" />
                     </button>

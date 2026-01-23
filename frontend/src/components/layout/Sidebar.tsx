@@ -57,7 +57,7 @@ const Sidebar: React.FC = () => {
 
     const navItems: NavItem[] = [
         { path: '/', label: 'Дашборд', icon: LayoutDashboard },
-        { path: '/manager', label: 'Manager Hub', icon: Briefcase },
+        { path: '/manager', label: 'Кабинет руководителя', icon: Briefcase },
         { path: '/profile', label: 'Мой профиль', icon: User },
         { path: '/tasks', label: 'Задачи', icon: CheckSquare },
         {
@@ -88,7 +88,7 @@ const Sidebar: React.FC = () => {
                 { path: '/photocraft', label: 'Фотомастерство', icon: GraduationCap },
                 { path: '/sales', label: 'Продажи и сервис', icon: GraduationCap },
                 { path: '/culture', label: 'Корпоративная культура', icon: GraduationCap },
-                { path: '/soft', label: 'Soft Skills', icon: GraduationCap },
+                { path: '/soft', label: 'Гибкие навыки', icon: GraduationCap },
                 { path: '/tech', label: 'Технологии', icon: GraduationCap },
                 { path: '/mgmt', label: 'Менеджмент', icon: GraduationCap },
                 { path: '/trainers', label: 'Институт обучающих', icon: Users },

@@ -22,7 +22,7 @@ export const RelationshipSelector: React.FC<RelationshipSelectorProps> = ({
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
             <div className="bg-white rounded-lg p-6 w-96 shadow-xl">
-                <h3 className="text-lg font-medium mb-4">Select {targetType}</h3>
+                <h3 className="text-lg font-medium mb-4">Выбрать {targetType}</h3>
 
                 <div className="mb-4">
                     <select
@@ -30,7 +30,7 @@ export const RelationshipSelector: React.FC<RelationshipSelectorProps> = ({
                         value={selected}
                         onChange={(e) => setSelected(e.target.value)}
                     >
-                        <option value="">Select an entity...</option>
+                        <option value="">Выберите сущность...</option>
                         {options.map(opt => (
                             <option key={opt.value} value={opt.value}>{opt.label}</option>
                         ))}
@@ -42,14 +42,14 @@ export const RelationshipSelector: React.FC<RelationshipSelectorProps> = ({
                         onClick={onCancel}
                         className="px-4 py-2 text-gray-700 bg-gray-100 rounded hover:bg-gray-200"
                     >
-                        Cancel
+                        Отмена
                     </button>
                     <button
                         onClick={() => selected && onSelect(selected)}
                         disabled={!selected}
                         className="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50"
                     >
-                        Select
+                        Выбрать
                     </button>
                 </div>
             </div>

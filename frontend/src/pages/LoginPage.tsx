@@ -36,7 +36,7 @@ const LoginPage: React.FC = () => {
                         MatrixGin v2.0
                     </h2>
                     <p className="mt-2 text-sm text-gray-400">
-                        Sign in to access the system
+                        Войдите в систему
                     </p>
                 </div>
 
@@ -53,7 +53,7 @@ const LoginPage: React.FC = () => {
                                 autoComplete="email"
                                 required
                                 className="appearance-none rounded-t-md relative block w-full px-3 py-3 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Email address"
+                                placeholder="Email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
@@ -69,7 +69,7 @@ const LoginPage: React.FC = () => {
                                 autoComplete="current-password"
                                 required
                                 className="appearance-none rounded-b-md relative block w-full px-3 py-3 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                placeholder="Password"
+                                placeholder="Пароль"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />

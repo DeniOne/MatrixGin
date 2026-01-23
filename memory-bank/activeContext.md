@@ -21,6 +21,9 @@ MatrixGin должен трансформироваться из **систем�
 - **Sprint 14 Completed**: **Module 09 (Status & Ranks)** implementation.
   - **Backend**: Managed statuses (MANUAL) and automated Ranks (GMC-based).
   - **Frontend**: Status Management Admin UI and Profile badges.
+- **Language Migration (Frontend)**: ✅ **COMPLETED 2026-01-24**.
+  - Frontend UI fully translated to Russian (Foundation, Manager Hub, Profile, Wallet).
+  - Scripts `generate-translation-registry.ts` and `apply-translation.ts` added to `backend/scripts`.
 - **Verification**: ✅ Module 09 implementation and build passed.
 
 ## GAP-анализ модулей (Updated 2026-01-22)

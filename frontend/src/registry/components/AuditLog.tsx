@@ -33,10 +33,10 @@ const AuditLog: React.FC<AuditLogProps> = ({ logs, isLoading }) => {
             <table className="w-full text-left text-xs text-slate-400">
                 <thead className="bg-slate-900 text-[10px] uppercase text-slate-500 font-mono">
                     <tr>
-                        <th className="px-4 py-2 w-32">Timestamp (UTC)</th>
+                        <th className="px-4 py-2 w-32">Метка времени (UTC)</th>
                         <th className="px-4 py-2 w-32">Actor</th>
                         <th className="px-4 py-2 w-32">Operation</th>
-                        <th className="px-4 py-2">Details</th>
+                        <th className="px-4 py-2">Подробнее</th>
                     </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/50 font-mono">

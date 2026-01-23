@@ -36,7 +36,7 @@ export default function StatusQualificationOverlay() {
                 <div className="bg-gray-800/50 p-3 rounded-xl border border-purple-500/20 flex flex-col items-center">
                     <TrendingUp className="w-4 h-4 text-purple-400 mb-2" />
                     <span className="text-lg font-bold text-white">{data.universe}</span>
-                    <span className="text-[8px] text-gray-500 font-bold uppercase mt-1">Universe</span>
+                    <span className="text-[8px] text-gray-500 font-bold uppercase mt-1">Вселенная</span>
                 </div>
             </div>
 

@@ -80,6 +80,7 @@ MEMORY BANK WORKFLOW
 
 1. **READ memory-bank** — TECHLEAD должен прочитать все файлы в `f:\Matrix_Gin\memory-bank\`:
    - `projectbrief.md` — общее описание проекта
+   - `LANGUAGE_POLICY.md` - политика языкового режима (обязательно) 
    - `techContext.md` — технический контекст
    - `systemPatterns.md` — архитектурные паттерны
    - `activeContext.md` — текущий контекст работы
@@ -102,6 +103,7 @@ MEMORY BANK WORKFLOW
 - ✅ API endpoints с примерами
 - ✅ Database schema changes
 - ✅ Критические design decisions
+- ✅ Подтвержение что соблюдена политика языкового режима
 - ❌ НЕ записывать: мелкие фиксы, рефакторинг, UI tweaks
 
 **Цель:** Каждая новая сессия должна начинаться с полного контекста проекта.

@@ -46,8 +46,8 @@ const StatusProgressCard: React.FC = () => {
         }
     }, [statusData, rankData]);
 
-    if (loadingStatus || loadingRank) return <div className="loader">Loading status...</div>;
-    if (errorStatus || errorRank) return <div className="error">Failed to load status.</div>;
+    if (loadingStatus || loadingRank) return <div className="loader">Загрузка статуса...</div>;
+    if (errorStatus || errorRank) return <div className="error">Ошибка загрузки статуса.</div>;
 
     const current = statusData?.status;
     const allLevels: StatusLevel[] = [
@@ -61,7 +61,7 @@ const StatusProgressCard: React.FC = () => {
 
     return (
         <div className="status-progress-card">
-            <h2>Your Gamification Status</h2>
+            <h2>Ваш статус геймификации</h2>
             {currentLevelObj && (
                 <div className="current-status">
                     <span className="badge">{currentLevelObj.name}</span>
@@ -70,11 +70,11 @@ const StatusProgressCard: React.FC = () => {
             )}
             {nextLevel ? (
                 <>
-                    <h3>Next Level: {nextLevel.name}</h3>
+                    <h3>Следующий уровень: {nextLevel.name}</h3>
                     <div className="progress-bar">
                         <div className="filled" style={{ width: `${progressPercent}%` }} />
                     </div>
-                    <p>{progressPercent}% towards next level</p>
+                    <p>{progressPercent}% до следующего уровня</p>
                     <ul className="requirements">
                         {Object.entries(nextLevel.requirements).map(([key, value]) => (
                             <li key={key}>{key}: {String(value)}</li>
@@ -82,7 +82,7 @@ const StatusProgressCard: React.FC = () => {
                     </ul>
                 </>
             ) : (
-                <p>Congratulations! You have reached the highest level.</p>
+                <p>Поздравляем! Вы достигли максимального уровня.</p>
             )}
         </div>
     );

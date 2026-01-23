@@ -120,7 +120,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                             Перетащите файлы сюда или{' '}
                             <span className="text-blue-600 hover:text-blue-700">выберите</span>
                         </p>
-                        <p className="text-xs text-gray-500">PDF, JPG, PNG до 10MB</p>
+                        <p className="text-xs text-gray-500">PDF, JPG, PNG до 10МБ</p>
                     </div>
                 )}
             </div>

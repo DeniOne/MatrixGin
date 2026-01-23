@@ -9,7 +9,7 @@ const WalletPage: React.FC = () => {
     const { data: wallet, isLoading: isWalletLoading } = useGetWalletQuery();
     const { data: transactionsData, isLoading: isTxLoading } = useGetTransactionsQuery({ limit: 5 });
 
-    if (isWalletLoading) return <div className="p-8 text-indigo-500 animate-pulse">Loading wallet context...</div>;
+    if (isWalletLoading) return <div className="p-8 text-indigo-500 animate-pulse">Загрузка данных кошелька...</div>;
 
     const transactions = transactionsData?.data || [];
 
@@ -34,7 +34,7 @@ const WalletPage: React.FC = () => {
                     <div className="relative z-10 space-y-6">
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                            <h3 className="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.2em]">Operational Assets</h3>
+                            <h3 className="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.2em]">Операционные Активы</h3>
                         </div>
                         <div className="flex items-baseline gap-3">
                             <div className="text-6xl font-black text-white tracking-tighter">
@@ -64,7 +64,7 @@ const WalletPage: React.FC = () => {
                     <div className="relative z-10 space-y-6">
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                            <h3 className="text-amber-400 text-[10px] font-bold uppercase tracking-[0.2em]">Strategic Capital</h3>
+                            <h3 className="text-amber-400 text-[10px] font-bold uppercase tracking-[0.2em]">Стратегический Капитал</h3>
                         </div>
                         <div className="flex items-baseline gap-3">
                             <div className="text-6xl font-black text-white tracking-tighter">

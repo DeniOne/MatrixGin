@@ -14,7 +14,8 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "prisma": "prisma",
     "prisma:dev": "prisma migrate dev",
-    "prisma:generate": "prisma generate"
+    "prisma:generate": "prisma generate",
+    "migrate:foundation": "ts-node scripts/backfill-foundation.ts"
   },
   "keywords": [],
   "author": "",

@@ -165,6 +165,23 @@ export class RoleMatrixService {
         assigned_by: string;
         reason?: string;
     }) {
+        // CANON v2.2: Hard Gate - Foundation Check
+        const acceptance = await prisma.foundationAcceptance.findUnique({
+            where: { person_id: data.employee_id }
+        });
+
+        // 2026-01-23: Strict Versioning Support
+        // TODO: Load active version from config
+        const ACTIVE_VERSION = 'v1.0';
+
+        if (!acceptance || acceptance.decision !== 'ACCEPTED') {
+            throw new Error(`FOUNDATION_REQUIRED: Cannot assign role to user ${data.employee_id} without Foundation Acceptance.`);
+        }
+
+        if (acceptance.version !== ACTIVE_VERSION) {
+            throw new Error(`FOUNDATION_VERSION_MISMATCH: User ${data.employee_id} has outdated Foundation version.`);
+        }
+
         // Deactivate current roles
         await prisma.$executeRaw`
             UPDATE employee_roles 

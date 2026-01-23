@@ -3,7 +3,10 @@
  */
 
 import React, { useState } from 'react';
-useGetMyCoursesQuery,
+import {
+    useGetAcademiesQuery,
+    useGetAvailableCoursesQuery,
+    useGetMyCoursesQuery,
     useGetTrainerDashboardQuery
 } from '../features/university/api/universityApi';
 import { AcademyCard } from '../features/university/components/AcademyCard';
