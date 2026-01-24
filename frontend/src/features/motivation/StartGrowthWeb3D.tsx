@@ -20,7 +20,7 @@ interface StartGrowthWeb3DProps {
 
 // --- CONSTANTS ---
 const NODE_COLOR_ACTIVE = '#10B981'; // Emerald-500
-const CONNECTION_COLOR = '#9CA3AF'; // Gray-400
+const CONNECTION_COLOR = '#64748b'; // Slate-500 (visible on white)
 
 // --- SUB-COMPONENTS ---
 
@@ -44,7 +44,7 @@ function SkillNode({ node }: { node: GrowthNode }) {
                 <meshStandardMaterial color={node.color} emissive={node.color} emissiveIntensity={0.5} />
             </mesh>
             <Html distanceFactor={10}>
-                <div className="bg-gray-900/80 text-white text-xs px-2 py-1 rounded backdrop-blur-sm whitespace-nowrap border border-gray-700">
+                <div className="bg-white/90 text-[#030213] text-xs px-2 py-1 rounded backdrop-blur-sm whitespace-nowrap border border-black/10 shadow-sm font-medium">
                     {node.label}: {node.value}%
                 </div>
             </Html>
@@ -126,22 +126,22 @@ export const StartGrowthWeb3D: React.FC<StartGrowthWeb3DProps> = ({ quality, spe
     ], [quality, speed, sales, team]);
 
     return (
-        <div className="h-64 w-full bg-slate-900 rounded-xl overflow-hidden border border-slate-700 shadow-inner relative">
+        <div className="h-64 w-full bg-white rounded-2xl overflow-hidden border border-black/10 shadow-sm relative">
             {/* Instruction Overlay (Read-Only) */}
             <div className="absolute top-2 left-2 z-10 pointer-events-none">
-                <span className="text-xs text-slate-400 bg-slate-800/50 px-2 py-1 rounded">
+                <span className="text-xs text-[#717182] bg-white/80 border border-black/5 px-2 py-1 rounded backdrop-blur-sm font-medium">
                     Используйте мышь для вращения • Только чтение
                 </span>
             </div>
 
             <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
-                <ambientLight intensity={0.5} />
-                <pointLight position={[10, 10, 10]} />
+                <ambientLight intensity={0.8} />
+                <pointLight position={[10, 10, 10]} intensity={1.2} />
 
                 {/* Central Core */}
                 <mesh position={[0, 0, 0]}>
                     <sphereGeometry args={[0.2, 16, 16]} />
-                    <meshStandardMaterial color="#ffffff" />
+                    <meshStandardMaterial color="#4f46e5" />
                 </mesh>
 
                 <WebConnections nodes={nodes} />

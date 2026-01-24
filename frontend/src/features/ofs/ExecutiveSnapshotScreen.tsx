@@ -50,7 +50,7 @@ export const ExecutiveSnapshotScreen: React.FC = () => {
     }, []);
 
     if (loading) {
-        return <div className="p-8 text-gray-500">System Analysis in progress...</div>;
+        return <div className="p-8 text-[#717182]">System Analysis in progress...</div>;
     }
 
     if (!snapshot) return null;
@@ -64,10 +64,10 @@ export const ExecutiveSnapshotScreen: React.FC = () => {
             <header className="mb-8 flex justify-between items-end border-b border-gray-200 pb-4">
                 <div>
                     <h1 className="text-3xl font-light text-gray-800 tracking-tight">System Registry</h1>
-                    <p className="text-sm text-gray-500 mt-1">Executive Strategic Panel</p>
+                    <p className="text-sm text-[#717182] mt-1">Executive Strategic Panel</p>
                 </div>
                 <div className="text-right">
-                    <div className="text-xs text-gray-400 uppercase">Last Updated</div>
+                    <div className="text-xs text-[#717182] uppercase">Last Updated</div>
                     <div className="text-sm font-mono text-gray-600">
                         {new Date(snapshot.meta.timestamp).toLocaleTimeString()}
                     </div>
@@ -76,8 +76,8 @@ export const ExecutiveSnapshotScreen: React.FC = () => {
 
             {/* SCENARIO BANNER */}
             {isScenario && (
-                <div className="mb-6 bg-slate-800 text-white px-4 py-3 rounded-md shadow-lg flex justify-between items-center">
-                    <span className="font-bold tracking-wide">SCENARIO PREVIEW MODE</span>
+                <div className="mb-6 bg-slate-800 text-[#030213] px-4 py-3 rounded-md shadow-lg flex justify-between items-center">
+                    <span className="font-medium tracking-wide">SCENARIO PREVIEW MODE</span>
                     <span className="text-xs opacity-75">Changes are in-memory only. Not saved to Registry.</span>
                 </div>
             )}
@@ -85,7 +85,7 @@ export const ExecutiveSnapshotScreen: React.FC = () => {
             {/* FAIL-SAFE BANNER */}
             {isInsufficient && (
                 <div className="mb-6 bg-gray-200 text-gray-600 px-4 py-3 rounded-md flex justify-between items-center">
-                    <span className="font-bold">DATA UNAVAILABLE</span>
+                    <span className="font-medium">DATA UNAVAILABLE</span>
                     <span className="text-sm">Registry Read Adapter is unreachable.</span>
                 </div>
             )}
@@ -116,7 +116,7 @@ export const ExecutiveSnapshotScreen: React.FC = () => {
             </div>
 
             {/* FOOTER */}
-            <footer className="mt-12 text-center text-xs text-gray-400">
+            <footer className="mt-12 text-center text-xs text-[#717182]">
                 MatrixGin v2.x • OFS Module 04 • Confidential Executive Access
             </footer>
         </div>

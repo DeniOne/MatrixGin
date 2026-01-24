@@ -62,12 +62,12 @@ const RecommendationFeedbackPanel: React.FC<RecommendationFeedbackPanelProps> = 
     };
 
     return (
-        <div className="space-y-6 p-6 bg-gray-900/40 border border-gray-800 rounded-2xl">
+        <div className="space-y-6 p-6 bg-white/40 border border-black/10 rounded-2xl">
             <div className="space-y-2">
-                <h4 className="text-sm font-black text-gray-400 uppercase tracking-widest">
+                <h4 className="text-sm font-medium text-[#717182] uppercase tracking-widest">
                     Насколько полезна эта рекомендация?
                 </h4>
-                <p className="text-xs text-gray-500 font-light">
+                <p className="text-xs text-[#717182] font-light">
                     Ваш отзыв помогает улучшить качество рекомендаций, но не влияет на систему автоматически.
                 </p>
             </div>
@@ -99,7 +99,7 @@ const RecommendationFeedbackPanel: React.FC<RecommendationFeedbackPanelProps> = 
 
             {/* Опциональный комментарий */}
             <div className="space-y-2">
-                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                <label className="text-xs font-medium text-[#717182] uppercase tracking-widest">
                     Комментарий (опционально)
                 </label>
                 <textarea
@@ -108,13 +108,13 @@ const RecommendationFeedbackPanel: React.FC<RecommendationFeedbackPanelProps> = 
                     maxLength={500}
                     placeholder="Поделитесь деталями..."
                     disabled={isSuccess}
-                    className="w-full p-3 bg-gray-950 border border-gray-800 rounded-xl text-sm text-gray-300 placeholder-gray-600 focus:border-indigo-500 focus:outline-none transition-colors disabled:opacity-50 resize-none"
+                    className="w-full p-3 bg-gray-950 border border-black/10 rounded-xl text-sm text-gray-300 placeholder-gray-600 focus:border-indigo-500 focus:outline-none transition-colors disabled:opacity-50 resize-none"
                     rows={3}
                 />
                 <div className="flex justify-between items-center text-xs">
                     <span className="text-gray-600">{comment.length}/500</span>
                     {comment.length >= 450 && (
-                        <span className="text-amber-500 font-bold">Приближается лимит</span>
+                        <span className="text-amber-500 font-medium">Приближается лимит</span>
                     )}
                 </div>
             </div>
@@ -123,7 +123,7 @@ const RecommendationFeedbackPanel: React.FC<RecommendationFeedbackPanelProps> = 
             <button
                 onClick={handleSubmit}
                 disabled={!selectedType || isLoading || isSuccess}
-                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-800 disabled:text-gray-600 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-800 disabled:text-gray-600 text-[#030213] font-medium uppercase tracking-widest text-xs rounded-xl transition-all disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
                 {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                 {isSuccess ? '✓ Отправлено' : 'Отправить отзыв'}
@@ -156,13 +156,13 @@ const FeedbackButton: React.FC<FeedbackButtonProps> = ({
                 p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2
                 ${selected
                     ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300'
-                    : 'bg-gray-900/40 border-gray-800 text-gray-500 hover:border-gray-700'
+                    : 'bg-white/40 border-black/10 text-[#717182] hover:border-gray-700'
                 }
                 disabled:opacity-50 disabled:cursor-not-allowed
             `}
         >
             {icon}
-            <span className="text-xs font-bold uppercase tracking-wider">{label}</span>
+            <span className="text-xs font-medium uppercase tracking-wider">{label}</span>
         </button>
     );
 };

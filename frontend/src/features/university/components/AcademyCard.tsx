@@ -25,7 +25,7 @@ export const AcademyCard: React.FC<AcademyCardProps> = ({ academy }) => {
                     />
                 )}
                 <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    <h3 className="text-xl font-medium text-gray-900 mb-2">
                         {academy.name}
                     </h3>
                     {academy.description && (
@@ -33,7 +33,7 @@ export const AcademyCard: React.FC<AcademyCardProps> = ({ academy }) => {
                             {academy.description}
                         </p>
                     )}
-                    <div className="flex items-center space-x-4 text-sm text-gray-500">
+                    <div className="flex items-center space-x-4 text-sm text-[#717182]">
                         <span className="flex items-center">
                             <svg
                                 className="w-4 h-4 mr-1"

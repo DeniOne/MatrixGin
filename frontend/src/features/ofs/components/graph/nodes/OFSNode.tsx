@@ -80,7 +80,7 @@ const OFSNode = ({ data }: NodeProps<OFSNodeData>) => {
             {/* Scenario Badge */}
             {deltaBadge && (
                 <div className={clsx(
-                    'absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-white text-xs font-bold shadow-sm',
+                    'absolute -top-2 -right-2 w-5 h-5 flex items-center justify-center rounded-full text-[#030213] text-xs font-medium shadow-sm',
                     deltaBadge.color
                 )}>
                     {deltaBadge.label}
@@ -89,7 +89,7 @@ const OFSNode = ({ data }: NodeProps<OFSNodeData>) => {
 
             {/* Node Content */}
             <div className="flex flex-col items-center gap-1">
-                <span className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold select-none">
+                <span className="text-[10px] uppercase tracking-wider text-[#717182] font-medium select-none">
                     {type}
                 </span>
                 <span className={clsx(

@@ -74,7 +74,7 @@ const PhotoShiftsPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center mb-2">
+          <h1 className="text-3xl font-medium text-gray-900 flex items-center mb-2">
             <Calendar className="w-8 h-8 mr-3 text-blue-600" />
             Практические смены
           </h1>
@@ -82,7 +82,7 @@ const PhotoShiftsPage: React.FC = () => {
             Записывайтесь на практику для отработки навыков в реальных условиях
           </p>
         </div>
-        <button className="mt-4 md:mt-0 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+        <button className="mt-4 md:mt-0 bg-blue-600 text-[#030213] px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
           Мое расписание
         </button>
       </div>
@@ -91,28 +91,28 @@ const PhotoShiftsPage: React.FC = () => {
       <div className="flex flex-wrap gap-2 mb-6">
         <button
           onClick={() => setFilter('ALL')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === 'ALL' ? 'bg-gray-900 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === 'ALL' ? 'bg-white text-[#030213]' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
         >
           Все смены
         </button>
         <button
           onClick={() => setFilter('DEMO')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === 'DEMO' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === 'DEMO' ? 'bg-blue-600 text-[#030213]' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
         >
           Демо-смены
         </button>
         <button
           onClick={() => setFilter('SUPERVISED')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === 'SUPERVISED' ? 'bg-purple-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === 'SUPERVISED' ? 'bg-purple-600 text-[#030213]' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
         >
           Под присмотром
         </button>
         <button
           onClick={() => setFilter('INDEPENDENT')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === 'INDEPENDENT' ? 'bg-green-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
+          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${filter === 'INDEPENDENT' ? 'bg-green-600 text-[#030213]' : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
             }`}
         >
           Самостоятельные
@@ -126,22 +126,22 @@ const PhotoShiftsPage: React.FC = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between">
               <div className="flex items-start space-x-4 mb-4 md:mb-0">
                 <div className="flex flex-col items-center justify-center bg-gray-50 rounded-lg p-3 min-w-[80px] border border-gray-100">
-                  <span className="text-2xl font-bold text-gray-900">{shift.date.split('.')[0]}</span>
-                  <span className="text-xs text-gray-500 uppercase">нояб</span>
+                  <span className="text-2xl font-medium text-gray-900">{shift.date.split('.')[0]}</span>
+                  <span className="text-xs text-[#717182] uppercase">нояб</span>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className={`px-2 py-0.5 rounded text-xs font-bold ${getTypeColor(shift.type)}`}>
+                    <span className={`px-2 py-0.5 rounded text-xs font-medium ${getTypeColor(shift.type)}`}>
                       {getTypeLabel(shift.type)}
                     </span>
                     {shift.status === 'FULL' && (
-                      <span className="px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-800">
+                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
                         Мест нет
                       </span>
                     )}
                   </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-1">{shift.location}</h3>
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                  <h3 className="text-lg font-medium text-gray-900 mb-1">{shift.location}</h3>
+                  <div className="flex flex-wrap gap-4 text-sm text-[#717182]">
                     <div className="flex items-center">
                       <Clock className="w-4 h-4 mr-1.5" />
                       {shift.time}
@@ -169,8 +169,8 @@ const PhotoShiftsPage: React.FC = () => {
                 <button
                   disabled={shift.status === 'FULL'}
                   className={`px-6 py-2 rounded-lg font-medium transition-colors ${shift.status === 'FULL'
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-gray-100 text-[#717182] cursor-not-allowed'
+                    : 'bg-blue-600 text-[#030213] hover:bg-blue-700'
                     }`}
                 >
                   {shift.status === 'FULL' ? 'Заполнен' : 'Записаться'}

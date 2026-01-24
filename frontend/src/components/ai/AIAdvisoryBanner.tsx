@@ -3,20 +3,20 @@ import { ShieldAlert } from 'lucide-react';
 
 const AIAdvisoryBanner: React.FC = () => {
     return (
-        <div className="bg-indigo-500/10 border border-indigo-500/20 rounded-2xl p-4 flex items-start gap-4 mb-8">
-            <div className="bg-indigo-500/20 p-2 rounded-lg">
-                <ShieldAlert className="w-5 h-5 text-indigo-400" />
+        <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 flex items-start gap-4 mb-8 shadow-sm">
+            <div className="bg-white p-2 rounded-xl shadow-sm">
+                <ShieldAlert className="w-6 h-6 text-indigo-600" />
             </div>
             <div className="flex-1">
-                <h3 className="text-sm font-bold text-indigo-100 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-indigo-900 flex items-center gap-2">
                     Слой AI-советов
-                    <span className="text-[10px] bg-indigo-500/30 px-1.5 py-0.5 rounded text-indigo-300 uppercase font-black tracking-widest">Только чтение</span>
+                    <span className="text-[10px] bg-indigo-100 px-2 py-0.5 rounded text-indigo-700 uppercase font-medium tracking-widest border border-indigo-200">Только чтение</span>
                 </h3>
-                <p className="text-xs text-indigo-300/80 mt-1 leading-relaxed">
+                <p className="text-xs text-indigo-800/80 mt-1 leading-relaxed">
                     Этот раздел содержит рекомендации, сгенерированные AI MatrixGin.
                     AI выступает исключительно в роли <strong>советника</strong>.
                     Все решения и финальные действия выполняются человеком.
-                    <a href="#" className="underline ml-1 hover:text-indigo-200 transition-colors">AI Constitution & Ethics</a>
+                    <a href="#" className="underline ml-1 hover:text-indigo-950 transition-colors font-medium">AI Constitution & Ethics</a>
                 </p>
             </div>
         </div>

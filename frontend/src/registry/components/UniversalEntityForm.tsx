@@ -80,7 +80,7 @@ export const UniversalEntityForm: React.FC<Props> = ({ entityType, entityUrn, mo
             <Form form={form} layout="vertical" onFinish={handleFinish}>
                 {projection.sections.map((section: any) => (
                     <div key={section.title} className="mb-6">
-                        <h3 className="text-lg font-semibold mb-4 border-b pb-2">{section.title}</h3>
+                        <h3 className="text-lg font-medium mb-4 border-b pb-2">{section.title}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             {section.fields.map((field: any) => (
                                 <Form.Item

@@ -151,11 +151,11 @@ const SalesPlaybookPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 h-[calc(100vh-64px)] flex flex-col">
             <div className="mb-6 flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                    <h1 className="text-3xl font-medium text-gray-900 flex items-center">
                         <BookOpen className="w-8 h-8 mr-3 text-blue-600" />
                         Плейбуки и Скрипты
                     </h1>
-                    <p className="text-gray-500 mt-1">Библиотека сценариев продаж и работы с клиентами</p>
+                    <p className="text-[#717182] mt-1">Библиотека сценариев продаж и работы с клиентами</p>
                 </div>
             </div>
 
@@ -164,7 +164,7 @@ const SalesPlaybookPage: React.FC = () => {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 flex flex-col overflow-hidden">
                     <div className="p-4 border-b border-gray-100">
                         <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#717182] w-4 h-4" />
                             <input
                                 type="text"
                                 placeholder="Поиск скрипта..."
@@ -185,7 +185,7 @@ const SalesPlaybookPage: React.FC = () => {
                                     }`}
                             >
                                 <div className="flex justify-between items-start mb-1">
-                                    <span className={`text-xs font-bold px-2 py-0.5 rounded ${playbook.category === 'COLD_CALL' ? 'bg-orange-100 text-orange-700' :
+                                    <span className={`text-xs font-medium px-2 py-0.5 rounded ${playbook.category === 'COLD_CALL' ? 'bg-orange-100 text-orange-700' :
                                         playbook.category === 'OBJECTIONS' ? 'bg-red-100 text-red-700' :
                                             'bg-gray-100 text-gray-700'
                                         }`}>
@@ -196,7 +196,7 @@ const SalesPlaybookPage: React.FC = () => {
                                 <h3 className={`font-medium ${activePlaybook?.id === playbook.id ? 'text-blue-700' : 'text-gray-900'}`}>
                                     {playbook.title}
                                 </h3>
-                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">{playbook.description}</p>
+                                <p className="text-xs text-[#717182] mt-1 line-clamp-2">{playbook.description}</p>
                             </div>
                         ))}
                     </div>
@@ -208,8 +208,8 @@ const SalesPlaybookPage: React.FC = () => {
                         <>
                             <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
                                 <div>
-                                    <h2 className="text-xl font-bold text-gray-900">{activePlaybook.title}</h2>
-                                    <p className="text-sm text-gray-500">Шаг: {currentNodeId === 'start' ? 'Начало разговора' : 'Продолжение'}</p>
+                                    <h2 className="text-xl font-medium text-gray-900">{activePlaybook.title}</h2>
+                                    <p className="text-sm text-[#717182]">Шаг: {currentNodeId === 'start' ? 'Начало разговора' : 'Продолжение'}</p>
                                 </div>
                                 <button
                                     onClick={resetPlaybook}
@@ -223,7 +223,7 @@ const SalesPlaybookPage: React.FC = () => {
                                 {/* Tips */}
                                 {currentNode.tips && currentNode.tips.length > 0 && (
                                     <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                                        <h4 className="text-sm font-bold text-yellow-800 mb-2 flex items-center">
+                                        <h4 className="text-sm font-medium text-yellow-800 mb-2 flex items-center">
                                             <MessageCircle className="w-4 h-4 mr-2" />
                                             Советы эксперта
                                         </h4>
@@ -237,20 +237,20 @@ const SalesPlaybookPage: React.FC = () => {
 
                                 {/* Main Script Text */}
                                 <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm mb-8 relative">
-                                    <div className="absolute -left-3 top-6 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold border-4 border-white shadow-sm">
+                                    <div className="absolute -left-3 top-6 w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-[#030213] text-xs font-medium border-4 border-white shadow-sm">
                                         You
                                     </div>
                                     <p className="text-lg text-gray-800 leading-relaxed">
                                         {currentNode.text}
                                     </p>
                                     <div className="mt-4 flex items-center space-x-4 border-t border-gray-100 pt-4">
-                                        <button className="text-gray-400 hover:text-green-600 transition-colors">
+                                        <button className="text-[#717182] hover:text-green-600 transition-colors">
                                             <ThumbsUp className="w-5 h-5" />
                                         </button>
-                                        <button className="text-gray-400 hover:text-red-600 transition-colors">
+                                        <button className="text-[#717182] hover:text-red-600 transition-colors">
                                             <ThumbsDown className="w-5 h-5" />
                                         </button>
-                                        <button className="text-gray-400 hover:text-blue-600 transition-colors ml-auto">
+                                        <button className="text-[#717182] hover:text-blue-600 transition-colors ml-auto">
                                             <Share2 className="w-5 h-5" />
                                         </button>
                                     </div>
@@ -259,7 +259,7 @@ const SalesPlaybookPage: React.FC = () => {
                                 {/* Options */}
                                 {currentNode.options && currentNode.options.length > 0 ? (
                                     <div>
-                                        <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">
+                                        <h3 className="text-sm font-medium text-[#717182] uppercase tracking-wider mb-4">
                                             Варианты ответа клиента:
                                         </h3>
                                         <div className="grid gap-3">
@@ -272,7 +272,7 @@ const SalesPlaybookPage: React.FC = () => {
                                                     <span className="font-medium text-gray-700 group-hover:text-blue-700">
                                                         {option.label}
                                                     </span>
-                                                    <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500" />
+                                                    <ChevronRight className="w-5 h-5 text-[#717182] group-hover:text-blue-500" />
                                                 </button>
                                             ))}
                                         </div>
@@ -282,7 +282,7 @@ const SalesPlaybookPage: React.FC = () => {
                                         <p className="text-green-800 font-medium">Сценарий завершен</p>
                                         <button
                                             onClick={resetPlaybook}
-                                            className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                                            className="mt-4 bg-green-600 text-[#030213] px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
                                         >
                                             Новый диалог
                                         </button>
@@ -291,7 +291,7 @@ const SalesPlaybookPage: React.FC = () => {
                             </div>
                         </>
                     ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center text-gray-400 p-8 text-center">
+                        <div className="flex-1 flex flex-col items-center justify-center text-[#717182] p-8 text-center">
                             <BookOpen className="w-16 h-16 mb-4 opacity-20" />
                             <h3 className="text-xl font-medium text-gray-900 mb-2">Выберите плейбук</h3>
                             <p className="max-w-md">

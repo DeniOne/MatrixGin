@@ -2,8 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+  font-family: 'Geist', system-ui, sans-serif;
+  background-color: #F3F3F5;
+  color: #030213;
+}
+
 /* Registry Entity Forms - Custom Styles */
-.ant-form-item-label > label {
+.ant-form-item-label>label {
   font-weight: 600;
   color: #1f2937 !important;
   font-size: 14px;
@@ -12,7 +18,7 @@
 .ant-input,
 .ant-input-number-input,
 .ant-select-selector,
-.ant-picker-input > input,
+.ant-picker-input>input,
 .ant-input-textarea textarea {
   color: #000 !important;
   font-size: 14px;
@@ -20,7 +26,7 @@
 
 .ant-input::placeholder,
 .ant-input-number-input::placeholder,
-.ant-picker-input > input::placeholder,
+.ant-picker-input>input::placeholder,
 .ant-input-textarea textarea::placeholder {
   color: #9ca3af;
 }
@@ -29,4 +35,3 @@
 .ant-form-item-required::before {
   color: #ef4444 !important;
 }
-

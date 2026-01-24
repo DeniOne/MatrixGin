@@ -31,21 +31,21 @@ export const BadgeCard: React.FC<BadgeProps> = ({
                 {imageUrl ? (
                     <img src={imageUrl} alt={title} className="w-10 h-10 object-contain" />
                 ) : (
-                    <Award className={`w-8 h-8 ${isLocked ? 'text-gray-400' : 'text-blue-600'}`} />
+                    <Award className={`w-8 h-8 ${isLocked ? 'text-[#717182]' : 'text-blue-600'}`} />
                 )}
             </div>
 
-            <h3 className={`font-bold text-sm mb-1 ${isLocked ? 'text-gray-500' : 'text-gray-900'}`}>
+            <h3 className={`font-medium text-sm mb-1 ${isLocked ? 'text-[#717182]' : 'text-gray-900'}`}>
                 {title}
             </h3>
 
-            <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+            <p className="text-xs text-[#717182] line-clamp-2 mb-2">
                 {description}
             </p>
 
             {earnedAt && !isLocked && (
                 <div className="mt-auto pt-2 border-t border-gray-100 w-full">
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wider">
+                    <span className="text-[10px] text-[#717182] uppercase tracking-wider">
                         Получен {new Date(earnedAt).toLocaleDateString('ru-RU')}
                     </span>
                 </div>

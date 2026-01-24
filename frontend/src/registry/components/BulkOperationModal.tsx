@@ -90,7 +90,7 @@ export const BulkOperationModal: React.FC<BulkOperationModalProps> = ({ visible,
                                 } catch (e) { /* ignore invalid json while typing */ }
                             }}
                         />
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs text-[#717182] mt-1">
                             Example: {"{"}"key": "status", "value": "active"{"}"}
                         </div>
                     </div>

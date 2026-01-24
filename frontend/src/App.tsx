@@ -1,5 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { ConfigProvider, App as AntdApp } from 'antd';
+import matrixGinTheme from './theme/matrixGinTheme';
 
 // Foundation Module
 import { FoundationLayout } from './layouts/FoundationLayout';
@@ -73,7 +75,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     }
 
     return (
-        <div className="flex h-screen bg-gray-950 text-white">
+        <div className="flex h-screen bg-[#F4F6F8] text-[#2C3E50]">
             <Sidebar />
             <main className="flex-1 overflow-y-auto p-6">
                 {children}
@@ -171,9 +173,13 @@ const AppRoutes: React.FC = () => {
 
 const App: React.FC = () => {
     return (
-        <Router>
-            <AppRoutes />
-        </Router>
+        <ConfigProvider theme={matrixGinTheme}>
+            <AntdApp>
+                <Router>
+                    <AppRoutes />
+                </Router>
+            </AntdApp>
+        </ConfigProvider>
     );
 };
 

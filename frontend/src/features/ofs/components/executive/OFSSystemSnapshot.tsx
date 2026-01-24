@@ -20,10 +20,10 @@ function Indicator({ title, description, status, icon: Icon }: IndicatorProps) {
     const navigate = useNavigate();
 
     const statusColors = {
-        green: 'text-green-400 bg-green-500/10 border-green-500/20 hover:bg-green-500/20 cursor-pointer',
-        yellow: 'text-amber-400 bg-amber-500/10 border-amber-500/20 hover:bg-amber-500/20 cursor-pointer',
-        red: 'text-red-400 bg-red-500/10 border-red-500/20 hover:bg-red-500/20 cursor-pointer',
-        gray: 'text-gray-400 bg-gray-500/10 border-gray-500/20 cursor-not-allowed opacity-70',
+        green: 'text-green-700 bg-green-50 border-green-200 hover:bg-green-100 cursor-pointer',
+        yellow: 'text-amber-700 bg-amber-50 border-amber-200 hover:bg-amber-100 cursor-pointer',
+        red: 'text-red-700 bg-red-50 border-red-200 hover:bg-red-100 cursor-pointer',
+        gray: 'text-[#717182] bg-gray-50 border-gray-200 cursor-not-allowed opacity-70',
     };
 
     const handleClick = () => {
@@ -36,23 +36,23 @@ function Indicator({ title, description, status, icon: Icon }: IndicatorProps) {
         <div
             onClick={handleClick}
             className={cn(
-                "p-3 rounded-xl border backdrop-blur-md transition-all group relative",
+                "p-3 rounded-xl border transition-all group relative bg-white shadow-sm",
                 statusColors[status]
             )}
         >
             <div className="flex items-center gap-3 mb-1.5">
                 <Icon className="w-4 h-4" />
-                <span className="text-[10px] font-bold uppercase tracking-wider">{title}</span>
+                <span className="text-[10px] font-medium uppercase tracking-wider">{title}</span>
             </div>
             <div className="flex items-center justify-between">
                 <div className="w-full">
-                    <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-1 bg-white/5 rounded-full overflow-hidden">
                         <div
                             className={cn(
                                 "h-full transition-all duration-1000",
                                 status === 'green' ? 'bg-green-500' :
                                     status === 'yellow' ? 'bg-amber-500' :
-                                        status === 'red' ? 'bg-red-500' : 'bg-gray-500'
+                                        status === 'red' ? 'bg-red-500' : 'bg-gray-400'
                             )}
                             style={{
                                 width: status === 'green' ? '92%' :
@@ -66,8 +66,8 @@ function Indicator({ title, description, status, icon: Icon }: IndicatorProps) {
 
             {/* Tooltip on hover */}
             <div className="absolute left-0 -bottom-2 translate-y-full opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
-                <div className="bg-gray-900 border border-gray-800 p-2 rounded-lg shadow-2xl w-48">
-                    <p className="text-[9px] text-gray-400 leading-relaxed">
+                <div className="bg-white border border-black/10 p-2 rounded-lg shadow-xl w-48 text-left">
+                    <p className="text-[9px] text-[#717182] leading-relaxed">
                         {status === 'gray' ? 'Недостаточно данных для анализа' : description}
                     </p>
                 </div>

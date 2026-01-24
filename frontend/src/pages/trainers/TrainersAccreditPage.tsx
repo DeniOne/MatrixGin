@@ -11,30 +11,30 @@ const TrainersAccreditPage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Аккредитация Тренера</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-8">Аккредитация Тренера</h1>
 
             <div className="bg-white rounded-xl border p-8 mb-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Путь к сертификации</h2>
+                <h2 className="text-xl font-medium text-gray-900 mb-6">Путь к сертификации</h2>
                 <div className="space-y-6">
                     {steps.map((step) => (
                         <div key={step.id} className="flex items-start">
                             <div className="mr-4 flex-shrink-0">
                                 {step.status === 'completed' ? (
                                     <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                                        <CheckCircle className="w-6 h-6 text-white" />
+                                        <CheckCircle className="w-6 h-6 text-[#030213]" />
                                     </div>
                                 ) : step.status === 'current' ? (
                                     <div className="w-10 h-10 bg-indigo-500 rounded-full flex items-center justify-center">
-                                        <Circle className="w-6 h-6 text-white" />
+                                        <Circle className="w-6 h-6 text-[#030213]" />
                                     </div>
                                 ) : (
                                     <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                        <Lock className="w-6 h-6 text-gray-400" />
+                                        <Lock className="w-6 h-6 text-[#717182]" />
                                     </div>
                                 )}
                             </div>
                             <div className="flex-1">
-                                <h3 className={`font-bold mb-2 ${step.status === 'locked' ? 'text-gray-400' : 'text-gray-900'}`}>
+                                <h3 className={`font-medium mb-2 ${step.status === 'locked' ? 'text-[#717182]' : 'text-gray-900'}`}>
                                     Шаг {step.id}: {step.title}
                                 </h3>
                                 {step.status === 'current' && (
@@ -42,8 +42,8 @@ const TrainersAccreditPage: React.FC = () => {
                                         <div className="w-full bg-gray-100 rounded-full h-2 mb-2">
                                             <div className="bg-indigo-600 h-2 rounded-full" style={{ width: `${step.progress}%` }}></div>
                                         </div>
-                                        <p className="text-sm text-gray-500">{step.progress}% завершено</p>
-                                        <button className="mt-3 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">
+                                        <p className="text-sm text-[#717182]">{step.progress}% завершено</p>
+                                        <button className="mt-3 px-4 py-2 bg-indigo-600 text-[#030213] rounded-lg text-sm font-medium hover:bg-indigo-700">
                                             Продолжить
                                         </button>
                                     </div>

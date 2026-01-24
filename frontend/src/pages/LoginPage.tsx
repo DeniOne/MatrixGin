@@ -29,13 +29,13 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-white px-4">
             <div className="max-w-md w-full space-y-8 bg-gray-800 p-8 rounded-xl shadow-2xl border border-gray-700">
                 <div className="text-center">
-                    <h2 className="mt-6 text-3xl font-extrabold text-white">
+                    <h2 className="mt-6 text-3xl font-medium text-[#030213]">
                         MatrixGin v2.0
                     </h2>
-                    <p className="mt-2 text-sm text-gray-400">
+                    <p className="mt-2 text-sm text-[#717182]">
                         Войдите в систему
                     </p>
                 </div>
@@ -44,7 +44,7 @@ const LoginPage: React.FC = () => {
                     <div className="rounded-md shadow-sm -space-y-px">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Mail className="h-5 w-5 text-gray-500" />
+                                <Mail className="h-5 w-5 text-[#717182]" />
                             </div>
                             <input
                                 id="email-address"
@@ -52,7 +52,7 @@ const LoginPage: React.FC = () => {
                                 type="email"
                                 autoComplete="email"
                                 required
-                                className="appearance-none rounded-t-md relative block w-full px-3 py-3 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-t-md relative block w-full px-3 py-3 pl-10 border border-gray-700 placeholder-gray-500 text-[#030213] bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -60,7 +60,7 @@ const LoginPage: React.FC = () => {
                         </div>
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <Lock className="h-5 w-5 text-gray-500" />
+                                <Lock className="h-5 w-5 text-[#717182]" />
                             </div>
                             <input
                                 id="password"
@@ -68,7 +68,7 @@ const LoginPage: React.FC = () => {
                                 type="password"
                                 autoComplete="current-password"
                                 required
-                                className="appearance-none rounded-b-md relative block w-full px-3 py-3 pl-10 border border-gray-700 placeholder-gray-500 text-white bg-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                                className="appearance-none rounded-b-md relative block w-full px-3 py-3 pl-10 border border-gray-700 placeholder-gray-500 text-[#030213] bg-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                                 placeholder="Пароль"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}

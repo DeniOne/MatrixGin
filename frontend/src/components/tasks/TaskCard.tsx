@@ -28,7 +28,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     const getStatusColor = (status: TaskStatus) => {
         switch (status) {
             case TaskStatus.TODO:
-                return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
+                return 'bg-gray-500/10 text-[#717182] border-gray-500/20';
             case TaskStatus.IN_PROGRESS:
                 return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
             case TaskStatus.REVIEW:
@@ -36,7 +36,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             case TaskStatus.DONE:
                 return 'bg-green-500/10 text-green-400 border-green-500/20';
             case TaskStatus.ARCHIVED:
-                return 'bg-gray-700/10 text-gray-500 border-gray-700/20';
+                return 'bg-gray-700/10 text-[#717182] border-gray-700/20';
         }
     };
 
@@ -57,7 +57,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
             <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold text-white truncate group-hover:text-indigo-400 transition-colors">
+                        <h3 className="text-lg font-medium text-[#030213] truncate group-hover:text-indigo-400 transition-colors">
                             {task.title}
                         </h3>
                         <span className={clsx('px-2 py-1 text-xs font-medium rounded border', getPriorityColor(task.priority))}>
@@ -68,11 +68,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                         </span>
                     </div>
 
-                    <p className="text-gray-400 text-sm line-clamp-2 mb-4">
+                    <p className="text-[#717182] text-sm line-clamp-2 mb-4">
                         {task.description}
                     </p>
 
-                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <div className="flex items-center gap-4 text-xs text-[#717182]">
                         {task.dueDate && (
                             <div className="flex items-center gap-1">
                                 <Calendar className="w-4 h-4" />
@@ -87,7 +87,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                         )}
                         {task.mcReward && (
                             <div className="flex items-center gap-1 text-yellow-500">
-                                <span className="font-semibold">+{task.mcReward} MC</span>
+                                <span className="font-medium">+{task.mcReward} MC</span>
                             </div>
                         )}
                     </div>

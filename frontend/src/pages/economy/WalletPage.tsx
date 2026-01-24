@@ -16,11 +16,11 @@ const WalletPage: React.FC = () => {
     return (
         <div className="space-y-8 max-w-7xl mx-auto p-4">
             <header className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+                <h1 className="text-3xl font-medium text-[#030213] tracking-tight flex items-center gap-3">
                     <Wallet className="w-8 h-8 text-indigo-400" />
                     Мой Кошелек
                 </h1>
-                <p className="text-gray-400 font-light max-w-2xl">
+                <p className="text-[#717182] font-light max-w-2xl">
                     Управление активами и прозрачная история вашего участия в экономике MatrixGin.
                 </p>
             </header>
@@ -34,10 +34,10 @@ const WalletPage: React.FC = () => {
                     <div className="relative z-10 space-y-6">
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                            <h3 className="text-indigo-400 text-[10px] font-bold uppercase tracking-[0.2em]">Операционные Активы</h3>
+                            <h3 className="text-indigo-400 text-[10px] font-medium uppercase tracking-[0.2em]">Операционные Активы</h3>
                         </div>
                         <div className="flex items-baseline gap-3">
-                            <div className="text-6xl font-black text-white tracking-tighter">
+                            <div className="text-6xl font-medium text-[#030213] tracking-tighter">
                                 {wallet?.mcBalance.toLocaleString() || '0'}
                             </div>
                             <div className="text-indigo-300 font-medium text-xl">MC</div>
@@ -64,10 +64,10 @@ const WalletPage: React.FC = () => {
                     <div className="relative z-10 space-y-6">
                         <div className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                            <h3 className="text-amber-400 text-[10px] font-bold uppercase tracking-[0.2em]">Стратегический Капитал</h3>
+                            <h3 className="text-amber-400 text-[10px] font-medium uppercase tracking-[0.2em]">Стратегический Капитал</h3>
                         </div>
                         <div className="flex items-baseline gap-3">
-                            <div className="text-6xl font-black text-white tracking-tighter">
+                            <div className="text-6xl font-medium text-[#030213] tracking-tighter">
                                 {wallet?.gmcBalance.toLocaleString() || '0'}
                             </div>
                             <div className="text-amber-300 font-medium text-xl">GMC</div>
@@ -79,13 +79,13 @@ const WalletPage: React.FC = () => {
                 </div>
             </div>
 
-            <section className="bg-gray-900/30 border border-gray-800/50 rounded-3xl p-8 backdrop-blur-md">
+            <section className="bg-white/30 border border-black/10/50 rounded-3xl p-8 backdrop-blur-md">
                 <div className="flex justify-between items-center mb-8">
-                    <h2 className="text-xl font-bold text-white flex items-center gap-3">
-                        <History className="w-6 h-6 text-gray-400" />
+                    <h2 className="text-xl font-medium text-[#030213] flex items-center gap-3">
+                        <History className="w-6 h-6 text-[#717182]" />
                         Последние операции
                     </h2>
-                    <a href="/economy/transactions" className="text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest">
+                    <a href="/economy/transactions" className="text-xs font-medium text-indigo-400 hover:text-indigo-300 transition-colors uppercase tracking-widest">
                         Смотреть все
                     </a>
                 </div>
@@ -93,11 +93,11 @@ const WalletPage: React.FC = () => {
                 <div className="overflow-x-auto">
                     <table className="w-full text-left">
                         <thead>
-                            <tr className="border-b border-gray-800">
-                                <th className="pb-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Дата</th>
-                                <th className="pb-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Тип</th>
-                                <th className="pb-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Описание</th>
-                                <th className="pb-4 text-[10px] font-bold text-gray-500 uppercase tracking-wider text-right">Сумма</th>
+                            <tr className="border-b border-black/10">
+                                <th className="pb-4 text-[10px] font-medium text-[#717182] uppercase tracking-wider">Дата</th>
+                                <th className="pb-4 text-[10px] font-medium text-[#717182] uppercase tracking-wider">Тип</th>
+                                <th className="pb-4 text-[10px] font-medium text-[#717182] uppercase tracking-wider">Описание</th>
+                                <th className="pb-4 text-[10px] font-medium text-[#717182] uppercase tracking-wider text-right">Сумма</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-800/30">
@@ -107,7 +107,7 @@ const WalletPage: React.FC = () => {
                                 <tr><td colSpan={4} className="py-8 text-center text-gray-600 italic">Операций пока не совершалось</td></tr>
                             ) : transactions.map(tx => (
                                 <tr key={tx.id} className="group hover:bg-white/[0.02] transition-colors">
-                                    <td className="py-5 text-xs text-gray-500 font-mono">
+                                    <td className="py-5 text-xs text-[#717182] font-mono">
                                         {new Date(tx.createdAt).toLocaleDateString('ru-RU')}
                                     </td>
                                     <td className="py-5">
@@ -117,7 +117,7 @@ const WalletPage: React.FC = () => {
                                             ) : (
                                                 <ArrowUpRight className="w-3 h-3 text-red-500" />
                                             )}
-                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter bg-gray-800 px-2 py-0.5 rounded">
+                                            <span className="text-[10px] font-medium text-[#717182] uppercase tracking-tighter bg-gray-800 px-2 py-0.5 rounded">
                                                 {tx.type}
                                             </span>
                                         </div>
@@ -126,7 +126,7 @@ const WalletPage: React.FC = () => {
                                         <div className="text-sm text-gray-300 line-clamp-1">{tx.description || 'Без описания'}</div>
                                     </td>
                                     <td className="py-5 text-right">
-                                        <div className={`text-sm font-black tracking-tight ${tx.amount > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                                        <div className={`text-sm font-medium tracking-tight ${tx.amount > 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                                             {tx.amount > 0 ? '+' : ''}{tx.amount.toLocaleString()} {tx.currency}
                                         </div>
                                     </td>

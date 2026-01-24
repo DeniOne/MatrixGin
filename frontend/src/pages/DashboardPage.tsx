@@ -44,13 +44,13 @@ const DashboardPage: React.FC = () => {
     };
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-10">
+        <div className="p-6 max-w-7xl mx-auto space-y-10 animate-in fade-in duration-500">
             {/* Header */}
             <div>
-                <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
+                <h1 className="text-4xl font-medium text-[#030213] mb-2 tracking-tight">
                     Привет, {user?.firstName || 'Герой'}! 🚀
                 </h1>
-                <p className="text-gray-400 text-lg">
+                <p className="text-[#717182] text-lg">
                     Твой персональный навигатор роста и мотивации.
                 </p>
             </div>
@@ -65,8 +65,8 @@ const DashboardPage: React.FC = () => {
                         <div className="relative">
                             <ErrorBoundary fallback={<GrowthRadarChart data={pulseData} size={320} />}>
                                 <Suspense fallback={
-                                    <div className="h-64 flex items-center justify-center bg-slate-900 rounded-xl border border-slate-700">
-                                        <span className="text-slate-400 animate-pulse">Загрузка Матрицы...</span>
+                                    <div className="h-64 flex items-center justify-center bg-white rounded-xl border border-black/10">
+                                        <span className="text-[#717182] animate-pulse">Загрузка Матрицы...</span>
                                     </div>
                                 }>
                                     <StartGrowthWeb3D {...stats3D} />
@@ -94,24 +94,24 @@ const DashboardPage: React.FC = () => {
                     <LearningWidget courses={learningCourses} />
 
                     {/* Real Stats / Activity */}
-                    <div className="bg-gray-900/40 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl">
-                        <h3 className="text-lg font-medium text-white/80 mb-6 italic">Пульс активности</h3>
+                    <div className="bg-white rounded-2xl p-6 border border-black/10 shadow-sm">
+                        <h3 className="text-lg font-medium text-[#030213] mb-6 italic">Пульс активности</h3>
                         <div className="space-y-4">
-                            <div className="flex justify-between items-center py-2 border-b border-white/5">
-                                <span className="text-sm text-gray-400">Фото-компании</span>
-                                <span className="text-lg font-bold text-indigo-400">
+                            <div className="flex justify-between items-center py-2 border-b border-black/5">
+                                <span className="text-sm text-[#717182]">Фото-компании</span>
+                                <span className="text-lg font-medium text-indigo-600">
                                     {shiftData?.companiesCreated || 0}
                                 </span>
                             </div>
-                            <div className="flex justify-between items-center py-2 border-b border-white/5">
-                                <span className="text-sm text-gray-400">Продано сегодня</span>
-                                <span className="text-lg font-bold text-emerald-400">
+                            <div className="flex justify-between items-center py-2 border-b border-black/5">
+                                <span className="text-sm text-[#717182]">Продано сегодня</span>
+                                <span className="text-lg font-medium text-emerald-600">
                                     {shiftData?.companiesSold || 0}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center py-2">
-                                <span className="text-sm text-gray-400">Прогноз (факт)</span>
-                                <span className="text-lg font-bold text-amber-400">
+                                <span className="text-sm text-[#717182]">Прогноз (факт)</span>
+                                <span className="text-lg font-medium text-amber-500">
                                     {shiftData?.forecastEarnings || 0} ₽
                                 </span>
                             </div>

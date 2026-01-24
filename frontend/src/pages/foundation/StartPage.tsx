@@ -45,7 +45,7 @@ export const StartPage: React.FC = () => {
         navigate('/foundation/immersion/CONSTITUTION');
     };
 
-    if (isLoading) return <div className="p-12 text-center text-gray-500">Подключение к ядру...</div>;
+    if (isLoading) return <div className="p-12 text-center text-[#717182]">Подключение к ядру...</div>;
 
     return (
         <div className="p-8 md:p-12">
@@ -53,7 +53,7 @@ export const StartPage: React.FC = () => {
                 <ShieldAlert size={64} />
             </div>
 
-            <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">Доступ ограничен</h2>
+            <h2 className="text-3xl font-medium text-center mb-4 text-gray-900">Доступ ограничен</h2>
 
             <p className="text-lg text-gray-600 mb-8 text-center leading-relaxed">
                 Добро пожаловать в Университет. <br />

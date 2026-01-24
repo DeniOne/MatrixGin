@@ -89,13 +89,13 @@ const SoftEventsPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">События и Воркшопы</h1>
-                    <p className="text-gray-500 mt-1">Учитесь у лучших и обменивайтесь опытом с коллегами</p>
+                    <h1 className="text-3xl font-medium text-gray-900">События и Воркшопы</h1>
+                    <p className="text-[#717182] mt-1">Учитесь у лучших и обменивайтесь опытом с коллегами</p>
                 </div>
 
                 <div className="mt-4 md:mt-0 flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3 w-full md:w-auto">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#717182] w-4 h-4" />
                         <input
                             type="text"
                             placeholder="Поиск событий..."
@@ -105,21 +105,21 @@ const SoftEventsPage: React.FC = () => {
                     <div className="flex bg-white border border-gray-200 rounded-lg p-1">
                         <button
                             onClick={() => setFilter('all')}
-                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${filter === 'all' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${filter === 'all' ? 'bg-gray-100 text-gray-900' : 'text-[#717182] hover:text-gray-700'
                                 }`}
                         >
                             Все
                         </button>
                         <button
                             onClick={() => setFilter('workshop')}
-                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${filter === 'workshop' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${filter === 'workshop' ? 'bg-gray-100 text-gray-900' : 'text-[#717182] hover:text-gray-700'
                                 }`}
                         >
                             Воркшопы
                         </button>
                         <button
                             onClick={() => setFilter('webinar')}
-                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${filter === 'webinar' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${filter === 'webinar' ? 'bg-gray-100 text-gray-900' : 'text-[#717182] hover:text-gray-700'
                                 }`}
                         >
                             Вебинары
@@ -136,7 +136,7 @@ const SoftEventsPage: React.FC = () => {
                             <div className="md:w-64 h-48 md:h-auto relative">
                                 <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
                                 <div className="absolute top-3 left-3">
-                                    <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wide text-white ${event.type === 'workshop' ? 'bg-purple-600' :
+                                    <span className={`px-2 py-1 rounded text-xs font-medium uppercase tracking-wide text-[#030213] ${event.type === 'workshop' ? 'bg-purple-600' :
                                         event.type === 'webinar' ? 'bg-blue-600' : 'bg-orange-500'
                                         }`}>
                                         {event.type === 'workshop' ? 'Воркшоп' :
@@ -146,7 +146,7 @@ const SoftEventsPage: React.FC = () => {
                             </div>
                             <div className="p-6 flex-1 flex flex-col">
                                 <div className="flex justify-between items-start mb-2">
-                                    <div className="flex items-center text-sm text-gray-500 space-x-4">
+                                    <div className="flex items-center text-sm text-[#717182] space-x-4">
                                         <span className="flex items-center">
                                             <Calendar className="w-4 h-4 mr-1" />
                                             {event.date}
@@ -169,7 +169,7 @@ const SoftEventsPage: React.FC = () => {
                                     )}
                                 </div>
 
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">{event.title}</h3>
+                                <h3 className="text-xl font-medium text-gray-900 mb-2">{event.title}</h3>
 
                                 <div className="flex items-center mb-4">
                                     <img src={event.speakerImage} alt={event.speaker} className="w-6 h-6 rounded-full mr-2" />
@@ -179,7 +179,7 @@ const SoftEventsPage: React.FC = () => {
                                 </div>
 
                                 <div className="mt-auto flex items-center justify-between pt-4 border-t border-gray-100">
-                                    <div className="flex items-center text-sm text-gray-500">
+                                    <div className="flex items-center text-sm text-[#717182]">
                                         <Users className="w-4 h-4 mr-1" />
                                         {event.participants} {event.maxParticipants ? `/ ${event.maxParticipants}` : 'участников'}
                                     </div>
@@ -189,7 +189,7 @@ const SoftEventsPage: React.FC = () => {
                                             Вы записаны
                                         </button>
                                     ) : (
-                                        <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                                        <button className="px-4 py-2 bg-indigo-600 text-[#030213] rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
                                             Записаться
                                         </button>
                                     )}
@@ -202,16 +202,16 @@ const SoftEventsPage: React.FC = () => {
                 {/* Sidebar Calendar & Filters */}
                 <div className="space-y-6">
                     <div className="bg-white rounded-xl border border-gray-200 p-6">
-                        <h3 className="font-bold text-gray-900 mb-4">Календарь событий</h3>
+                        <h3 className="font-medium text-gray-900 mb-4">Календарь событий</h3>
                         {/* Simplified Calendar Visual */}
                         <div className="grid grid-cols-7 gap-1 text-center text-sm mb-2">
-                            <div className="text-gray-400 text-xs">Пн</div>
-                            <div className="text-gray-400 text-xs">Вт</div>
-                            <div className="text-gray-400 text-xs">Ср</div>
-                            <div className="text-gray-400 text-xs">Чт</div>
-                            <div className="text-gray-400 text-xs">Пт</div>
-                            <div className="text-gray-400 text-xs">Сб</div>
-                            <div className="text-gray-400 text-xs">Вс</div>
+                            <div className="text-[#717182] text-xs">Пн</div>
+                            <div className="text-[#717182] text-xs">Вт</div>
+                            <div className="text-[#717182] text-xs">Ср</div>
+                            <div className="text-[#717182] text-xs">Чт</div>
+                            <div className="text-[#717182] text-xs">Пт</div>
+                            <div className="text-[#717182] text-xs">Сб</div>
+                            <div className="text-[#717182] text-xs">Вс</div>
                         </div>
                         <div className="grid grid-cols-7 gap-1 text-center text-sm">
                             {/* Previous month days */}
@@ -244,19 +244,19 @@ const SoftEventsPage: React.FC = () => {
                             <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">22</div>
                             <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">23</div>
                             <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">24</div>
-                            <div className="p-2 bg-indigo-600 text-white rounded-full font-bold shadow-md cursor-pointer">25</div>
+                            <div className="p-2 bg-indigo-600 text-[#030213] rounded-full font-medium shadow-md cursor-pointer">25</div>
                             <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">26</div>
                             <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">27</div>
-                            <div className="p-2 bg-blue-100 text-blue-600 rounded-full font-bold cursor-pointer">28</div>
+                            <div className="p-2 bg-blue-100 text-blue-600 rounded-full font-medium cursor-pointer">28</div>
                             <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">29</div>
                             <div className="p-2 hover:bg-gray-50 rounded cursor-pointer">30</div>
                         </div>
                         <div className="mt-4 pt-4 border-t border-gray-100">
-                            <div className="flex items-center text-xs text-gray-500 mb-2">
+                            <div className="flex items-center text-xs text-[#717182] mb-2">
                                 <div className="w-2 h-2 rounded-full bg-indigo-600 mr-2"></div>
                                 Воркшопы
                             </div>
-                            <div className="flex items-center text-xs text-gray-500">
+                            <div className="flex items-center text-xs text-[#717182]">
                                 <div className="w-2 h-2 rounded-full bg-blue-600 mr-2"></div>
                                 Вебинары
                             </div>
@@ -264,7 +264,7 @@ const SoftEventsPage: React.FC = () => {
                     </div>
 
                     <div className="bg-indigo-50 rounded-xl p-6 border border-indigo-100">
-                        <h3 className="font-bold text-indigo-900 mb-2">Хотите выступить?</h3>
+                        <h3 className="font-medium text-indigo-900 mb-2">Хотите выступить?</h3>
                         <p className="text-sm text-indigo-700 mb-4">Поделитесь своим опытом с коллегами. Мы поможем подготовить презентацию.</p>
                         <button className="w-full py-2 bg-white text-indigo-600 border border-indigo-200 rounded-lg text-sm font-medium hover:bg-indigo-100 transition-colors">
                             Стать спикером

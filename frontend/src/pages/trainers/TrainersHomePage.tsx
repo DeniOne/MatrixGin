@@ -10,14 +10,14 @@ const TrainersHomePage: React.FC = () => {
 
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Институт Обучающих</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-8">Институт Обучающих</h1>
 
             <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl p-8 mb-8 border border-yellow-200">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-2">Стань наставником!</h2>
+                        <h2 className="text-2xl font-medium text-gray-900 mb-2">Стань наставником!</h2>
                         <p className="text-gray-600 mb-4">Получи аккредит ацию и начни зарабатывать, делясь знаниями</p>
-                        <button className="px-6 py-3 bg-yellow-600 text-white rounded-lg font-medium hover:bg-yellow-700">
+                        <button className="px-6 py-3 bg-yellow-600 text-[#030213] rounded-lg font-medium hover:bg-yellow-700">
                             Начать путь тренера
                         </button>
                     </div>
@@ -25,16 +25,16 @@ const TrainersHomePage: React.FC = () => {
                 </div>
             </div>
 
-            <h2 className="text-xl font-bold text-gray-900 mb-6">🏆 Топ наставников месяца</h2>
+            <h2 className="text-xl font-medium text-gray-900 mb-6">🏆 Топ наставников месяца</h2>
             <div className="space-y-4">
                 {topTrainers.map((trainer, idx) => (
                     <div key={trainer.id} className="bg-white p-6 rounded-xl border flex items-center justify-between">
                         <div className="flex items-center">
-                            <div className="text-3xl font-bold text-gray-300 mr-4 w-8">#{idx + 1}</div>
+                            <div className="text-3xl font-medium text-gray-300 mr-4 w-8">#{idx + 1}</div>
                             <img src={trainer.avatar} alt={trainer.name} className="w-14 h-14 rounded-full mr-4" />
                             <div>
-                                <h3 className="font-bold text-gray-900">{trainer.name}</h3>
-                                <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                <h3 className="font-medium text-gray-900">{trainer.name}</h3>
+                                <div className="flex items-center space-x-4 text-sm text-[#717182]">
                                     <span className="flex items-center">
                                         <Star className="w-4 h-4 text-yellow-500 mr-1 fill-current" />
                                         {trainer.rating}

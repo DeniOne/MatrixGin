@@ -68,7 +68,7 @@ export const EntityGraphViewer: React.FC<EntityGraphViewerProps> = ({ urn, viewT
 
     return (
         <div className="border rounded bg-white p-4 overflow-hidden">
-            <h3 className="text-sm font-bold text-gray-500 mb-2">
+            <h3 className="text-sm font-medium text-[#717182] mb-2">
                 Серверный вид: {viewType.toUpperCase()}
             </h3>
             <svg width={width} height={height} className="bg-gray-50 border">

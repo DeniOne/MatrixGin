@@ -7,8 +7,8 @@ export const FoundationLayout: React.FC = () => {
             {/* Strict Header: No Navigation */}
             <header className="bg-white border-b border-gray-200 px-8 py-6 flex justify-center items-center shadow-sm">
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">КОРПОРАТИВНЫЙ УНИВЕРСИТЕТ</h1>
-                    <p className="text-sm text-gray-500 uppercase tracking-widest mt-1">Фундаментальное погружение</p>
+                    <h1 className="text-2xl font-medium text-gray-900 tracking-tight">КОРПОРАТИВНЫЙ УНИВЕРСИТЕТ</h1>
+                    <p className="text-sm text-[#717182] uppercase tracking-widest mt-1">Фундаментальное погружение</p>
                 </div>
             </header>
 
@@ -18,7 +18,7 @@ export const FoundationLayout: React.FC = () => {
                     <Outlet />
                 </div>
 
-                <footer className="mt-8 text-center text-gray-400 text-xs">
+                <footer className="mt-8 text-center text-[#717182] text-xs">
                     <p>Операционная Система MatrixGin v2.2</p>
                     <p className="mt-1">Доступ строго контролируется. Действия логируются.</p>
                 </footer>

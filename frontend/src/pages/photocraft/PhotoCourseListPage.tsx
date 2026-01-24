@@ -86,7 +86,7 @@ const PhotoCourseListPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center mb-2">
+          <h1 className="text-3xl font-medium text-gray-900 flex items-center mb-2">
             <Camera className="w-8 h-8 mr-3 text-blue-600" />
             Каталог курсов
           </h1>
@@ -107,7 +107,7 @@ const PhotoCourseListPage: React.FC = () => {
               placeholder="Поиск курса..."
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-2.5 h-5 w-5 text-[#717182]" />
           </div>
 
           <FilterPanel
@@ -139,8 +139,8 @@ const PhotoCourseListPage: React.FC = () => {
             </div>
           ) : courses.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
-              <p className="text-gray-500 text-lg">Курсы не найдены</p>
-              <p className="text-gray-400 text-sm mt-2">Попробуйте изменить параметры поиска</p>
+              <p className="text-[#717182] text-lg">Курсы не найдены</p>
+              <p className="text-[#717182] text-sm mt-2">Попробуйте изменить параметры поиска</p>
               <button onClick={clearFilters} className="mt-4 text-blue-600 hover:underline">
                 Сбросить все фильтры
               </button>

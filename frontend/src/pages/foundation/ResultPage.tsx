@@ -35,7 +35,7 @@ export const ResultPage: React.FC = () => {
                     <div className="flex justify-center mb-6 text-green-500">
                         <CheckCircle size={80} />
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">Фундамент принят</h2>
+                    <h2 className="text-3xl font-medium text-gray-900 mb-4">Фундамент принят</h2>
                     <p className="text-lg text-gray-600">
                         Добро пожаловать в Матрицу, Коллега.<br />
                         Accessing Corporate University...
@@ -43,10 +43,10 @@ export const ResultPage: React.FC = () => {
                 </div>
             ) : (
                 <div className="animate-fade-in">
-                    <div className="flex justify-center mb-6 text-gray-400">
+                    <div className="flex justify-center mb-6 text-[#717182]">
                         <XCircle size={80} />
                     </div>
-                    <h2 className="text-3xl font-bold text-gray-900 mb-4">Доступ запрещен</h2>
+                    <h2 className="text-3xl font-medium text-gray-900 mb-4">Доступ запрещен</h2>
                     <p className="text-lg text-gray-600">
                         Вы отклонили Фундамент.<br />
                         Выход...

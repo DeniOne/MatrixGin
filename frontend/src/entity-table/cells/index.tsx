@@ -30,7 +30,7 @@ export const DateCell: React.FC<CellProps> = ({ value }) => {
 // 3. DateTime Cell
 export const DateTimeCell: React.FC<CellProps> = ({ value }) => {
     if (!value) return <span className="text-gray-300">-</span>;
-    return <span className="text-xs text-gray-500">{dayjs(value).format('DD.MM.YYYY HH:mm')}</span>;
+    return <span className="text-xs text-[#717182]">{dayjs(value).format('DD.MM.YYYY HH:mm')}</span>;
 };
 
 // 4. Badge Cell (for Enums)

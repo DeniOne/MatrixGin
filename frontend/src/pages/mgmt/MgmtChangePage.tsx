@@ -10,14 +10,14 @@ const MgmtChangePage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Управление Изменениями</h1>
-            <p className="text-gray-500 mb-8">Playbook для успешной трансформации</p>
+            <h1 className="text-3xl font-medium text-gray-900 mb-2">Управление Изменениями</h1>
+            <p className="text-[#717182] mb-8">Playbook для успешной трансформации</p>
 
             <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl p-6 mb-8 border border-orange-200">
                 <div className="flex items-center">
                     <RefreshCw className="w-8 h-8 text-orange-600 mr-4" />
                     <div>
-                        <h3 className="font-bold text-gray-900 mb-1">Модель ADKAR</h3>
+                        <h3 className="font-medium text-gray-900 mb-1">Модель ADKAR</h3>
                         <p className="text-sm text-gray-600">Пошаговый фреймворк для управления изменениями</p>
                     </div>
                 </div>
@@ -30,8 +30,8 @@ const MgmtChangePage: React.FC = () => {
                             <div className="flex items-center">
                                 <BookOpen className="w-6 h-6 text-orange-600 mr-4" />
                                 <div>
-                                    <h3 className="font-bold text-gray-900">{playbook.title}</h3>
-                                    <p className="text-sm text-gray-500">{playbook.steps} шагов</p>
+                                    <h3 className="font-medium text-gray-900">{playbook.title}</h3>
+                                    <p className="text-sm text-[#717182]">{playbook.steps} шагов</p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-2">

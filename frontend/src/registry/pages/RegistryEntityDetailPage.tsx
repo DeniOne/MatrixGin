@@ -33,7 +33,7 @@ const RegistryEntityDetailPage: React.FC = () => {
     const [executeTransition, { isLoading: isTransitioning }] = useExecuteTransitionMutation();
 
     if (!config || !id || !ruLabel) return <div>Invalid Route</div>;
-    if (isEntityLoading) return <div className="p-8 text-slate-500 animate-pulse">{UI_TEXT.LOADING}</div>;
+    if (isEntityLoading) return <div className="p-8 text-[#717182] animate-pulse">{UI_TEXT.LOADING}</div>;
     if (!entity) return <div>{UI_TEXT.NOT_FOUND}</div>;
 
     const handleUpdate = async (payload: CreateEntityPayload | UpdateEntityPayload) => {
@@ -60,7 +60,7 @@ const RegistryEntityDetailPage: React.FC = () => {
         <div className="max-w-5xl mx-auto">
             {/* HEADER */}
             <div className="mb-8">
-                <Link to={`/registry/${entityType}`} className="inline-flex items-center text-xs text-slate-500 hover:text-white mb-4 transition-colors">
+                <Link to={`/registry/${entityType}`} className="inline-flex items-center text-xs text-[#717182] hover:text-[#030213] mb-4 transition-colors">
                     <ArrowLeft className="w-3 h-3 mr-1" />
                     {UI_TEXT.BACK_TO_LIST}
                 </Link>
@@ -68,10 +68,10 @@ const RegistryEntityDetailPage: React.FC = () => {
                 <div className="flex items-start justify-between">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <h1 className="text-3xl font-bold text-white tracking-tight">{entity.name}</h1>
+                            <h1 className="text-3xl font-medium text-[#030213] tracking-tight">{entity.name}</h1>
                             <LifecycleBadge status={entity.lifecycle_status} />
                         </div>
-                        <div className="flex items-center gap-4 text-xs font-mono text-slate-500">
+                        <div className="flex items-center gap-4 text-xs font-mono text-[#717182]">
                             <span className="flex items-center gap-1">
                                 <Lock className="w-3 h-3" />
                                 {entity.code}
@@ -84,7 +84,7 @@ const RegistryEntityDetailPage: React.FC = () => {
             </div>
 
             {/* TABS */}
-            <div className="flex items-center gap-1 border-b border-slate-800 mb-8">
+            <div className="flex items-center gap-1 border-b border-black/10 mb-8">
                 {[
                     { id: 'general', label: UI_TEXT.TAB_GENERAL, icon: FileText },
                     { id: 'lifecycle', label: UI_TEXT.TAB_LIFECYCLE, icon: Settings },
@@ -97,7 +97,7 @@ const RegistryEntityDetailPage: React.FC = () => {
                             flex items-center gap-2 px-4 py-2 border-b-2 text-sm font-medium transition-colors
                             ${activeTab === tab.id
                                 ? 'border-indigo-500 text-indigo-400'
-                                : 'border-transparent text-slate-500 hover:text-slate-300 hover:border-slate-800'
+                                : 'border-transparent text-[#717182] hover:text-slate-300 hover:border-black/10'
                             }
                         `}
                     >
@@ -110,7 +110,7 @@ const RegistryEntityDetailPage: React.FC = () => {
             {/* CONTENT */}
             <div className="min-h-[400px]">
                 {activeTab === 'general' && (
-                    <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+                    <div className="bg-white border border-black/10 rounded-lg p-6">
                         <RegistryForm
                             initialData={entity}
                             onSubmit={handleUpdate}
@@ -121,9 +121,9 @@ const RegistryEntityDetailPage: React.FC = () => {
 
                 {activeTab === 'lifecycle' && (
                     <div className="max-w-2xl text-slate-300">
-                        <div className="mb-6 p-4 bg-slate-900/50 rounded border border-slate-800 text-sm">
-                            <h4 className="font-bold text-slate-200 mb-2">{UI_TEXT.LIFECYCLE_RULES_TITLE}</h4>
-                            <ul className="list-disc list-inside space-y-1 text-xs text-slate-400">
+                        <div className="mb-6 p-4 bg-white/50 rounded border border-black/10 text-sm">
+                            <h4 className="font-medium text-slate-200 mb-2">{UI_TEXT.LIFECYCLE_RULES_TITLE}</h4>
+                            <ul className="list-disc list-inside space-y-1 text-xs text-[#717182]">
                                 <li>{UI_TEXT.LIFECYCLE_RULE_1}</li>
                                 <li>{UI_TEXT.LIFECYCLE_RULE_2}</li>
                                 <li>{UI_TEXT.LIFECYCLE_RULE_3}</li>

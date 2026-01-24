@@ -24,19 +24,19 @@ export default function ExecutiveOFSPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-950 text-gray-100 font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen bg-[#F3F3F5] text-[#030213] font-sans selection:bg-blue-500/30">
             {/* Persistent Header */}
-            <header className="sticky top-0 z-40 bg-gray-950/80 backdrop-blur-xl border-b border-gray-800">
+            <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-black/10">
                 <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="p-2 bg-blue-600/10 rounded-lg border border-blue-600/20">
-                            <Network className="w-8 h-8 text-blue-500" />
+                        <div className="p-2 bg-blue-50 rounded-lg border border-blue-100">
+                            <Network className="w-8 h-8 text-blue-600" />
                         </div>
                         <div>
-                            <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                            <h1 className="text-2xl font-medium tracking-tight text-[#030213]">
                                 OFS — Организационно-функциональная система
                             </h1>
-                            <p className="text-xs text-gray-500 font-medium uppercase tracking-[0.2em] mt-0.5">
+                            <p className="text-xs text-[#717182] font-medium uppercase tracking-[0.2em] mt-0.5">
                                 Панель управления: Структура, ЦКП и Интеллектуальный капитал
                             </p>
                         </div>
@@ -44,35 +44,35 @@ export default function ExecutiveOFSPage() {
 
                     <div className="flex items-center gap-6">
                         {/* Mode Switcher */}
-                        <div className="flex bg-gray-900 rounded-full p-1 border border-gray-800 shadow-inner">
+                        <div className="flex bg-[#F3F3F5] rounded-full p-1 border border-black/5 shadow-inner">
                             <button
                                 onClick={() => setMode('As Is')}
-                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === 'As Is'
-                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                                    : 'text-gray-500 hover:text-gray-300'
+                                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${mode === 'As Is'
+                                    ? 'bg-blue-600 text-[#030213] shadow-lg shadow-blue-600/20'
+                                    : 'text-[#717182] hover:text-[#030213]'
                                     }`}
                             >
                                 ТЕКУЩЕЕ (AS IS)
                             </button>
                             <button
                                 onClick={() => setMode('Scenario')}
-                                className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${mode === 'Scenario'
-                                    ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/20'
-                                    : 'text-gray-500 hover:text-gray-300'
+                                className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all ${mode === 'Scenario'
+                                    ? 'bg-amber-600 text-[#030213] shadow-lg shadow-amber-600/20'
+                                    : 'text-[#717182] hover:text-[#030213]'
                                     }`}
                             >
                                 СЦЕНАРИЙ
                             </button>
                         </div>
 
-                        <div className="h-6 w-px bg-gray-800" />
+                        <div className="h-6 w-px bg-white/10" />
 
                         <div className="flex items-center gap-3">
-                            <button className="p-2 hover:bg-gray-800 rounded-lg transition-colors border border-transparent hover:border-gray-700">
-                                <History className="w-5 h-5 text-gray-400" />
+                            <button className="p-2 hover:bg-[#F3F3F5] rounded-lg transition-colors border border-transparent hover:border-black/5">
+                                <History className="w-5 h-5 text-[#717182]" />
                             </button>
-                            <button className="p-2 hover:bg-gray-800 rounded-lg transition-colors border border-transparent hover:border-gray-700">
-                                <Settings className="w-5 h-5 text-gray-400" />
+                            <button className="p-2 hover:bg-[#F3F3F5] rounded-lg transition-colors border border-transparent hover:border-black/5">
+                                <Settings className="w-5 h-5 text-[#717182]" />
                             </button>
                         </div>
                     </div>
@@ -83,14 +83,14 @@ export default function ExecutiveOFSPage() {
                 {/* System Snapshot */}
                 <section>
                     <div className="flex items-center gap-2 mb-4">
-                        <LayoutDashboard className="w-4 h-4 text-gray-400" />
-                        <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Контекст здоровья системы</h2>
+                        <LayoutDashboard className="w-4 h-4 text-[#717182]" />
+                        <h2 className="text-xs font-medium text-[#717182] uppercase tracking-widest">Контекст здоровья системы</h2>
                     </div>
                     <OFSSystemSnapshot />
                 </section>
 
                 {/* Main Interaction Area */}
-                <section className="flex-1 min-h-[700px] bg-gray-900/30 rounded-2xl border border-gray-800 relative overflow-hidden flex flex-col">
+                <section className="flex-1 min-h-[700px] bg-white rounded-2xl border border-black/10 shadow-sm relative overflow-hidden flex flex-col">
                     {/* Relationship Map */}
                     <div className="flex-1 overflow-hidden" onClick={() => setSelectedNode(null)}>
                         <OFSMap onSelectNode={(id: string, name: string) => setSelectedNode({ id, name })} selectedNodeId={selectedNode?.id} />
@@ -99,12 +99,12 @@ export default function ExecutiveOFSPage() {
                     {/* Scenario Mode Banner */}
                     {mode === 'Scenario' && (
                         <>
-                            <div className="absolute top-0 inset-x-0 bg-amber-600/10 border-b border-amber-600/20 py-2 px-6 flex items-center justify-between pointer-events-none z-10">
+                            <div className="absolute top-0 inset-x-0 bg-amber-50 border-b border-amber-200 py-2 px-6 flex items-center justify-between pointer-events-none z-10">
                                 <div className="flex items-center gap-2">
-                                    <Info className="w-4 h-4 text-amber-500" />
-                                    <span className="text-xs font-bold text-amber-500 uppercase tracking-widest">Экспериментальное стратегическое пространство</span>
+                                    <Info className="w-4 h-4 text-amber-600" />
+                                    <span className="text-xs font-medium text-amber-700 uppercase tracking-widest">Экспериментальное стратегическое пространство</span>
                                 </div>
-                                <span className="text-[10px] text-amber-500/60 italic leading-none">Сценарий показывает последствия гипотез, а не прогнозы.</span>
+                                <span className="text-[10px] text-amber-700/60 italic leading-none">Сценарий показывает последствия гипотез, а не прогнозы.</span>
                             </div>
                             <ScenarioMode type="Staffing" />
                         </>

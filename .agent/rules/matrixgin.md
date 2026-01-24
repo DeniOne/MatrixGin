@@ -1,6 +1,5 @@
 ---
 trigger: always_on
-glob:
-description:
 ---
 
+всегда используй правила из этого файла F:\Matrix_Gin\memory-bank\LANGUAGE_POLICY.md

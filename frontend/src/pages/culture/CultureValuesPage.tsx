@@ -87,8 +87,8 @@ const CultureValuesPage: React.FC = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Библиотека Ценностей</h1>
-                <p className="text-gray-500 mt-1">Истории воплощения наших ценностей в реальной работе</p>
+                <h1 className="text-3xl font-medium text-gray-900">Библиотека Ценностей</h1>
+                <p className="text-[#717182] mt-1">Истории воплощения наших ценностей в реальной работе</p>
             </div>
 
             {/* Values Filter */}
@@ -98,7 +98,7 @@ const CultureValuesPage: React.FC = () => {
                         key={value.name}
                         onClick={() => setSelectedValue(value.name)}
                         className={`flex items-center px-4 py-2.5 rounded-xl font-medium transition-all ${selectedValue === value.name
-                                ? `bg-${value.color}-600 text-white shadow-md`
+                                ? `bg-${value.color}-600 text-[#030213] shadow-md`
                                 : 'bg-white text-gray-700 border border-gray-200 hover:border-gray-300'
                             }`}
                     >
@@ -115,32 +115,32 @@ const CultureValuesPage: React.FC = () => {
                         <div className="h-48 relative overflow-hidden bg-gray-100">
                             <img src={story.thumbnail} alt={story.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                             {story.type === 'video' && (
-                                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="absolute inset-0 bg-white/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
                                         <PlayCircle className="w-10 h-10 text-indigo-600 fill-current" />
                                     </div>
                                 </div>
                             )}
-                            <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
+                            <div className="absolute top-3 right-3 bg-white/70 text-[#030213] px-2 py-1 rounded text-xs font-medium">
                                 {story.duration}
                             </div>
                         </div>
                         <div className="p-5">
                             <div className="mb-3">
-                                <span className={`text-xs font-bold uppercase tracking-wide px-2 py-1 rounded bg-${getValueColor(story.value)}-100 text-${getValueColor(story.value)}-700`}>
+                                <span className={`text-xs font-medium uppercase tracking-wide px-2 py-1 rounded bg-${getValueColor(story.value)}-100 text-${getValueColor(story.value)}-700`}>
                                     {story.value}
                                 </span>
                             </div>
-                            <h3 className="font-bold text-lg text-gray-900 mb-3 line-clamp-2">{story.title}</h3>
+                            <h3 className="font-medium text-lg text-gray-900 mb-3 line-clamp-2">{story.title}</h3>
                             <div className="flex items-center mb-4">
                                 <img src={story.authorImage} alt={story.author} className="w-8 h-8 rounded-full mr-2" />
                                 <div className="text-sm">
                                     <div className="font-medium text-gray-900">{story.author}</div>
-                                    <div className="text-gray-500 text-xs">{story.authorRole}</div>
+                                    <div className="text-[#717182] text-xs">{story.authorRole}</div>
                                 </div>
                             </div>
                             <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                                <div className="flex items-center text-gray-500 text-sm space-x-4">
+                                <div className="flex items-center text-[#717182] text-sm space-x-4">
                                     <span className="flex items-center">
                                         <ThumbsUp className="w-4 h-4 mr-1" />
                                         {story.likes}

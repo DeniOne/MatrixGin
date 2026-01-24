@@ -30,9 +30,9 @@ export const SignalBlock: React.FC<SignalBlockProps> = ({ title, data, onClick }
       onClick={onClick}
     >
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">{title}</h3>
+        <h3 className="text-sm font-medium text-[#717182] uppercase tracking-wider">{title}</h3>
         {data.delta && (
-          <span className={`text-xs font-bold px-2 py-1 rounded ${data.delta === 'IMPROVED' ? 'bg-green-100 text-green-800' :
+          <span className={`text-xs font-medium px-2 py-1 rounded ${data.delta === 'IMPROVED' ? 'bg-green-100 text-green-800' :
               data.delta === 'WORSENED' ? 'bg-red-100 text-red-800' :
                 'bg-gray-100 text-gray-800'
             }`}>
@@ -44,7 +44,7 @@ export const SignalBlock: React.FC<SignalBlockProps> = ({ title, data, onClick }
       <div className="flex items-center gap-4">
         <div className={`w-4 h-4 rounded-full ${colorClass} animate-pulse-slow`}></div>
         <div className="flex-1">
-          <span className={`text-2xl font-bold ${data.level === 'GRAY' ? 'text-gray-400' : 'text-gray-800'}`}>
+          <span className={`text-2xl font-medium ${data.level === 'GRAY' ? 'text-[#717182]' : 'text-gray-800'}`}>
             {LEVEL_LABELS[data.level]}
           </span>
         </div>

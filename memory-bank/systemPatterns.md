@@ -31,3 +31,4 @@ MatrixGin — это **Registry-Driven** система. Весь проект �
 ## Reference Documents
 - [ARCHITECTURE.md](file:///f:/Matrix_Gin/documentation/ARCHITECTURE.md)
 - [MASTER_CHECKLIST.md](file:///f:/Matrix_Gin/documentation/MASTER_CHECKLIST.md)
+- [UI_DESIGN_CANON.md](file:///f:/Matrix_Gin/memory-bank/UI_DESIGN_CANON.md)

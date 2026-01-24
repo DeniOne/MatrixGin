@@ -86,7 +86,7 @@ export default function OFSMap({ onSelectNode, selectedNodeId }: OFSMapProps) {
                             <text
                                 x={node.x} y={node.y + 45}
                                 textAnchor="middle"
-                                className={`text-[10px] font-black uppercase tracking-widest transition-colors ${isSelected ? 'fill-white' : 'fill-gray-400 group-hover:fill-gray-200'}`}
+                                className={`text-[10px] font-medium uppercase tracking-widest transition-colors ${isSelected ? 'fill-white' : 'fill-gray-400 group-hover:fill-gray-200'}`}
                             >
                                 {node.name}
                             </text>
@@ -102,18 +102,18 @@ export default function OFSMap({ onSelectNode, selectedNodeId }: OFSMapProps) {
             </svg>
 
             {/* Map Legend */}
-            <div className="absolute bottom-6 left-6 bg-gray-950/60 backdrop-blur-md border border-gray-800 p-4 rounded-xl space-y-3">
+            <div className="absolute bottom-6 left-6 bg-gray-950/60 backdrop-blur-md border border-black/10 p-4 rounded-xl space-y-3">
                 <div className="flex items-center gap-3">
                     <div className="w-3 h-px bg-gray-700" />
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Орг. связь</span>
+                    <span className="text-[10px] text-[#717182] font-medium uppercase tracking-wider">Орг. связь</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="w-3 h-px bg-blue-500/60" />
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Функционал</span>
+                    <span className="text-[10px] text-[#717182] font-medium uppercase tracking-wider">Функционал</span>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="w-3 h-px bg-purple-500/60" />
-                    <span className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">Экспертиза</span>
+                    <span className="text-[10px] text-[#717182] font-medium uppercase tracking-wider">Экспертиза</span>
                 </div>
             </div>
         </div>

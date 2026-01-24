@@ -41,38 +41,38 @@ const SalesLeaderboardPage: React.FC = () => {
     const getRankChangeIcon = (current: number, prev: number) => {
         if (current < prev) return <ArrowUp className="w-4 h-4 text-green-500" />;
         if (current > prev) return <ArrowDown className="w-4 h-4 text-red-500" />;
-        return <Minus className="w-4 h-4 text-gray-400" />;
+        return <Minus className="w-4 h-4 text-[#717182]" />;
     };
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                    <h1 className="text-3xl font-medium text-gray-900 flex items-center">
                         <Trophy className="w-8 h-8 mr-3 text-yellow-500" />
                         Рейтинг Продаж
                     </h1>
-                    <p className="text-gray-500 mt-1">Топ лучших сотрудников по выручке и конверсии</p>
+                    <p className="text-[#717182] mt-1">Топ лучших сотрудников по выручке и конверсии</p>
                 </div>
                 <div className="mt-4 md:mt-0 flex space-x-3">
                     <div className="bg-white border border-gray-200 rounded-lg p-1 flex">
                         <button
                             onClick={() => setPeriod('week')}
-                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${period === 'week' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${period === 'week' ? 'bg-gray-100 text-gray-900' : 'text-[#717182] hover:text-gray-700'
                                 }`}
                         >
                             Неделя
                         </button>
                         <button
                             onClick={() => setPeriod('month')}
-                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${period === 'month' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${period === 'month' ? 'bg-gray-100 text-gray-900' : 'text-[#717182] hover:text-gray-700'
                                 }`}
                         >
                             Месяц
                         </button>
                         <button
                             onClick={() => setPeriod('quarter')}
-                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${period === 'quarter' ? 'bg-gray-100 text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-colors ${period === 'quarter' ? 'bg-gray-100 text-gray-900' : 'text-[#717182] hover:text-gray-700'
                                 }`}
                         >
                             Квартал
@@ -93,26 +93,26 @@ const SalesLeaderboardPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 {/* 2nd Place */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center relative mt-4 md:mt-8">
-                    <div className="absolute -top-4 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white font-bold border-4 border-white shadow-sm">
+                    <div className="absolute -top-4 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-[#030213] font-medium border-4 border-white shadow-sm">
                         2
                     </div>
                     <div className="w-20 h-20 bg-gray-100 rounded-full mb-4 flex items-center justify-center overflow-hidden">
                         {agents[1].avatar ? (
                             <img src={agents[1].avatar} alt={agents[1].name} className="w-full h-full object-cover" />
                         ) : (
-                            <User className="w-10 h-10 text-gray-400" />
+                            <User className="w-10 h-10 text-[#717182]" />
                         )}
                     </div>
-                    <h3 className="font-bold text-lg text-gray-900 text-center">{agents[1].name}</h3>
-                    <p className="text-sm text-gray-500 mb-4 text-center">{agents[1].branch}</p>
+                    <h3 className="font-medium text-lg text-gray-900 text-center">{agents[1].name}</h3>
+                    <p className="text-sm text-[#717182] mb-4 text-center">{agents[1].branch}</p>
                     <div className="w-full space-y-2">
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Выручка</span>
-                            <span className="font-bold text-gray-900">{agents[1].revenue.toLocaleString()} ₽</span>
+                            <span className="text-[#717182]">Выручка</span>
+                            <span className="font-medium text-gray-900">{agents[1].revenue.toLocaleString()} ₽</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Конверсия</span>
-                            <span className="font-bold text-green-600">{agents[1].conversion}%</span>
+                            <span className="text-[#717182]">Конверсия</span>
+                            <span className="font-medium text-green-600">{agents[1].conversion}%</span>
                         </div>
                     </div>
                 </div>
@@ -129,46 +129,46 @@ const SalesLeaderboardPage: React.FC = () => {
                             <User className="w-12 h-12 text-yellow-600" />
                         )}
                     </div>
-                    <h3 className="font-bold text-xl text-gray-900 text-center">{agents[0].name}</h3>
-                    <p className="text-sm text-gray-500 mb-6 text-center">{agents[0].branch}</p>
+                    <h3 className="font-medium text-xl text-gray-900 text-center">{agents[0].name}</h3>
+                    <p className="text-sm text-[#717182] mb-6 text-center">{agents[0].branch}</p>
                     <div className="w-full space-y-3 bg-white/50 p-4 rounded-lg">
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-600">Выручка</span>
-                            <span className="font-bold text-gray-900 text-lg">{agents[0].revenue.toLocaleString()} ₽</span>
+                            <span className="font-medium text-gray-900 text-lg">{agents[0].revenue.toLocaleString()} ₽</span>
                         </div>
                         <div className="flex justify-between text-sm">
                             <span className="text-gray-600">Конверсия</span>
-                            <span className="font-bold text-green-600 text-lg">{agents[0].conversion}%</span>
+                            <span className="font-medium text-green-600 text-lg">{agents[0].conversion}%</span>
                         </div>
                         <div className="flex justify-between text-sm pt-2 border-t border-gray-100">
                             <span className="text-gray-600">Баллы</span>
-                            <span className="font-bold text-purple-600">{agents[0].points} XP</span>
+                            <span className="font-medium text-purple-600">{agents[0].points} XP</span>
                         </div>
                     </div>
                 </div>
 
                 {/* 3rd Place */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 flex flex-col items-center relative mt-4 md:mt-8">
-                    <div className="absolute -top-4 w-8 h-8 bg-orange-300 rounded-full flex items-center justify-center text-white font-bold border-4 border-white shadow-sm">
+                    <div className="absolute -top-4 w-8 h-8 bg-orange-300 rounded-full flex items-center justify-center text-[#030213] font-medium border-4 border-white shadow-sm">
                         3
                     </div>
                     <div className="w-20 h-20 bg-gray-100 rounded-full mb-4 flex items-center justify-center overflow-hidden">
                         {agents[2].avatar ? (
                             <img src={agents[2].avatar} alt={agents[2].name} className="w-full h-full object-cover" />
                         ) : (
-                            <User className="w-10 h-10 text-gray-400" />
+                            <User className="w-10 h-10 text-[#717182]" />
                         )}
                     </div>
-                    <h3 className="font-bold text-lg text-gray-900 text-center">{agents[2].name}</h3>
-                    <p className="text-sm text-gray-500 mb-4 text-center">{agents[2].branch}</p>
+                    <h3 className="font-medium text-lg text-gray-900 text-center">{agents[2].name}</h3>
+                    <p className="text-sm text-[#717182] mb-4 text-center">{agents[2].branch}</p>
                     <div className="w-full space-y-2">
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Выручка</span>
-                            <span className="font-bold text-gray-900">{agents[2].revenue.toLocaleString()} ₽</span>
+                            <span className="text-[#717182]">Выручка</span>
+                            <span className="font-medium text-gray-900">{agents[2].revenue.toLocaleString()} ₽</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Конверсия</span>
-                            <span className="font-bold text-green-600">{agents[2].conversion}%</span>
+                            <span className="text-[#717182]">Конверсия</span>
+                            <span className="font-medium text-green-600">{agents[2].conversion}%</span>
                         </div>
                     </div>
                 </div>
@@ -180,12 +180,12 @@ const SalesLeaderboardPage: React.FC = () => {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-100">
-                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ранг</th>
-                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Сотрудник</th>
-                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Филиал</th>
-                                <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Сделки</th>
-                                <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Конверсия</th>
-                                <th className="px-6 py-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Выручка</th>
+                                <th className="px-6 py-4 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">Ранг</th>
+                                <th className="px-6 py-4 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">Сотрудник</th>
+                                <th className="px-6 py-4 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">Филиал</th>
+                                <th className="px-6 py-4 text-right text-xs font-medium text-[#717182] uppercase tracking-wider">Сделки</th>
+                                <th className="px-6 py-4 text-right text-xs font-medium text-[#717182] uppercase tracking-wider">Конверсия</th>
+                                <th className="px-6 py-4 text-right text-xs font-medium text-[#717182] uppercase tracking-wider">Выручка</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -193,19 +193,19 @@ const SalesLeaderboardPage: React.FC = () => {
                                 <tr key={agent.id} className="hover:bg-gray-50 transition-colors">
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
-                                            <span className="font-bold text-gray-900 w-6">{agent.rank}</span>
+                                            <span className="font-medium text-gray-900 w-6">{agent.rank}</span>
                                             {getRankChangeIcon(agent.rank, agent.prevRank)}
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
                                             <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
-                                                <User className="w-4 h-4 text-gray-500" />
+                                                <User className="w-4 h-4 text-[#717182]" />
                                             </div>
                                             <span className="font-medium text-gray-900">{agent.name}</span>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#717182]">
                                         {agent.branch}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-900">
@@ -214,7 +214,7 @@ const SalesLeaderboardPage: React.FC = () => {
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-green-600">
                                         {agent.conversion}%
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-bold text-gray-900">
+                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900">
                                         {agent.revenue.toLocaleString()} ₽
                                     </td>
                                 </tr>

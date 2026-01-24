@@ -57,13 +57,13 @@ export const CourseCard: React.FC<CourseCardProps> = ({
             {/* Header / Badges */}
             <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
                 {course.isMandatory && (
-                    <div className="flex items-center gap-1 px-2 py-1 bg-rose-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-md shadow-sm">
+                    <div className="flex items-center gap-1 px-2 py-1 bg-rose-500 text-[#030213] text-[10px] font-medium uppercase tracking-wider rounded-md shadow-sm">
                         <AlertCircle size={10} />
                         Обязательный
                     </div>
                 )}
                 {course.requiredGrade && (
-                    <div className={`flex items-center gap-1 px-2 py-1 border text-[10px] font-bold uppercase tracking-wider rounded-md shadow-sm ${getGradeColor(course.requiredGrade)}`}>
+                    <div className={`flex items-center gap-1 px-2 py-1 border text-[10px] font-medium uppercase tracking-wider rounded-md shadow-sm ${getGradeColor(course.requiredGrade)}`}>
                         <GraduationCap size={10} />
                         {course.requiredGrade}
                     </div>
@@ -80,16 +80,16 @@ export const CourseCard: React.FC<CourseCardProps> = ({
             {/* Content */}
             <div className="px-6 pb-6 pt-8 flex-1 flex flex-col">
                 <div className="mb-2">
-                    <span className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest block mb-1">
+                    <span className="text-[10px] font-medium text-indigo-500 uppercase tracking-widest block mb-1">
                         {course.academyName || 'Академия'}
                     </span>
-                    <h3 className="text-lg font-bold text-gray-900 line-clamp-2 leading-snug group-hover:text-indigo-600 transition-colors">
+                    <h3 className="text-lg font-medium text-gray-900 line-clamp-2 leading-snug group-hover:text-indigo-600 transition-colors">
                         {course.title}
                     </h3>
                 </div>
 
                 {course.description && (
-                    <p className="text-gray-500 text-sm mb-6 line-clamp-2 flex-grow">
+                    <p className="text-[#717182] text-sm mb-6 line-clamp-2 flex-grow">
                         {course.description}
                     </p>
                 )}
@@ -116,7 +116,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                         {course.rewardMC > 0 && (
                             <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg border border-amber-100">
                                 <Award size={14} className="text-amber-500" />
-                                <span className="text-xs font-bold text-amber-700">{course.rewardMC} MC</span>
+                                <span className="text-xs font-medium text-amber-700">{course.rewardMC} MC</span>
                             </div>
                         )}
                     </div>
@@ -124,7 +124,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                     {isEnrolled ? (
                         <Link
                             to={`${baseUrl}/${course.id}`}
-                            className="flex items-center gap-1 px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all hover:-translate-y-0.5"
+                            className="flex items-center gap-1 px-4 py-2 bg-indigo-600 text-[#030213] text-xs font-medium rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all hover:-translate-y-0.5"
                         >
                             Продолжить
                             <ChevronRight size={14} />
@@ -133,7 +133,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({
                         <button
                             onClick={handleEnroll}
                             disabled={isLoading}
-                            className="flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 border-2 border-indigo-600 text-xs font-bold rounded-xl hover:bg-indigo-50 transition-all disabled:opacity-50"
+                            className="flex items-center gap-2 px-4 py-2 bg-white text-indigo-600 border-2 border-indigo-600 text-xs font-medium rounded-xl hover:bg-indigo-50 transition-all disabled:opacity-50"
                         >
                             {isLoading ? (
                                 <Loader2 size={14} className="animate-spin" />

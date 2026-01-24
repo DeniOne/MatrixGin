@@ -28,7 +28,7 @@ export const PersonalFileCard: React.FC<PersonalFileCardProps> = ({
             <div className="flex items-start justify-between">
                 <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-medium text-gray-900">
                             {file.fileNumber}
                         </h3>
                         <PersonalFileStatusBadge status={file.hrStatus} />

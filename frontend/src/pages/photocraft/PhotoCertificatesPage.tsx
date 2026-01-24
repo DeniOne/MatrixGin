@@ -83,14 +83,14 @@ const PhotoCertificatesPage: React.FC = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Мои достижения</h1>
-                <p className="text-gray-500 mt-1">Сертификаты, бейджи и подтвержденные навыки</p>
+                <h1 className="text-3xl font-medium text-gray-900">Мои достижения</h1>
+                <p className="text-[#717182] mt-1">Сертификаты, бейджи и подтвержденные навыки</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Certificates Column */}
                 <div className="lg:col-span-2 space-y-8">
-                    <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                    <h2 className="text-xl font-medium text-gray-900 flex items-center">
                         <Award className="w-6 h-6 mr-2 text-indigo-600" />
                         Сертификаты
                     </h2>
@@ -101,9 +101,9 @@ const PhotoCertificatesPage: React.FC = () => {
                                 <div className="h-48 bg-gray-100 relative">
                                     <img src={cert.image} alt={cert.title} className="w-full h-full object-cover" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
-                                        <div className="text-white">
+                                        <div className="text-[#030213]">
                                             <div className="text-xs font-medium opacity-80 mb-1">Выдан: {cert.date}</div>
-                                            <h3 className="font-bold text-lg leading-tight">{cert.title}</h3>
+                                            <h3 className="font-medium text-lg leading-tight">{cert.title}</h3>
                                         </div>
                                     </div>
                                 </div>
@@ -113,7 +113,7 @@ const PhotoCertificatesPage: React.FC = () => {
                                             <CheckCircle className="w-4 h-4 mr-1.5" />
                                             Подтвержден
                                         </div>
-                                        <span className="bg-indigo-50 text-indigo-700 px-2 py-1 rounded text-xs font-bold">
+                                        <span className="bg-indigo-50 text-indigo-700 px-2 py-1 rounded text-xs font-medium">
                                             {cert.grade}
                                         </span>
                                     </div>
@@ -127,7 +127,7 @@ const PhotoCertificatesPage: React.FC = () => {
                                     </div>
 
                                     <div className="flex space-x-2 pt-2 border-t border-gray-100">
-                                        <button className="flex-1 flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
+                                        <button className="flex-1 flex items-center justify-center px-4 py-2 bg-indigo-600 text-[#030213] rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">
                                             <Download className="w-4 h-4 mr-2" />
                                             Скачать PDF
                                         </button>
@@ -142,21 +142,21 @@ const PhotoCertificatesPage: React.FC = () => {
                         {/* Placeholder for next certificate */}
                         <div className="bg-gray-50 rounded-xl border-2 border-dashed border-gray-300 flex flex-col items-center justify-center p-8 text-center h-full min-h-[300px]">
                             <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mb-4">
-                                <Lock className="w-8 h-8 text-gray-400" />
+                                <Lock className="w-8 h-8 text-[#717182]" />
                             </div>
-                            <h3 className="font-bold text-gray-900 mb-2">Следующая цель</h3>
-                            <p className="text-gray-500 text-sm mb-4">Курс "Продвинутая ретушь"</p>
+                            <h3 className="font-medium text-gray-900 mb-2">Следующая цель</h3>
+                            <p className="text-[#717182] text-sm mb-4">Курс "Продвинутая ретушь"</p>
                             <div className="w-full bg-gray-200 rounded-full h-2 mb-2 max-w-[200px]">
                                 <div className="bg-indigo-600 h-2 rounded-full" style={{ width: '45%' }}></div>
                             </div>
-                            <span className="text-xs text-gray-500">Прогресс: 45%</span>
+                            <span className="text-xs text-[#717182]">Прогресс: 45%</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Badges Column */}
                 <div className="space-y-6">
-                    <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                    <h2 className="text-xl font-medium text-gray-900 flex items-center">
                         <Star className="w-6 h-6 mr-2 text-yellow-500" />
                         Бейджи
                     </h2>
@@ -170,10 +170,10 @@ const PhotoCertificatesPage: React.FC = () => {
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex justify-between items-start">
-                                            <h3 className="font-bold text-gray-900 text-sm">{badge.title}</h3>
+                                            <h3 className="font-medium text-gray-900 text-sm">{badge.title}</h3>
                                             {badge.unlocked && <CheckCircle className="w-4 h-4 text-green-500" />}
                                         </div>
-                                        <p className="text-xs text-gray-500 mt-1">{badge.description}</p>
+                                        <p className="text-xs text-[#717182] mt-1">{badge.description}</p>
 
                                         {!badge.unlocked && badge.progress !== undefined && (
                                             <div className="mt-2">
@@ -183,7 +183,7 @@ const PhotoCertificatesPage: React.FC = () => {
                                                         style={{ width: `${badge.progress}%` }}
                                                     ></div>
                                                 </div>
-                                                <div className="text-right text-[10px] text-gray-400 mt-1">{badge.progress}%</div>
+                                                <div className="text-right text-[10px] text-[#717182] mt-1">{badge.progress}%</div>
                                             </div>
                                         )}
                                     </div>

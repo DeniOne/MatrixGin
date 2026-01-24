@@ -83,10 +83,10 @@ const SoftIDPPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Индивидуальный План Развития</h1>
-                    <p className="text-gray-500 mt-1">Ставьте амбициозные цели и отслеживайте свой прогресс</p>
+                    <h1 className="text-3xl font-medium text-gray-900">Индивидуальный План Развития</h1>
+                    <p className="text-[#717182] mt-1">Ставьте амбициозные цели и отслеживайте свой прогресс</p>
                 </div>
-                <button className="mt-4 md:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 flex items-center shadow-sm">
+                <button className="mt-4 md:mt-0 px-4 py-2 bg-indigo-600 text-[#030213] rounded-lg font-medium hover:bg-indigo-700 flex items-center shadow-sm">
                     <Plus className="w-5 h-5 mr-2" />
                     Создать цель
                 </button>
@@ -96,26 +96,26 @@ const SoftIDPPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-medium text-gray-500">Всего целей</h3>
+                        <h3 className="text-sm font-medium text-[#717182]">Всего целей</h3>
                         <Target className="w-5 h-5 text-indigo-600" />
                     </div>
-                    <div className="text-3xl font-bold text-gray-900">{goals.length}</div>
+                    <div className="text-3xl font-medium text-gray-900">{goals.length}</div>
                 </div>
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-medium text-gray-500">В процессе</h3>
+                        <h3 className="text-sm font-medium text-[#717182]">В процессе</h3>
                         <TrendingUp className="w-5 h-5 text-blue-600" />
                     </div>
-                    <div className="text-3xl font-bold text-gray-900">
+                    <div className="text-3xl font-medium text-gray-900">
                         {goals.filter(g => g.status === 'in_progress').length}
                     </div>
                 </div>
                 <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                        <h3 className="text-sm font-medium text-gray-500">Требуют внимания</h3>
+                        <h3 className="text-sm font-medium text-[#717182]">Требуют внимания</h3>
                         <AlertCircle className="w-5 h-5 text-red-600" />
                     </div>
-                    <div className="text-3xl font-bold text-gray-900">
+                    <div className="text-3xl font-medium text-gray-900">
                         {goals.filter(g => g.status === 'overdue').length}
                     </div>
                 </div>
@@ -128,18 +128,18 @@ const SoftIDPPage: React.FC = () => {
                         <div className="flex flex-col md:flex-row justify-between items-start mb-6">
                             <div className="flex-1">
                                 <div className="flex items-center space-x-3 mb-2">
-                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide ${getStatusColor(goal.status)}`}>
+                                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium uppercase tracking-wide ${getStatusColor(goal.status)}`}>
                                         {getStatusText(goal.status)}
                                     </span>
-                                    <span className="text-xs text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded">
+                                    <span className="text-xs text-[#717182] font-medium bg-gray-100 px-2 py-0.5 rounded">
                                         {goal.category}
                                     </span>
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900">{goal.title}</h3>
+                                <h3 className="text-xl font-medium text-gray-900">{goal.title}</h3>
                             </div>
                             <div className="flex items-center mt-4 md:mt-0 space-x-4">
                                 <div className="text-right">
-                                    <div className="text-sm text-gray-500 flex items-center justify-end">
+                                    <div className="text-sm text-[#717182] flex items-center justify-end">
                                         <Calendar className="w-4 h-4 mr-1" />
                                         Дедлайн: {goal.deadline}
                                     </div>
@@ -147,7 +147,7 @@ const SoftIDPPage: React.FC = () => {
                                         {goal.status === 'overdue' && 'Просрочено на 5 дней'}
                                     </div>
                                 </div>
-                                <button className="text-gray-400 hover:text-gray-600">
+                                <button className="text-[#717182] hover:text-gray-600">
                                     <MoreHorizontal className="w-6 h-6" />
                                 </button>
                             </div>
@@ -155,7 +155,7 @@ const SoftIDPPage: React.FC = () => {
 
                         {/* Progress Bar */}
                         <div className="mb-6">
-                            <div className="flex justify-between text-sm font-medium text-gray-500 mb-2">
+                            <div className="flex justify-between text-sm font-medium text-[#717182] mb-2">
                                 <span>Прогресс выполнения</span>
                                 <span>{goal.progress}%</span>
                             </div>
@@ -171,7 +171,7 @@ const SoftIDPPage: React.FC = () => {
 
                         {/* Tasks */}
                         <div className="bg-gray-50 rounded-lg p-4">
-                            <h4 className="font-bold text-sm text-gray-700 mb-3 flex items-center">
+                            <h4 className="font-medium text-sm text-gray-700 mb-3 flex items-center">
                                 <CheckSquare className="w-4 h-4 mr-2" />
                                 Ключевые результаты (Key Results)
                             </h4>
@@ -180,9 +180,9 @@ const SoftIDPPage: React.FC = () => {
                                     <label key={task.id} className="flex items-start space-x-3 cursor-pointer group">
                                         <div className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${task.completed ? 'bg-indigo-600 border-indigo-600' : 'bg-white border-gray-300 group-hover:border-indigo-400'
                                             }`}>
-                                            {task.completed && <CheckSquare className="w-3.5 h-3.5 text-white" />}
+                                            {task.completed && <CheckSquare className="w-3.5 h-3.5 text-[#030213]" />}
                                         </div>
-                                        <span className={`text-sm ${task.completed ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
+                                        <span className={`text-sm ${task.completed ? 'text-[#717182] line-through' : 'text-gray-700'}`}>
                                             {task.title}
                                         </span>
                                     </label>

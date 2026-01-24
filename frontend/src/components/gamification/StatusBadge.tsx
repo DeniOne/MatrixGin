@@ -8,7 +8,7 @@ const StatusBadge: React.FC = () => {
     if (isLoading) {
         return (
             <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg">
-                <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+                <Loader2 className="w-4 h-4 animate-spin text-[#717182]" />
             </div>
         );
     }
@@ -20,36 +20,36 @@ const StatusBadge: React.FC = () => {
     const getStatusColor = (statusValue: EmployeeStatus) => {
         switch (statusValue) {
             case EmployeeStatus.PHOTON:
-                return 'bg-gray-600 text-gray-200';
+                return 'bg-gray-100 text-gray-600 border border-black/5';
             case EmployeeStatus.TOPCHIK:
-                return 'bg-blue-600 text-blue-100';
+                return 'bg-blue-50 text-blue-600 border border-blue-200';
             case EmployeeStatus.KREMEN:
-                return 'bg-green-600 text-green-100';
+                return 'bg-green-50 text-green-600 border border-green-200';
             case EmployeeStatus.CARBON:
-                return 'bg-purple-600 text-purple-100';
+                return 'bg-purple-50 text-purple-600 border border-purple-200';
             case EmployeeStatus.UNIVERSE:
-                return 'bg-gradient-to-r from-yellow-500 to-orange-500 text-white';
+                return 'bg-gradient-to-r from-yellow-500 to-orange-500 text-[#030213] shadow-lg shadow-orange-500/20';
             default:
-                return 'bg-gray-600 text-gray-200';
+                return 'bg-gray-100 text-gray-600';
         }
     };
 
     const getRankColor = (rank: EmployeeRank) => {
         switch (rank) {
             case EmployeeRank.TRAINEE:
-                return 'text-gray-400';
+                return 'text-[#717182]';
             case EmployeeRank.EMPLOYEE:
-                return 'text-blue-400';
+                return 'text-blue-600';
             case EmployeeRank.SPECIALIST:
-                return 'text-green-400';
+                return 'text-green-600';
             case EmployeeRank.EXPERT:
-                return 'text-purple-400';
+                return 'text-purple-600';
             case EmployeeRank.INVESTOR:
-                return 'text-yellow-400';
+                return 'text-yellow-600';
             case EmployeeRank.MAGNATE:
-                return 'text-orange-400';
+                return 'text-orange-600';
             default:
-                return 'text-gray-400';
+                return 'text-[#717182]';
         }
     };
 
@@ -90,55 +90,55 @@ const StatusBadge: React.FC = () => {
     };
 
     return (
-        <div className="bg-gray-800 rounded-lg p-4 space-y-3">
+        <div className="bg-white rounded-2xl p-6 border border-black/10 shadow-sm space-y-4 h-full">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <Trophy className="w-5 h-5 text-yellow-500" />
-                    <span className="text-sm font-medium text-gray-400">Статус</span>
+                    <span className="text-sm font-medium text-[#717182]">Статус</span>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-bold ${getStatusColor(status.status)}`}>
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(status.status)}`}>
                     {getStatusLabel(status.status)}
                 </span>
             </div>
 
             <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-400">Ранг</span>
-                <span className={`text-sm font-bold ${getRankColor(status.rank)}`}>
+                <span className="text-sm font-medium text-[#717182]">Ранг</span>
+                <span className={`text-sm font-medium ${getRankColor(status.rank)}`}>
                     {getRankLabel(status.rank)}
                 </span>
             </div>
 
             <div>
                 <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-gray-400">Прогресс до следующего статуса</span>
-                    <span className="text-xs font-medium text-white">
+                    <span className="text-xs text-[#717182]">Прогресс до следующего статуса</span>
+                    <span className="text-xs font-medium text-[#030213]">
                         {status.progressPercent.toFixed(1)}%
                     </span>
                 </div>
-                <div className="w-full bg-gray-700 rounded-full h-2">
+                <div className="w-full bg-[#F3F3F5] rounded-full h-2">
                     <div
                         className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300"
                         style={{ width: `${Math.min(status.progressPercent, 100)}%` }}
                     />
                 </div>
                 <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-[#717182]">
                         {status.currentGMC.toLocaleString()} GMC
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-[#717182]">
                         {status.nextStatusThreshold.toLocaleString()} GMC
                     </span>
                 </div>
             </div>
 
             {status.privileges && status.privileges.length > 0 && (
-                <div className="pt-3 border-t border-gray-700">
-                    <div className="text-xs font-medium text-gray-400 mb-2">Привилегии</div>
+                <div className="pt-3 border-t border-black/5">
+                    <div className="text-xs font-medium text-[#717182] mb-2">Привилегии</div>
                     <div className="flex flex-wrap gap-1">
                         {status.privileges.map((privilege, index) => (
                             <span
                                 key={index}
-                                className="px-2 py-1 bg-gray-700 text-xs text-gray-300 rounded"
+                                className="px-2 py-1 bg-[#F3F3F5] text-xs text-[#030213] rounded border border-black/5"
                             >
                                 {privilege}
                             </span>

@@ -69,7 +69,7 @@ export const RelationshipBlock: React.FC<RelationshipBlockProps> = ({
             <div className="px-4 py-3 border-b bg-gray-50 flex justify-between items-center">
                 <div>
                     <h4 className="font-medium text-sm text-gray-900">{definition.label || definition.urn}</h4>
-                    <p className="text-xs text-gray-500">Множественность: {definition.cardinality}</p>
+                    <p className="text-xs text-[#717182]">Множественность: {definition.cardinality}</p>
                 </div>
             </div>
 
@@ -80,14 +80,14 @@ export const RelationshipBlock: React.FC<RelationshipBlockProps> = ({
                         <div className="flex gap-2">
                             <button
                                 onClick={() => { setReplaceTargetId(rel.id); setIsSelectorOpen(true); }}
-                                className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                                className="p-1 text-[#717182] hover:text-blue-600 transition-colors"
                                 title="Заменить"
                             >
                                 <ArrowLeftRight size={16} />
                             </button>
                             <button
                                 onClick={() => { if (confirm('Отвязать?')) handleUnlink(rel.id); }}
-                                className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                className="p-1 text-[#717182] hover:text-red-600 transition-colors"
                                 title="Отвязать"
                             >
                                 <Trash2 size={16} />
@@ -96,7 +96,7 @@ export const RelationshipBlock: React.FC<RelationshipBlockProps> = ({
                     </div>
                 ))}
                 {relevantInstances.length === 0 && (
-                    <div className="px-4 py-3 text-sm text-gray-400 italic">Нет связей</div>
+                    <div className="px-4 py-3 text-sm text-[#717182] italic">Нет связей</div>
                 )}
             </div>
 

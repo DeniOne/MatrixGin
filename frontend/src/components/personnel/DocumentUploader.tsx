@@ -103,7 +103,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                 ) : (
                     <div className="text-gray-600">
                         <svg
-                            className="mx-auto h-12 w-12 text-gray-400 mb-2"
+                            className="mx-auto h-12 w-12 text-[#717182] mb-2"
                             stroke="currentColor"
                             fill="none"
                             viewBox="0 0 48 48"
@@ -120,7 +120,7 @@ export const DocumentUploader: React.FC<DocumentUploaderProps> = ({
                             Перетащите файлы сюда или{' '}
                             <span className="text-blue-600 hover:text-blue-700">выберите</span>
                         </p>
-                        <p className="text-xs text-gray-500">PDF, JPG, PNG до 10МБ</p>
+                        <p className="text-xs text-[#717182]">PDF, JPG, PNG до 10МБ</p>
                     </div>
                 )}
             </div>

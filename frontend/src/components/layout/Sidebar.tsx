@@ -146,10 +146,10 @@ const Sidebar: React.FC = () => {
                     <div
                         onClick={() => toggleExpand(item.path)}
                         className={clsx(
-                            'flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 cursor-pointer',
+                            'flex items-center justify-between px-4 py-3 text-sm rounded-lg transition-colors duration-200 cursor-pointer',
                             isActive || isChildActive
-                                ? 'bg-indigo-600/10 text-indigo-400'
-                                : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                                ? 'bg-blue-50 text-blue-600 font-medium'
+                                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-normal',
                             depth > 0 && 'ml-4'
                         )}
                     >
@@ -164,10 +164,10 @@ const Sidebar: React.FC = () => {
                         to={item.path}
                         className={({ isActive }) =>
                             clsx(
-                                'flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
+                                'flex items-center px-4 py-3 text-sm rounded-lg transition-colors duration-200',
                                 isActive
-                                    ? 'bg-indigo-600/10 text-indigo-400'
-                                    : 'text-gray-400 hover:bg-gray-800 hover:text-white',
+                                    ? 'bg-blue-50 text-blue-600 font-medium'
+                                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 font-normal',
                                 depth > 0 && 'ml-8'
                             )
                         }
@@ -188,23 +188,23 @@ const Sidebar: React.FC = () => {
     };
 
     return (
-        <aside className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col h-full flex-shrink-0">
-            <div className="h-16 flex items-center px-6 border-b border-gray-800">
-                <span className="text-xl font-bold text-white tracking-wider">MatrixGin</span>
-                <span className="ml-2 text-xs text-gray-500">v2.0</span>
+        <aside className="w-64 bg-white border-r border-black/10 flex flex-col h-full flex-shrink-0">
+            <div className="h-16 flex items-center px-6 border-b border-black/10">
+                <span className="text-xl font-medium text-[#030213] tracking-wider">MatrixGin</span>
+                <span className="ml-2 text-xs text-[#717182]">v2.0</span>
             </div>
 
             {/* User Info */}
             {user && (
-                <div className="px-4 py-3 border-b border-gray-800 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
-                        <User className="w-5 h-5 text-white" />
+                <div className="px-4 py-3 border-b border-[#E1E7EC] flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <User className="w-5 h-5 text-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">
+                        <p className="text-sm font-medium text-slate-800 truncate">
                             {user.firstName} {user.lastName}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">{user.role}</p>
+                        <p className="text-xs text-[#717182] truncate">{user.role}</p>
                     </div>
                 </div>
             )}
@@ -217,15 +217,15 @@ const Sidebar: React.FC = () => {
             </nav>
 
             {/* Footer with Settings and Logout */}
-            <div className="p-4 border-t border-gray-800 space-y-1">
+            <div className="p-4 border-t border-black/10 space-y-1">
                 <NavLink
                     to="/settings"
                     className={({ isActive }) =>
                         clsx(
                             'flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200',
                             isActive
-                                ? 'bg-indigo-600/10 text-indigo-400'
-                                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                                ? 'bg-blue-50 text-blue-600'
+                                : 'text-[#717182] hover:bg-slate-100 hover:text-slate-900'
                         )
                     }
                 >
@@ -234,7 +234,7 @@ const Sidebar: React.FC = () => {
                 </NavLink>
                 <button
                     onClick={handleLogout}
-                    className="w-full flex items-center px-4 py-2 text-sm font-medium rounded-lg text-gray-400 hover:bg-red-900/20 hover:text-red-400 transition-colors duration-200"
+                    className="w-full flex items-center px-4 py-2 text-sm font-medium rounded-lg text-[#717182] hover:bg-red-50 hover:text-red-500 transition-colors duration-200"
                 >
                     <LogOut className="w-5 h-5 mr-3" />
                     Выйти

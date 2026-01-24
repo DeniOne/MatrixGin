@@ -39,14 +39,14 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-white/50 flex items-center justify-center z-50 p-4">
             <div className="bg-gray-800 rounded-xl border border-gray-700 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-700">
-                    <h2 className="text-xl font-bold text-white">Создать задачу</h2>
+                    <h2 className="text-xl font-medium text-[#030213]">Создать задачу</h2>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-white transition-colors"
+                        className="text-[#717182] hover:text-[#030213] transition-colors"
                     >
                         <X className="w-6 h-6" />
                     </button>
@@ -69,7 +69,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
                             type="text"
                             value={formData.title}
                             onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-4 py-2 bg-white border border-gray-700 rounded-lg text-[#030213] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             placeholder="Введите заголовок задачи"
                             required
                         />
@@ -84,7 +84,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             rows={5}
-                            className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                            className="w-full px-4 py-2 bg-white border border-gray-700 rounded-lg text-[#030213] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                             placeholder="Введите описание задачи"
                             required
                         />
@@ -98,7 +98,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
                         <select
                             value={formData.priority}
                             onChange={(e) => setFormData({ ...formData, priority: e.target.value as TaskPriority })}
-                            className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-4 py-2 bg-white border border-gray-700 rounded-lg text-[#030213] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
                             <option value={TaskPriority.LOW}>Низкий</option>
                             <option value={TaskPriority.MEDIUM}>Средний</option>
@@ -116,7 +116,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
                             type="date"
                             value={formData.dueDate}
                             onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-                            className="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full px-4 py-2 bg-white border border-gray-700 rounded-lg text-[#030213] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
@@ -125,14 +125,14 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = ({ onClose }) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                            className="px-6 py-2 bg-gray-700 hover:bg-gray-600 text-[#030213] rounded-lg transition-colors"
                         >
                             Отмена
                         </button>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-[#030213] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {isLoading ? 'Creating...' : 'Create Task'}
                         </button>

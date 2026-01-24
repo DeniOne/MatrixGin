@@ -93,7 +93,7 @@ export const PersonalFileDetailPage: React.FC = () => {
                 <div className="flex items-start justify-between">
                     <div>
                         <div className="flex items-center gap-3 mb-2">
-                            <h2 className="text-2xl font-bold text-gray-900">{file.fileNumber}</h2>
+                            <h2 className="text-2xl font-medium text-gray-900">{file.fileNumber}</h2>
                             <PersonalFileStatusBadge status={file.hrStatus} />
                         </div>
                         <div className="text-sm text-gray-600 space-y-1">
@@ -137,9 +137,9 @@ export const PersonalFileDetailPage: React.FC = () => {
 
             {/* Status Change Dialog */}
             {showStatusDialog && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Изменить статус</h3>
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">Изменить статус</h3>
                         <div className="space-y-2">
                             {([HRStatus.ONBOARDING, HRStatus.ACTIVE, HRStatus.SUSPENDED, HRStatus.TERMINATED] as HRStatus[]).map((status) => (
                                 <button
@@ -171,7 +171,7 @@ export const PersonalFileDetailPage: React.FC = () => {
                             onClick={() => setActiveTab(tab.id)}
                             className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
                                 ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                : 'border-transparent text-[#717182] hover:text-gray-700 hover:border-gray-300'
                                 }`}
                         >
                             {tab.label}
@@ -184,7 +184,7 @@ export const PersonalFileDetailPage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 {activeTab === 'documents' && (
                     <div className="space-y-6">
-                        <h3 className="text-lg font-semibold text-gray-900">Документы</h3>
+                        <h3 className="text-lg font-medium text-gray-900">Документы</h3>
                         <DocumentUploader
                             personalFileId={file.id}
                             onUploadComplete={() => {
@@ -195,21 +195,21 @@ export const PersonalFileDetailPage: React.FC = () => {
                 )}
 
                 {activeTab === 'orders' && (
-                    <div className="text-center py-12 text-gray-500">
+                    <div className="text-center py-12 text-[#717182]">
                         <p>Приказы (в разработке)</p>
                     </div>
                 )}
 
                 {activeTab === 'contracts' && (
-                    <div className="text-center py-12 text-gray-500">
+                    <div className="text-center py-12 text-[#717182]">
                         <p>Договоры (в разработке)</p>
                     </div>
                 )}
 
                 {activeTab === 'history' && (
                     <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-gray-900">История изменений</h3>
-                        <div className="text-center py-12 text-gray-500">
+                        <h3 className="text-lg font-medium text-gray-900">История изменений</h3>
+                        <div className="text-center py-12 text-[#717182]">
                             <p>История событий (в разработке)</p>
                         </div>
                     </div>

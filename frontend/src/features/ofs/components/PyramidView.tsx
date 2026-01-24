@@ -21,7 +21,7 @@ export default function PyramidView() {
   const { data, isLoading, refetch } = useGetPyramidRolesQuery();
 
   if (isLoading) {
-    return <div className="text-center py-8 text-gray-500">Загрузка...</div>;
+    return <div className="text-center py-8 text-[#717182]">Загрузка...</div>;
   }
 
   const roles = data?.data || [];
@@ -35,7 +35,7 @@ export default function PyramidView() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">
+          <h2 className="text-2xl font-medium text-gray-900">
             Пирамида Взаимозависимости
           </h2>
           <p className="text-gray-600 mt-1">
@@ -44,7 +44,7 @@ export default function PyramidView() {
         </div>
         <button
           onClick={() => setShowAddRole(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-[#030213] rounded-lg hover:bg-blue-700"
         >
           <Plus className="w-4 h-4" />
           Добавить роль
@@ -58,7 +58,7 @@ export default function PyramidView() {
           <div className="flex justify-center">
             <div className={`w-64 p-4 rounded-lg border-2 text-center ${PYRAMID_COLORS.management}`}>
               <Crown className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="font-bold">Управление</h3>
+              <h3 className="font-medium">Управление</h3>
               <p className="text-xs mt-1">Стратегия, ресурсы, синхронизация</p>
             </div>
           </div>
@@ -67,19 +67,19 @@ export default function PyramidView() {
           <div className="grid grid-cols-3 gap-4 mt-8">
             <div className={`p-4 rounded-lg border-2 text-center ${PYRAMID_COLORS.photographers}`}>
               <Camera className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="font-bold">Фотографы</h3>
+              <h3 className="font-medium">Фотографы</h3>
               <p className="text-xs mt-1">Первичная ценность</p>
             </div>
 
             <div className={`p-4 rounded-lg border-2 text-center ${PYRAMID_COLORS.production}`}>
               <Cog className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="font-bold">Производство</h3>
+              <h3 className="font-medium">Производство</h3>
               <p className="text-xs mt-1">Готовый продукт</p>
             </div>
 
             <div className={`p-4 rounded-lg border-2 text-center ${PYRAMID_COLORS.sales}`}>
               <TrendingUp className="w-8 h-8 mx-auto mb-2" />
-              <h3 className="font-bold">Продажи</h3>
+              <h3 className="font-medium">Продажи</h3>
               <p className="text-xs mt-1">Реализация ценности</p>
             </div>
           </div>
@@ -96,18 +96,18 @@ export default function PyramidView() {
             <div key={type} className="bg-white rounded-lg border border-gray-200 p-6">
               <div className={`flex items-center gap-2 mb-4 p-3 rounded-lg ${colorClass}`}>
                 <Icon className="w-5 h-5" />
-                <h3 className="font-bold capitalize">{type}</h3>
+                <h3 className="font-medium capitalize">{type}</h3>
               </div>
 
               <div className="space-y-3">
                 {typeRoles.map((role: any) => (
                   <div key={role.id} className="border border-gray-200 rounded-lg p-3">
-                    <h4 className="font-semibold text-gray-900">{role.role_name}</h4>
+                    <h4 className="font-medium text-gray-900">{role.role_name}</h4>
                     {role.description && (
                       <p className="text-sm text-gray-600 mt-1">{role.description}</p>
                     )}
                     {role.kpi_metrics && (
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-2 text-xs text-[#717182]">
                         KPI: {Object.keys(role.kpi_metrics).join(', ')}
                       </div>
                     )}
@@ -168,7 +168,7 @@ function AddPyramidRoleForm({ onClose, onSuccess }: { onClose: () => void; onSuc
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-      <h3 className="font-semibold text-gray-900">Добавить роль в пирамиду</h3>
+      <h3 className="font-medium text-gray-900">Добавить роль в пирамиду</h3>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Вершина пирамиды</label>
@@ -228,7 +228,7 @@ function AddPyramidRoleForm({ onClose, onSuccess }: { onClose: () => void; onSuc
         <button
           type="submit"
           disabled={isLoading}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          className="flex-1 px-4 py-2 bg-blue-600 text-[#030213] rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
           {isLoading ? 'Создание...' : 'Создать'}
         </button>

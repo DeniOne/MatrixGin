@@ -57,7 +57,7 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({ definition, value,
 
     return (
         <div className="mb-4">
-            <label className="block text-sm font-semibold text-white mb-2">
+            <label className="block text-sm font-medium text-[#030213] mb-2">
                 {translateFieldLabel(definition.label)}
                 {definition.config?.required && <span className="text-red-500 ml-1">*</span>}
             </label>

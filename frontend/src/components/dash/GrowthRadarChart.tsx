@@ -40,8 +40,8 @@ const GrowthRadarChart: React.FC<GrowthRadarChartProps> = ({ data, size = 300 })
     }).join(' ');
 
     return (
-        <div className="flex flex-col items-center bg-gray-900/40 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-xl">
-            <h3 className="text-lg font-medium text-white/80 mb-4">Матрица Роста</h3>
+        <div className="flex flex-col items-center bg-white rounded-2xl p-6 border border-black/10 shadow-sm h-full">
+            <h3 className="text-lg font-medium text-[#030213] mb-4">Матрица Роста</h3>
 
             <svg width={size} height={size} className="overflow-visible">
                 {/* Background Rings */}
@@ -50,7 +50,7 @@ const GrowthRadarChart: React.FC<GrowthRadarChartProps> = ({ data, size = 300 })
                         key={step}
                         points={getPoints(radius * step)}
                         fill="none"
-                        stroke="rgba(255, 255, 255, 0.05)"
+                        stroke="rgba(0, 0, 0, 0.05)"
                         strokeWidth="1"
                     />
                 ))}
@@ -67,7 +67,7 @@ const GrowthRadarChart: React.FC<GrowthRadarChartProps> = ({ data, size = 300 })
                                 y1={center}
                                 x2={x2}
                                 y2={y2}
-                                stroke="rgba(255, 255, 255, 0.1)"
+                                stroke="rgba(0, 0, 0, 0.1)"
                                 strokeDasharray="2 4"
                             />
                             <text
@@ -75,7 +75,7 @@ const GrowthRadarChart: React.FC<GrowthRadarChartProps> = ({ data, size = 300 })
                                 y={center + (radius + 20) * Math.sin(angle)}
                                 textAnchor="middle"
                                 fontSize="11"
-                                fill="rgba(255, 255, 255, 0.5)"
+                                fill="#717182"
                                 className="font-medium"
                             >
                                 {d.axis}
@@ -87,8 +87,8 @@ const GrowthRadarChart: React.FC<GrowthRadarChartProps> = ({ data, size = 300 })
                 {/* Value Polygon */}
                 <polygon
                     points={valuePoints}
-                    fill="rgba(99, 102, 241, 0.2)"
-                    stroke="#6366f1"
+                    fill="rgba(79, 70, 229, 0.1)"
+                    stroke="#4f46e5"
                     strokeWidth="2"
                     className="transition-all duration-1000 ease-out"
                 />
@@ -103,14 +103,14 @@ const GrowthRadarChart: React.FC<GrowthRadarChartProps> = ({ data, size = 300 })
                             cx={center + valRadius * Math.cos(angle)}
                             cy={center + valRadius * Math.sin(angle)}
                             r="4"
-                            fill="#6366f1"
+                            fill="#4f46e5"
                             className="transition-all duration-1000 ease-out"
                         />
                     );
                 })}
             </svg>
 
-            <div className="mt-4 text-xs text-indigo-400 font-light italic">
+            <div className="mt-4 text-xs text-[#717182] font-medium italic">
                 * Масштаб ваших возможностей
             </div>
         </div>

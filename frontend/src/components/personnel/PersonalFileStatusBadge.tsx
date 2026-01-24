@@ -29,7 +29,7 @@ const statusConfig: Record<HRStatus, { label: string; color: string; bgColor: st
     },
     ARCHIVED: {
         label: 'Архивирован',
-        color: 'text-gray-500',
+        color: 'text-[#717182]',
         bgColor: 'bg-gray-50',
     },
 };

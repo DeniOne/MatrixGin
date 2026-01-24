@@ -23,21 +23,21 @@ const TechSoftwarePage: React.FC = () => {
 
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Уроки по ПО</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-8">Уроки по ПО</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {courses.map(course => (
                     <div key={course.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition-shadow group">
                         <div className="h-48 relative bg-gray-100">
                             <img src={course.image} alt={course.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <div className="absolute inset-0 bg-white/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center">
                                     <PlayCircle className="w-10 h-10 text-indigo-600 fill-current" />
                                 </div>
                             </div>
                         </div>
                         <div className="p-5">
-                            <h3 className="font-bold text-lg text-gray-900 mb-2">{course.title}</h3>
-                            <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                            <h3 className="font-medium text-lg text-gray-900 mb-2">{course.title}</h3>
+                            <div className="flex items-center justify-between text-sm text-[#717182] mb-4">
                                 <span>{course.duration}</span>
                                 <span className="flex items-center">
                                     <Star className="w-4 h-4 text-yellow-400 mr-1 fill-current" />

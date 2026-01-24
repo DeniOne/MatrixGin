@@ -11,7 +11,7 @@ const PlaceholderPage: React.FC<PlaceholderPageProps> = ({ title }) => {
             <div className="bg-blue-50 p-6 rounded-full mb-6">
                 <Construction className="w-16 h-16 text-blue-600" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{title}</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-4">{title}</h1>
             <p className="text-lg text-gray-600 max-w-md">
                 Этот раздел находится в активной разработке.
                 Мы работаем над тем, чтобы сделать его максимально полезным для вас.

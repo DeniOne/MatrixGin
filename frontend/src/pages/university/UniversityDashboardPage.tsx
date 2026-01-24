@@ -37,15 +37,15 @@ const AcademyCard: React.FC<AcademyCardProps> = ({
         className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all group flex flex-col h-full"
     >
         <div className={`w-12 h-12 rounded-lg ${color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-            <Icon className="w-6 h-6 text-white" />
+            <Icon className="w-6 h-6 text-[#030213]" />
         </div>
-        <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-lg font-medium text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
             {title}
         </h3>
-        <p className="text-sm text-gray-500 mb-4 flex-grow">
+        <p className="text-sm text-[#717182] mb-4 flex-grow">
             {description}
         </p>
-        <div className="flex items-center text-xs text-gray-400 space-x-4 pt-4 border-t border-gray-100">
+        <div className="flex items-center text-xs text-[#717182] space-x-4 pt-4 border-t border-gray-100">
             <span className="flex items-center">
                 <BookOpen className="w-3 h-3 mr-1" />
                 {coursesCount} курсов
@@ -143,8 +143,8 @@ const UniversityDashboardPage: React.FC = () => {
                         <Building2 className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium">Академий</p>
-                        <p className="text-2xl font-bold text-gray-900">7</p>
+                        <p className="text-sm text-[#717182] font-medium">Академий</p>
+                        <p className="text-2xl font-medium text-gray-900">7</p>
                     </div>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 flex items-center">
@@ -152,8 +152,8 @@ const UniversityDashboardPage: React.FC = () => {
                         <BookOpen className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium">Курсов</p>
-                        <p className="text-2xl font-bold text-gray-900">55</p>
+                        <p className="text-sm text-[#717182] font-medium">Курсов</p>
+                        <p className="text-2xl font-medium text-gray-900">55</p>
                     </div>
                 </div>
                 <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 flex items-center">
@@ -161,13 +161,13 @@ const UniversityDashboardPage: React.FC = () => {
                         <Award className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="text-sm text-gray-500 font-medium">Навыков</p>
-                        <p className="text-2xl font-bold text-gray-900">172</p>
+                        <p className="text-sm text-[#717182] font-medium">Навыков</p>
+                        <p className="text-2xl font-medium text-gray-900">172</p>
                     </div>
                 </div>
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Академии</h2>
+            <h2 className="text-2xl font-medium text-gray-900 mb-6">Академии</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {academies.map((academy) => (

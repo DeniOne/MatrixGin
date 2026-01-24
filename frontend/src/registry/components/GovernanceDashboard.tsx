@@ -36,7 +36,7 @@ export const GovernanceDashboard: React.FC = () => {
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
-            <h1 className="text-2xl font-bold mb-6">Наблюдаемость реестра</h1>
+            <h1 className="text-2xl font-medium mb-6">Наблюдаемость реестра</h1>
 
             <Tabs items={[
                 {
@@ -94,7 +94,7 @@ export const GovernanceDashboard: React.FC = () => {
                                 {projectionMap && (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="border rounded p-4 bg-white">
-                                            <h3 className="font-bold text-green-700 mb-2">Видимые атрибуты ({projectionMap.visible_attributes.length})</h3>
+                                            <h3 className="font-medium text-green-700 mb-2">Видимые атрибуты ({projectionMap.visible_attributes.length})</h3>
                                             <ul className="list-disc pl-5">
                                                 {projectionMap.visible_attributes.map((a: any) => (
                                                     <li key={a.code}>{a.code} ({a.data_type})</li>
@@ -102,7 +102,7 @@ export const GovernanceDashboard: React.FC = () => {
                                             </ul>
                                         </div>
                                         <div className="border rounded p-4 bg-red-50">
-                                            <h3 className="font-bold text-red-700 mb-2">Скрытые / Обрезанные ({projectionMap.hidden_attributes.length})</h3>
+                                            <h3 className="font-medium text-red-700 mb-2">Скрытые / Обрезанные ({projectionMap.hidden_attributes.length})</h3>
                                             <ul className="list-disc pl-5">
                                                 {projectionMap.hidden_attributes.map((a: any) => (
                                                     <li key={a.code} className="text-red-600 font-mono">{a.code}</li>
@@ -119,7 +119,7 @@ export const GovernanceDashboard: React.FC = () => {
 
             {/* Added Policy Simulator Tab */}
             <div className="mt-8 border-t pt-6">
-                <h2 className="text-xl font-bold mb-4">Симулятор политик (Безопасный режим)</h2>
+                <h2 className="text-xl font-medium mb-4">Симулятор политик (Безопасный режим)</h2>
                 <PolicySimulator />
             </div>
         </div>
@@ -165,7 +165,7 @@ const PolicySimulator: React.FC = () => {
             </div>
 
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded mb-4">
-                <h4 className="font-bold text-yellow-800 mb-2">Симуляция правила:</h4>
+                <h4 className="font-medium text-yellow-800 mb-2">Симуляция правила:</h4>
                 <div className="flex gap-2">
                     <Select value={overlayRule.scope} onChange={v => setOverlayRule({ ...overlayRule, scope: v })} options={[{ value: 'ATTRIBUTE', label: 'Атрибут' }, { value: 'RELATIONSHIP', label: 'Relationship' }]} />
                     <input className="border p-1" placeholder="Целевой паттерн" value={overlayRule.targetPattern} onChange={e => setOverlayRule({ ...overlayRule, targetPattern: e.target.value })} />
@@ -178,18 +178,18 @@ const PolicySimulator: React.FC = () => {
             {diff && (
                 <div className="grid grid-cols-2 gap-4">
                     <div className="bg-green-50 p-4 border border-green-200 rounded">
-                        <h4 className="font-bold text-green-800">Added Visibility (Visible -&gt; Hidden?) No, Hidden -&gt; Visible</h4>
+                        <h4 className="font-medium text-green-800">Added Visibility (Visible -&gt; Hidden?) No, Hidden -&gt; Visible</h4>
                         {/* Wait, if we EXCLUDE, we expect attributes to move to Removed Visible */}
                         <ul className="list-disc pl-5">
                             {diff.added_visible_attributes.map((a: string) => <li key={a}>{a}</li>)}
                         </ul>
                     </div>
                     <div className="bg-red-50 p-4 border border-red-200 rounded">
-                        <h4 className="font-bold text-red-800">Removed Visibility (Visible -&gt; Hidden)</h4>
+                        <h4 className="font-medium text-red-800">Removed Visibility (Visible -&gt; Hidden)</h4>
                         <ul className="list-disc pl-5">
                             {diff.removed_visible_attributes.map((a: string) => <li key={a} className="font-mono">{a}</li>)}
                         </ul>
-                        {diff.removed_visible_attributes.length === 0 && <span className="text-gray-400 text-sm">Изменений не обнаружено</span>}
+                        {diff.removed_visible_attributes.length === 0 && <span className="text-[#717182] text-sm">Изменений не обнаружено</span>}
                     </div>
                 </div>
             )}

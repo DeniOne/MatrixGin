@@ -37,8 +37,8 @@ const MgmtLeadershipPage: React.FC = () => {
 
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Лидерские Программы</h1>
-            <p className="text-gray-500 mb-8">Развитие управленческих компетенций для менеджеров всех уровней</p>
+            <h1 className="text-3xl font-medium text-gray-900 mb-2">Лидерские Программы</h1>
+            <p className="text-[#717182] mb-8">Развитие управленческих компетенций для менеджеров всех уровней</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {programs.map(program => (
@@ -47,7 +47,7 @@ const MgmtLeadershipPage: React.FC = () => {
                         <div className={`p-4 bg-${program.color}-100 rounded-xl inline-block mb-4`}>
                             <div className={`text-${program.color}-600`}>{program.icon}</div>
                         </div>
-                        <h3 className="font-bold text-xl text-gray-900 mb-2">{program.title}</h3>
+                        <h3 className="font-medium text-xl text-gray-900 mb-2">{program.title}</h3>
                         <p className="text-sm text-indigo-600 font-medium mb-4">{program.level}</p>
                         <div className="space-y-2 text-sm text-gray-600 mb-6">
                             <div className="flex items-center">
@@ -60,7 +60,7 @@ const MgmtLeadershipPage: React.FC = () => {
                             </div>
                         </div>
                         {program.enrolled ? (
-                            <button className="w-full py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700">
+                            <button className="w-full py-3 bg-indigo-600 text-[#030213] rounded-lg font-medium hover:bg-indigo-700">
                                 Продолжить обучение
                             </button>
                         ) : (

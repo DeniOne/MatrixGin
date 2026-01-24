@@ -138,7 +138,7 @@ const OFSGraphContent = () => {
     // Loading / Empty States
     if (loading) {
         return (
-            <div className="w-full h-full flex items-center justify-center bg-slate-50 text-slate-400 font-mono animate-pulse">
+            <div className="w-full h-full flex items-center justify-center bg-slate-50 text-[#717182] font-mono animate-pulse">
                 ЗАГРУЗКА ДАННЫХ...
             </div>
         );
@@ -146,7 +146,7 @@ const OFSGraphContent = () => {
 
     if (!loading && dataNodes.length === 0) {
         return (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 text-slate-400 font-mono gap-2">
+            <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 text-[#717182] font-mono gap-2">
                 <span>НЕДОСТАТОЧНО ДАННЫХ</span>
                 <button
                     onClick={() => window.location.reload()}
@@ -185,7 +185,7 @@ const OFSGraphContent = () => {
                 {/* Scenario Banner */}
                 {activeOverlays.includes('SCENARIO_DELTA') && (
                     <Panel position="top-center" className="m-0 p-0">
-                        <div className="bg-amber-100 border-b border-amber-300 text-amber-800 px-4 py-1 text-xs font-bold uppercase tracking-widest shadow-sm">
+                        <div className="bg-amber-100 border-b border-amber-300 text-amber-800 px-4 py-1 text-xs font-medium uppercase tracking-widest shadow-sm">
                             Scenario Preview Mode
                         </div>
                     </Panel>
@@ -196,10 +196,10 @@ const OFSGraphContent = () => {
                     <Panel position="top-left" className="m-4">
                         <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-md border border-slate-200">
                             <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
-                            <span className="text-xs font-semibold text-slate-600">Фокус-режим</span>
+                            <span className="text-xs font-medium text-slate-600">Фокус-режим</span>
                             <button
                                 onClick={handleResetFocus}
-                                className="ml-2 p-0.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-600"
+                                className="ml-2 p-0.5 hover:bg-slate-100 rounded-full text-[#717182] hover:text-slate-600"
                             >
                                 <X className="w-3 h-3" />
                             </button>

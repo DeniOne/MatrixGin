@@ -34,23 +34,23 @@ const RegistryEntityCreatePage: React.FC = () => {
         <div className="max-w-3xl mx-auto">
             <Link
                 to={`/registry/${entityType}`}
-                className="inline-flex items-center text-sm text-slate-500 hover:text-white mb-6 transition-colors"
+                className="inline-flex items-center text-sm text-[#717182] hover:text-[#030213] mb-6 transition-colors"
             >
                 <ArrowLeft className="w-4 h-4 mr-1" />
                 {UI_TEXT.BACK_TO_LIST}
             </Link>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-lg p-8">
-                <h1 className="text-2xl font-bold text-white mb-2">{UI_TEXT.CREATE_HEADER}: {ruLabel.label}</h1>
-                <p className="text-slate-500 text-sm mb-8">
-                    {UI_TEXT.CREATE_DRAFT_NOTE} <span className="text-yellow-500 font-bold uppercase text-xs">{UI_TEXT.STATUS_DRAFT}</span>.
+            <div className="bg-white border border-black/10 rounded-lg p-8">
+                <h1 className="text-2xl font-medium text-[#030213] mb-2">{UI_TEXT.CREATE_HEADER}: {ruLabel.label}</h1>
+                <p className="text-[#717182] text-sm mb-8">
+                    {UI_TEXT.CREATE_DRAFT_NOTE} <span className="text-yellow-500 font-medium uppercase text-xs">{UI_TEXT.STATUS_DRAFT}</span>.
                 </p>
 
                 {error && (
                     <div className="mb-6 p-4 bg-red-900/20 border border-red-900/50 rounded-lg flex items-start gap-3 text-red-400 text-sm">
                         <AlertCircle className="w-5 h-5 shrink-0" />
                         <div>
-                            <p className="font-bold">Ошибка</p>
+                            <p className="font-medium">Ошибка</p>
                             <p className="text-xs mt-1 opacity-80">
                                 {(error as any)?.data?.message || 'Creation failed.'}
                             </p>

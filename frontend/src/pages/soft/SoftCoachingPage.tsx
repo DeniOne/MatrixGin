@@ -72,10 +72,10 @@ const SoftCoachingPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Коучинг и Менторство</h1>
-                    <p className="text-gray-500 mt-1">Работайте с наставниками для достижения своих карьерных целей</p>
+                    <h1 className="text-3xl font-medium text-gray-900">Коучинг и Менторство</h1>
+                    <p className="text-[#717182] mt-1">Работайте с наставниками для достижения своих карьерных целей</p>
                 </div>
-                <button className="mt-4 md:mt-0 px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 flex items-center">
+                <button className="mt-4 md:mt-0 px-4 py-2 bg-indigo-600 text-[#030213] rounded-lg font-medium hover:bg-indigo-700 flex items-center">
                     <Target className="w-4 h-4 mr-2" />
                     Добавить цель
                 </button>
@@ -84,7 +84,7 @@ const SoftCoachingPage: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Coaches List */}
                 <div className="lg:col-span-2 space-y-6">
-                    <h2 className="text-xl font-bold text-gray-900 flex items-center">
+                    <h2 className="text-xl font-medium text-gray-900 flex items-center">
                         <User className="w-5 h-5 mr-2 text-indigo-600" />
                         Доступные менторы
                     </h2>
@@ -98,10 +98,10 @@ const SoftCoachingPage: React.FC = () => {
                                 <div className="flex-1">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <h3 className="text-lg font-bold text-gray-900">{coach.name}</h3>
+                                            <h3 className="text-lg font-medium text-gray-900">{coach.name}</h3>
                                             <p className="text-indigo-600 font-medium text-sm">{coach.role}</p>
                                         </div>
-                                        <div className="flex items-center bg-yellow-50 px-2 py-1 rounded text-xs font-bold text-yellow-700">
+                                        <div className="flex items-center bg-yellow-50 px-2 py-1 rounded text-xs font-medium text-yellow-700">
                                             <span className="mr-1">★</span> {coach.rating}
                                         </div>
                                     </div>
@@ -122,7 +122,7 @@ const SoftCoachingPage: React.FC = () => {
                                                 </button>
                                             ))}
                                         </div>
-                                        <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">
+                                        <button className="px-4 py-2 bg-indigo-600 text-[#030213] rounded-lg text-sm font-medium hover:bg-indigo-700">
                                             Записаться
                                         </button>
                                     </div>
@@ -136,7 +136,7 @@ const SoftCoachingPage: React.FC = () => {
                 <div className="space-y-8">
                     {/* Goals Widget */}
                     <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                        <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
+                        <h2 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
                             <Target className="w-5 h-5 mr-2 text-red-500" />
                             Мои цели
                         </h2>
@@ -144,12 +144,12 @@ const SoftCoachingPage: React.FC = () => {
                             {goals.map(goal => (
                                 <div key={goal.id} className="border-b border-gray-100 last:border-0 pb-4 last:pb-0">
                                     <div className="flex justify-between items-start mb-2">
-                                        <h3 className={`font-medium text-sm ${goal.status === 'completed' ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
+                                        <h3 className={`font-medium text-sm ${goal.status === 'completed' ? 'text-[#717182] line-through' : 'text-gray-900'}`}>
                                             {goal.title}
                                         </h3>
                                         {goal.status === 'completed' && <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />}
                                     </div>
-                                    <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
+                                    <div className="flex items-center justify-between text-xs text-[#717182] mb-2">
                                         <span>Дедлайн: {goal.deadline}</span>
                                         <span>{goal.progress}%</span>
                                     </div>
@@ -168,8 +168,8 @@ const SoftCoachingPage: React.FC = () => {
                     </div>
 
                     {/* Upcoming Session */}
-                    <div className="bg-gradient-to-br from-indigo-900 to-purple-900 rounded-xl p-6 text-white shadow-lg">
-                        <h2 className="text-lg font-bold mb-4 flex items-center">
+                    <div className="bg-gradient-to-br from-indigo-900 to-purple-900 rounded-xl p-6 text-[#030213] shadow-lg">
+                        <h2 className="text-lg font-medium mb-4 flex items-center">
                             <Video className="w-5 h-5 mr-2" />
                             Ближайшая сессия
                         </h2>
@@ -177,7 +177,7 @@ const SoftCoachingPage: React.FC = () => {
                             <div className="flex items-center mb-3">
                                 <img src={coaches[0].image} alt="Коуч" className="w-10 h-10 rounded-full mr-3 border-2 border-white/20" />
                                 <div>
-                                    <div className="font-bold text-sm">Елена Смирнова</div>
+                                    <div className="font-medium text-sm">Елена Смирнова</div>
                                     <div className="text-xs opacity-70">Review прогресса</div>
                                 </div>
                             </div>
@@ -191,7 +191,7 @@ const SoftCoachingPage: React.FC = () => {
                                     10:00
                                 </div>
                             </div>
-                            <button className="w-full py-2 bg-white text-indigo-900 rounded-lg font-bold text-sm hover:bg-gray-100 transition-colors">
+                            <button className="w-full py-2 bg-white text-indigo-900 rounded-lg font-medium text-sm hover:bg-gray-100 transition-colors">
                                 Подключиться
                             </button>
                         </div>

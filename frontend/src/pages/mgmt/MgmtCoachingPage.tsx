@@ -11,12 +11,12 @@ const MgmtCoachingPage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Коучинг и Наставничество</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-8">Коучинг и Наставничество</h1>
 
             <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-8 mb-8 border border-purple-200">
-                <h2 className="text-xl font-bold text-gray-900 mb-3">Toolkit коуча</h2>
+                <h2 className="text-xl font-medium text-gray-900 mb-3">Toolkit коуча</h2>
                 <p className="text-gray-600 mb-4">Методики и инструменты для развития сотрудников</p>
-                <button className="px-6 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700">
+                <button className="px-6 py-2 bg-purple-600 text-[#030213] rounded-lg font-medium hover:bg-purple-700">
                     Начать коуч-сессию
                 </button>
             </div>
@@ -29,8 +29,8 @@ const MgmtCoachingPage: React.FC = () => {
                                 {resource.icon}
                             </div>
                             <div>
-                                <h3 className="font-bold text-gray-900 group-hover:text-purple-600">{resource.title}</h3>
-                                <p className="text-xs text-gray-500">{resource.type}</p>
+                                <h3 className="font-medium text-gray-900 group-hover:text-purple-600">{resource.title}</h3>
+                                <p className="text-xs text-[#717182]">{resource.type}</p>
                             </div>
                         </div>
                     </div>

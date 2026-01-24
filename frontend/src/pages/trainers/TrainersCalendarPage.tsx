@@ -10,12 +10,12 @@ const TrainersCalendarPage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Календарь и Расписание</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-8">Календарь и Расписание</h1>
 
             <div className="bg-white rounded-xl border p-6 mb-8">
                 <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-bold text-gray-900">Ноябрь 2024</h2>
-                    <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">
+                    <h2 className="text-xl font-medium text-gray-900">Ноябрь 2024</h2>
+                    <button className="px-4 py-2 bg-indigo-600 text-[#030213] rounded-lg text-sm font-medium hover:bg-indigo-700">
                         + Добавить слот
                     </button>
                 </div>
@@ -23,7 +23,7 @@ const TrainersCalendarPage: React.FC = () => {
                 <div className="space-y-4">
                     {sessions.map(session => (
                         <div key={session.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <h3 className="font-bold text-gray-900 mb-2">{session.title}</h3>
+                            <h3 className="font-medium text-gray-900 mb-2">{session.title}</h3>
                             <div className="space-y-1 text-sm text-gray-600">
                                 <div className="flex items-center">
                                     <Calendar className="w-4 h-4 mr-2" />

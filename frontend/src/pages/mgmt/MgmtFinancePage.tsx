@@ -29,15 +29,15 @@ const MgmtFinancePage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Финансы для Менеджеров</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-8">Финансы для Менеджеров</h1>
 
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 mb-8 border border-green-200">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="font-bold text-gray-900 mb-1">Калькулятор бюджета обучения</h3>
+                        <h3 className="font-medium text-gray-900 mb-1">Калькулятор бюджета обучения</h3>
                         <p className="text-sm text-gray-600">Рассчитайте ROI инвестиций в развитие команды</p>
                     </div>
-                    <button className="p-3 bg-green-600 rounded-lg text-white hover:bg-green-700">
+                    <button className="p-3 bg-green-600 rounded-lg text-[#030213] hover:bg-green-700">
                         <Calculator className="w-6 h-6" />
                     </button>
                 </div>
@@ -48,14 +48,14 @@ const MgmtFinancePage: React.FC = () => {
                     <div key={course.id} className="bg-white p-6 rounded-xl border">
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <h3 className="font-bold text-gray-900 mb-1">{course.title}</h3>
-                                <p className="text-sm text-gray-500">{course.lessons} уроков • {course.duration}</p>
+                                <h3 className="font-medium text-gray-900 mb-1">{course.title}</h3>
+                                <p className="text-sm text-[#717182]">{course.lessons} уроков • {course.duration}</p>
                             </div>
                             <DollarSign className="w-6 h-6 text-green-600" />
                         </div>
                         {course.status === 'in-progress' && course.progress && (
                             <div>
-                                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                                <div className="flex justify-between text-xs text-[#717182] mb-1">
                                     <span>Прогресс</span>
                                     <span>{course.progress}%</span>
                                 </div>

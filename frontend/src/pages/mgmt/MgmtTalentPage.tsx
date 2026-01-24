@@ -31,13 +31,13 @@ const MgmtTalentPage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Кадровый Резерв</h1>
-            <p className="text-gray-500 mb-8">Планирование преемственности и развитие талантов</p>
+            <h1 className="text-3xl font-medium text-gray-900 mb-2">Кадровый Резерв</h1>
+            <p className="text-[#717182] mb-8">Планирование преемственности и развитие талантов</p>
 
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-200">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="font-bold text-gray-900 mb-1">Talent Pipeline</h3>
+                        <h3 className="font-medium text-gray-900 mb-1">Talent Pipeline</h3>
                         <p className="text-sm text-gray-600">3 сотрудника готовы к повышению</p>
                     </div>
                     <Users className="w-8 h-8 text-blue-600" />
@@ -51,14 +51,14 @@ const MgmtTalentPage: React.FC = () => {
                             <div className="flex items-center">
                                 <img src={talent.avatar} alt={talent.name} className="w-12 h-12 rounded-full mr-4" />
                                 <div>
-                                    <h3 className="font-bold text-gray-900">{talent.name}</h3>
-                                    <p className="text-sm text-gray-500">{talent.role} → {talent.readyFor}</p>
+                                    <h3 className="font-medium text-gray-900">{talent.name}</h3>
+                                    <p className="text-sm text-[#717182]">{talent.role} → {talent.readyFor}</p>
                                 </div>
                             </div>
-                            <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-600" />
+                            <ChevronRight className="w-5 h-5 text-[#717182] group-hover:text-indigo-600" />
                         </div>
                         <div>
-                            <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <div className="flex justify-between text-xs text-[#717182] mb-1">
                                 <span>Готовность</span>
                                 <span>{talent.readiness}%</span>
                             </div>

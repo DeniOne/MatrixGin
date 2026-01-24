@@ -122,13 +122,13 @@ export const RegistryAIOpsViewer: React.FC<RegistryAIOpsViewerProps> = ({ entity
 
                             <Collapse ghost size="small">
                                 <Panel header="Why is this recommended?" key="1">
-                                    <div className="text-xs text-gray-500">
+                                    <div className="text-xs text-[#717182]">
                                         <p>На основе данных:</p>
                                         <ul className="list-disc pl-4">
                                             {item.basedOn.relations && <li>Связи: {item.basedOn.relations.join(', ')}</li>}
                                             {item.basedOn.impacts && <li>Влияние: {item.basedOn.impacts.join(', ')}</li>}
                                         </ul>
-                                        <p className="mt-2 text-gray-400">Детерминированный ID: {item.id}</p>
+                                        <p className="mt-2 text-[#717182]">Детерминированный ID: {item.id}</p>
                                     </div>
                                 </Panel>
                             </Collapse>
@@ -137,7 +137,7 @@ export const RegistryAIOpsViewer: React.FC<RegistryAIOpsViewerProps> = ({ entity
                 )}
             />
 
-            <div className="text-right text-xs text-gray-400">
+            <div className="text-right text-xs text-[#717182]">
                 Модель: {data.metadata.model} | Analyzed: {new Date(data.metadata.analyzedAt).toLocaleTimeString()}
             </div>
         </div>

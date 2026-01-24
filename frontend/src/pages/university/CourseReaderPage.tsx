@@ -127,7 +127,7 @@ export const CourseReaderPage: React.FC = () => {
                 </Space>
                 <Space size="large">
                     <div className="flex flex-col items-end">
-                        <Text strong className="text-xs uppercase text-gray-400">Прогресс курса</Text>
+                        <Text strong className="text-xs uppercase text-[#717182]">Прогресс курса</Text>
                         <Progress
                             percent={enrollment.progress}
                             size="small"
@@ -206,11 +206,11 @@ export const CourseReaderPage: React.FC = () => {
                                                         {activeModule.material.content_text}
                                                     </Paragraph>
                                                 ) : activeModule.material?.content_url ? (
-                                                    <div className="aspect-video bg-black rounded-2xl flex items-center justify-center text-white overflow-hidden shadow-2xl">
+                                                    <div className="aspect-video bg-white rounded-2xl flex items-center justify-center text-[#030213] overflow-hidden shadow-2xl">
                                                         {/* Placeholder for video player integration */}
                                                         <Space direction="vertical" align="center">
                                                             <PlayCircleOutlined className="text-6xl text-indigo-500" />
-                                                            <Text className="text-white">Видео-контент: {activeModule.material.content_url}</Text>
+                                                            <Text className="text-[#030213]">Видео-контент: {activeModule.material.content_url}</Text>
                                                         </Space>
                                                     </div>
                                                 ) : (

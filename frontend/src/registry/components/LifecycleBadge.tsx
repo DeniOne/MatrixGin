@@ -11,7 +11,7 @@ interface LifecycleBadgeProps {
 const statusConfig: Record<LifecycleStatus, string> = {
     draft: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
     active: 'bg-green-500/10 text-green-400 border-green-500/30',
-    archived: 'bg-slate-500/10 text-slate-400 border-slate-500/30 line-through',
+    archived: 'bg-slate-500/10 text-[#717182] border-slate-500/30 line-through',
 };
 
 const statusLabels: Record<LifecycleStatus, string> = {

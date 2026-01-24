@@ -44,7 +44,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
         'APPROVED': 'bg-green-500/20 text-green-400 border-green-500/30',
         'REJECTED': 'bg-red-500/20 text-red-400 border-red-500/30',
     };
-    const colorClass = statusColors[status] || 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+    const colorClass = statusColors[status] || 'bg-gray-500/20 text-[#717182] border-gray-500/30';
 
     return (
         <span className={clsx('px-2 py-1 text-xs font-medium rounded border', colorClass)}>
@@ -62,7 +62,7 @@ const SlaBadge: React.FC<{ level: SlaLevel }> = ({ level }) => {
     };
 
     return (
-        <span className={clsx('px-2 py-1 text-xs font-bold rounded', slaColors[level])}>
+        <span className={clsx('px-2 py-1 text-xs font-medium rounded', slaColors[level])}>
             {level}
         </span>
     );
@@ -81,7 +81,7 @@ const CopyableId: React.FC<{ id: string }> = ({ id }) => {
     return (
         <button
             onClick={handleCopy}
-            className="flex items-center gap-1 text-gray-300 hover:text-white font-mono text-sm group"
+            className="flex items-center gap-1 text-gray-300 hover:text-[#030213] font-mono text-sm group"
             title={id}
         >
             {shortId(id)}
@@ -97,7 +97,7 @@ const CopyableId: React.FC<{ id: string }> = ({ id }) => {
 /** Session row component */
 const SessionRow: React.FC<{ session: ProductionSession }> = ({ session }) => {
     return (
-        <tr className="border-b border-gray-800 hover:bg-gray-800/50 transition-colors">
+        <tr className="border-b border-black/10 hover:bg-gray-800/50 transition-colors">
             <td className="px-4 py-3">
                 <CopyableId id={session.id} />
             </td>
@@ -107,7 +107,7 @@ const SessionRow: React.FC<{ session: ProductionSession }> = ({ session }) => {
             <td className="px-4 py-3 text-gray-300">
                 {session.role}
             </td>
-            <td className="px-4 py-3 text-gray-400">
+            <td className="px-4 py-3 text-[#717182]">
                 {session.assignedUser || '—'}
             </td>
             <td className="px-4 py-3 text-gray-300 font-mono">
@@ -116,10 +116,10 @@ const SessionRow: React.FC<{ session: ProductionSession }> = ({ session }) => {
             <td className="px-4 py-3">
                 <SlaBadge level={session.slaLevel} />
             </td>
-            <td className="px-4 py-3 text-gray-400 text-sm">
+            <td className="px-4 py-3 text-[#717182] text-sm">
                 {formatDate(session.createdAt)}
             </td>
-            <td className="px-4 py-3 text-gray-400 text-sm">
+            <td className="px-4 py-3 text-[#717182] text-sm">
                 {formatDate(session.lastEventAt)}
             </td>
         </tr>
@@ -138,8 +138,8 @@ export const ProductionSessionsPage: React.FC = () => {
                     <Camera className="w-6 h-6 text-indigo-400" />
                 </div>
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Фотосессии</h1>
-                    <p className="text-sm text-gray-400">
+                    <h1 className="text-2xl font-medium text-[#030213]">Фотосессии</h1>
+                    <p className="text-sm text-[#717182]">
                         Производственные сессии из PSEE
                     </p>
                 </div>
@@ -149,7 +149,7 @@ export const ProductionSessionsPage: React.FC = () => {
             {isLoading && (
                 <div className="flex items-center justify-center py-16">
                     <Loader2 className="w-8 h-8 text-indigo-400 animate-spin" />
-                    <span className="ml-3 text-gray-400">Загрузка сессий...</span>
+                    <span className="ml-3 text-[#717182]">Загрузка сессий...</span>
                 </div>
             )}
 
@@ -170,8 +170,8 @@ export const ProductionSessionsPage: React.FC = () => {
             {data && data.data.length === 0 && (
                 <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-12 text-center">
                     <Camera className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-gray-400 font-medium">Нет активных сессий</h3>
-                    <p className="text-gray-500 text-sm mt-1">
+                    <h3 className="text-[#717182] font-medium">Нет активных сессий</h3>
+                    <p className="text-[#717182] text-sm mt-1">
                         Данные появятся, когда в PSEE будут созданы фотосессии
                     </p>
                 </div>
@@ -184,28 +184,28 @@ export const ProductionSessionsPage: React.FC = () => {
                         <table className="w-full">
                             <thead className="bg-gray-800/50 border-b border-gray-700">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                                         Session ID
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                                         Статус
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                                         Роль
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                                         Назначен
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                                         Время в статусе
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                                         SLA
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                                         Создана
                                     </th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
+                                    <th className="px-4 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                                         Последнее событие
                                     </th>
                                 </tr>
@@ -220,7 +220,7 @@ export const ProductionSessionsPage: React.FC = () => {
 
                     {/* Footer with count */}
                     <div className="px-4 py-3 border-t border-gray-700 bg-gray-800/30">
-                        <span className="text-sm text-gray-400">
+                        <span className="text-sm text-[#717182]">
                             Всего: {data.total} сессий
                         </span>
                     </div>

@@ -47,14 +47,14 @@ export default function IdeaChannels() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Каналы внедрения идей</h2>
+          <h2 className="text-2xl font-medium text-gray-900">Каналы внедрения идей</h2>
           <p className="text-gray-600 mt-1">
             3 конституционных канала для предложений
           </p>
         </div>
         <button
           onClick={() => setShowSubmitForm(!showSubmitForm)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-[#030213] rounded-lg hover:bg-blue-700"
         >
           <Plus className="w-4 h-4" />
           Подать идею
@@ -69,7 +69,7 @@ export default function IdeaChannels() {
             <div key={type} className={`rounded-lg border-2 p-4 ${config.color}`}>
               <div className="flex items-center gap-2 mb-2">
                 <Icon className="w-5 h-5" />
-                <h3 className="font-bold">{config.label}</h3>
+                <h3 className="font-medium">{config.label}</h3>
               </div>
               <p className="text-xs">{config.description}</p>
             </div>
@@ -129,7 +129,7 @@ export default function IdeaChannels() {
       {/* Ideas List */}
       <div className="bg-white rounded-lg border border-gray-200">
         {isLoading ? (
-          <div className="p-8 text-center text-gray-500">Загрузка...</div>
+          <div className="p-8 text-center text-[#717182]">Загрузка...</div>
         ) : ideas.length > 0 ? (
           <div className="divide-y divide-gray-200">
             {ideas.map((idea: any) => {
@@ -144,11 +144,11 @@ export default function IdeaChannels() {
                         <Icon className="w-5 h-5" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-900">{idea.title}</h3>
+                        <h3 className="font-medium text-gray-900">{idea.title}</h3>
                         {idea.description && (
                           <p className="text-sm text-gray-600 mt-1">{idea.description}</p>
                         )}
-                        <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-3 mt-2 text-xs text-[#717182]">
                           <span>Автор: {idea.first_name} {idea.last_name}</span>
                           <span>•</span>
                           <span>{new Date(idea.created_at).toLocaleDateString('ru-RU')}</span>
@@ -176,7 +176,7 @@ export default function IdeaChannels() {
             })}
           </div>
         ) : (
-          <div className="p-8 text-center text-gray-500">Нет идей</div>
+          <div className="p-8 text-center text-[#717182]">Нет идей</div>
         )}
       </div>
     </div>
@@ -209,7 +209,7 @@ function SubmitIdeaForm({ onClose, onSuccess }: { onClose: () => void; onSuccess
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6 space-y-4">
-      <h3 className="font-semibold text-gray-900">Подать идею</h3>
+      <h3 className="font-medium text-gray-900">Подать идею</h3>
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Канал</label>
@@ -271,7 +271,7 @@ function SubmitIdeaForm({ onClose, onSuccess }: { onClose: () => void; onSuccess
         <button
           type="submit"
           disabled={isLoading}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          className="flex-1 px-4 py-2 bg-blue-600 text-[#030213] rounded-lg hover:bg-blue-700 disabled:opacity-50"
         >
           {isLoading ? 'Отправка...' : 'Отправить'}
         </button>

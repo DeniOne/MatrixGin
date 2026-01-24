@@ -11,13 +11,13 @@ const TrainersResourcesPage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Ресурсы Наставника</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-8">Ресурсы Наставника</h1>
 
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 mb-8 border border-blue-200">
                 <div className="flex items-center">
                     <BookOpen className="w-8 h-8 text-blue-600 mr-4" />
                     <div>
-                        <h3 className="font-bold text-gray-900 mb-1">Библиотека методичек</h3>
+                        <h3 className="font-medium text-gray-900 mb-1">Библиотека методичек</h3>
                         <p className="text-sm text-gray-600">Все материалы для эффективного наставничества</p>
                     </div>
                 </div>
@@ -32,11 +32,11 @@ const TrainersResourcesPage: React.FC = () => {
                                     <FileText className="w-5 h-5" />
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-900 text-sm mb-1">{resource.title}</h3>
-                                    <p className="text-xs text-gray-500">{resource.type} • {resource.size}</p>
+                                    <h3 className="font-medium text-gray-900 text-sm mb-1">{resource.title}</h3>
+                                    <p className="text-xs text-[#717182]">{resource.type} • {resource.size}</p>
                                 </div>
                             </div>
-                            <Download className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
+                            <Download className="w-5 h-5 text-[#717182] group-hover:text-blue-600" />
                         </div>
                     </div>
                 ))}

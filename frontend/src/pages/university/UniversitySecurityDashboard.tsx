@@ -191,7 +191,7 @@ export const UniversitySecurityDashboard: React.FC = () => {
                                     <Row gutter={24}>
                                         <Col span={12}>
                                             <Text strong>Улики (Signals):</Text>
-                                            <ul className="list-disc list-inside mt-2 text-xs text-gray-500">
+                                            <ul className="list-disc list-inside mt-2 text-xs text-[#717182]">
                                                 {record.context.signals.map((s: string, i: number) => (
                                                     <li key={i}>{s}</li>
                                                 ))}
@@ -199,7 +199,7 @@ export const UniversitySecurityDashboard: React.FC = () => {
                                         </Col>
                                         <Col span={12}>
                                             <Text strong>Метаданные сессии:</Text>
-                                            <Paragraph className="mt-2 text-xs text-slate-400 font-mono">
+                                            <Paragraph className="mt-2 text-xs text-[#717182] font-mono">
                                                 IP: {record.context.metadata?.ipAddress || 'unknown'}<br />
                                                 Баллы: {record.context.confidenceScore}
                                             </Paragraph>

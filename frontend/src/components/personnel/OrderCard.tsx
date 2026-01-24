@@ -70,7 +70,7 @@ export const OrderCard: React.FC<OrderCardProps> = ({ order, userRole, onUpdate 
             <div className="flex items-start justify-between mb-3">
                 <div>
                     <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-lg font-semibold text-gray-900">{order.orderNumber}</h3>
+                        <h3 className="text-lg font-medium text-gray-900">{order.orderNumber}</h3>
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[order.status]}`}>
                             {statusLabels[order.status]}
                         </span>

@@ -11,12 +11,12 @@ interface AuditLogProps {
 
 const AuditLog: React.FC<AuditLogProps> = ({ logs, isLoading }) => {
     if (isLoading) {
-        return <div className="p-4 text-xs text-slate-500 animate-pulse">{UI_TEXT.LOADING}</div>;
+        return <div className="p-4 text-xs text-[#717182] animate-pulse">{UI_TEXT.LOADING}</div>;
     }
 
     if (!logs || logs.length === 0) {
         return (
-            <div className="p-8 text-center border border-dashed border-slate-800 rounded-lg text-slate-600">
+            <div className="p-8 text-center border border-dashed border-black/10 rounded-lg text-slate-600">
                 <History className="w-6 h-6 mx-auto mb-2 opacity-50" />
                 <span className="text-xs">{UI_TEXT.AUDIT_EMPTY}</span>
             </div>
@@ -24,14 +24,14 @@ const AuditLog: React.FC<AuditLogProps> = ({ logs, isLoading }) => {
     }
 
     return (
-        <div className="border border-slate-800 rounded-lg bg-slate-950 overflow-hidden">
-            <div className="px-4 py-2 border-b border-slate-800 bg-slate-900/50 flex items-center gap-2">
-                <Terminal className="w-3 h-3 text-slate-500" />
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{UI_TEXT.AUDIT_TITLE}</span>
+        <div className="border border-black/10 rounded-lg bg-[#F3F3F5] overflow-hidden">
+            <div className="px-4 py-2 border-b border-black/10 bg-white/50 flex items-center gap-2">
+                <Terminal className="w-3 h-3 text-[#717182]" />
+                <span className="text-xs font-medium text-[#717182] uppercase tracking-widest">{UI_TEXT.AUDIT_TITLE}</span>
             </div>
 
-            <table className="w-full text-left text-xs text-slate-400">
-                <thead className="bg-slate-900 text-[10px] uppercase text-slate-500 font-mono">
+            <table className="w-full text-left text-xs text-[#717182]">
+                <thead className="bg-white text-[10px] uppercase text-[#717182] font-mono">
                     <tr>
                         <th className="px-4 py-2 w-32">Метка времени (UTC)</th>
                         <th className="px-4 py-2 w-32">Actor</th>
@@ -41,8 +41,8 @@ const AuditLog: React.FC<AuditLogProps> = ({ logs, isLoading }) => {
                 </thead>
                 <tbody className="divide-y divide-slate-800/50 font-mono">
                     {logs.map((log) => (
-                        <tr key={log.id} className="hover:bg-slate-900/30 transition-colors">
-                            <td className="px-4 py-2 text-slate-500">
+                        <tr key={log.id} className="hover:bg-white/30 transition-colors">
+                            <td className="px-4 py-2 text-[#717182]">
                                 {format(new Date(log.timestamp), 'yyyy-MM-dd HH:mm:ss')}
                             </td>
                             <td className="px-4 py-2 text-indigo-400">
@@ -50,7 +50,7 @@ const AuditLog: React.FC<AuditLogProps> = ({ logs, isLoading }) => {
                             </td>
                             <td className="px-4 py-2">
                                 <span className={`
-                                    px-1.5 py-0.5 rounded text-[10px] font-bold
+                                    px-1.5 py-0.5 rounded text-[10px] font-medium
                                     ${log.operation === 'CREATE' ? 'bg-green-900/30 text-green-400' : ''}
                                     ${log.operation === 'UPDATE_META' ? 'bg-blue-900/30 text-blue-400' : ''}
                                     ${log.operation === 'UPDATE_LIFECYCLE' ? 'bg-purple-900/30 text-purple-400' : ''}

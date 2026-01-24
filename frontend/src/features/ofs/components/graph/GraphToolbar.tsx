@@ -32,7 +32,7 @@ export const GraphToolbar: React.FC<GraphToolbarProps> = ({
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-4">
             {/* Mode Switcher */}
             <div className="bg-white rounded-lg shadow-md p-1 flex flex-col gap-1 border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 py-1">
+                <span className="text-[10px] font-medium text-[#717182] uppercase tracking-widest px-2 py-1">
                     Линза
                 </span>
                 {MODES.map((mode) => (
@@ -54,7 +54,7 @@ export const GraphToolbar: React.FC<GraphToolbarProps> = ({
 
             {/* Overlay Toggles */}
             <div className="bg-white rounded-lg shadow-md p-1 flex flex-col gap-1 border border-slate-200">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-2 py-1">
+                <span className="text-[10px] font-medium text-[#717182] uppercase tracking-widest px-2 py-1">
                     Наложения
                 </span>
                 {OVERLAYS.map((overlay) => {
@@ -66,7 +66,7 @@ export const GraphToolbar: React.FC<GraphToolbarProps> = ({
                             className={clsx(
                                 'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors text-left',
                                 isActive
-                                    ? 'bg-slate-800 text-white'
+                                    ? 'bg-slate-800 text-[#030213]'
                                     : 'text-slate-600 hover:bg-slate-50'
                             )}
                         >

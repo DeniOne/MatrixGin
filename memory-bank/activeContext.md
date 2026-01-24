@@ -24,6 +24,11 @@ MatrixGin должен трансформироваться из **систем�
 - **Language Migration (Frontend)**: ✅ **COMPLETED 2026-01-24**.
   - Frontend UI fully translated to Russian (Foundation, Manager Hub, Profile, Wallet).
   - Scripts `generate-translation-registry.ts` and `apply-translation.ts` added to `backend/scripts`.
+- **UI Design Standardization (Geist Canon)**: ✅ **COMPLETED 2026-01-24**.
+  - Global font face enforced (Geist 100-900).
+  - Weights standardized to `medium` (500) and `normal` (400) project-wide (670+ occurrences).
+  - Legacy dark theme patterns replaced with "MatrixGin Light" design system.
+  - **Source of Truth established**: `f:\Matrix_Gin\memory-bank\UI_DESIGN_CANON.md`.
 - **Module 13: Corporate University (Foundation)**: ✅ **COMPLETED 2026-01-24**.
   - Implemented **Canon v2.2 Foundation Gate**.
   - Single Source of Truth: `FoundationAcceptance` model.

@@ -70,10 +70,10 @@ export const TrainerApplicationModal: React.FC<TrainerApplicationModalProps> = (
 
                 <div className="bg-gray-50 p-6 rounded-2xl space-y-4">
                     <Title level={5} className="m-0 flex items-center gap-2">
-                        <BookOutlined className="text-gray-400" />
+                        <BookOutlined className="text-[#717182]" />
                         Требования к кандидату
                     </Title>
-                    <ul className="list-disc list-inside text-sm text-gray-500 space-y-1">
+                    <ul className="list-disc list-inside text-sm text-[#717182] space-y-1">
                         <li>Действующий грейд не ниже SENIOR</li>
                         <li>Стабильные показатели KPI за последние 3 месяца</li>
                         <li>Отсутствие критических нарушений канонов</li>

@@ -32,7 +32,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ personalFileId: _persona
 
     if (events.length === 0) {
         return (
-            <div className="text-center py-12 text-gray-500">
+            <div className="text-center py-12 text-[#717182]">
                 <p>История событий пуста</p>
             </div>
         );
@@ -40,7 +40,7 @@ export const HistoryTab: React.FC<HistoryTabProps> = ({ personalFileId: _persona
 
     return (
         <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">История изменений</h3>
+            <h3 className="text-lg font-medium text-gray-900">История изменений</h3>
 
             <div className="space-y-3">
                 {events.map((event) => (

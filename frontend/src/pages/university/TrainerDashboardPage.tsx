@@ -158,7 +158,7 @@ export const TrainerDashboardPage: React.FC = () => {
                     </div>
                     <Space>
                         {dashboard.currentAccreditation ? (
-                            <Tag color="gold" className="px-4 py-1 rounded-full text-sm font-bold border-none shadow-sm">
+                            <Tag color="gold" className="px-4 py-1 rounded-full text-sm font-medium border-none shadow-sm">
                                 <TrophyOutlined className="mr-2" />
                                 {dashboard.currentAccreditation.level} (Вес: {dashboard.currentAccreditation.weight})
                             </Tag>
@@ -205,7 +205,7 @@ export const TrainerDashboardPage: React.FC = () => {
                             <Statistic
                                 title="Всего подопечных"
                                 value={dashboard.stats.traineesTotal}
-                                prefix={<TeamOutlined className="text-gray-400" />}
+                                prefix={<TeamOutlined className="text-[#717182]" />}
                             />
                         </Card>
                     </Col>

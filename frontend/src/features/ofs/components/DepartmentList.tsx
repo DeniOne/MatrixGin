@@ -22,7 +22,7 @@ export default function DepartmentList() {
   };
 
   if (isLoading) {
-    return <div className="text-center py-8 text-gray-500">Загрузка...</div>;
+    return <div className="text-center py-8 text-[#717182]">Загрузка...</div>;
   }
 
   const departments = data?.data || [];
@@ -30,10 +30,10 @@ export default function DepartmentList() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Департаменты</h2>
+        <h2 className="text-2xl font-medium text-gray-900">Департаменты</h2>
         <button 
           onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-[#030213] rounded-lg hover:bg-blue-700"
         >
           <Plus className="w-4 h-4" />
           Добавить департамент
@@ -50,7 +50,7 @@ export default function DepartmentList() {
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2 flex-1">
                 <Building2 className="w-5 h-5 text-blue-600" />
-                <h3 className="font-semibold text-gray-900">{dept.name}</h3>
+                <h3 className="font-medium text-gray-900">{dept.name}</h3>
               </div>
               <div className="flex items-center gap-2">
                 {(dept.employee_count ?? 0) > 0 && (

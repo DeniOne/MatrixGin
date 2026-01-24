@@ -36,10 +36,10 @@ export default function OFSPage() {
             <div className="flex items-center gap-3">
               <Bot className="w-8 h-8 text-blue-600" />
               <div>
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-medium text-gray-900">
                   ОФС - Организационно-Функциональная Структура
                 </h1>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-[#717182] mt-1">
                   Управление организационной структурой компании
                 </p>
               </div>

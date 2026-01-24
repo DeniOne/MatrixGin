@@ -36,8 +36,8 @@ const SalesDashboardPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Академия Продаж</h1>
-        <p className="text-gray-500 mt-1">Дашборд эффективности и обучения</p>
+        <h1 className="text-3xl font-medium text-gray-900">Академия Продаж</h1>
+        <p className="text-[#717182] mt-1">Дашборд эффективности и обучения</p>
       </div>
 
       {/* KPI Grid */}
@@ -48,15 +48,15 @@ const SalesDashboardPage: React.FC = () => {
               <div className={`p-3 rounded-lg ${kpi.bg}`}>
                 <kpi.icon className={`w-6 h-6 ${kpi.color}`} />
               </div>
-              <div className={`flex items-center text-sm font-medium ${kpi.trend === 'up' ? 'text-green-600' : kpi.trend === 'down' ? 'text-red-600' : 'text-gray-500'
+              <div className={`flex items-center text-sm font-medium ${kpi.trend === 'up' ? 'text-green-600' : kpi.trend === 'down' ? 'text-red-600' : 'text-[#717182]'
                 }`}>
                 {kpi.trend === 'up' && <ArrowUpRight className="w-4 h-4 mr-1" />}
                 {kpi.trend === 'down' && <ArrowDownRight className="w-4 h-4 mr-1" />}
                 {kpi.change}
               </div>
             </div>
-            <h3 className="text-gray-500 text-sm font-medium">{kpi.label}</h3>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{kpi.value}</p>
+            <h3 className="text-[#717182] text-sm font-medium">{kpi.label}</h3>
+            <p className="text-2xl font-medium text-gray-900 mt-1">{kpi.value}</p>
           </div>
         ))}
       </div>
@@ -70,12 +70,12 @@ const SalesDashboardPage: React.FC = () => {
               <Link
                 key={action.title}
                 to={action.path}
-                className={`${action.color} rounded-xl p-6 text-white shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 flex flex-col items-center text-center group`}
+                className={`${action.color} rounded-xl p-6 text-[#030213] shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 flex flex-col items-center text-center group`}
               >
                 <div className="bg-white/20 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
                   <action.icon className="w-6 h-6" />
                 </div>
-                <span className="font-bold">{action.title}</span>
+                <span className="font-medium">{action.title}</span>
               </Link>
             ))}
           </div>
@@ -83,7 +83,7 @@ const SalesDashboardPage: React.FC = () => {
           {/* Active Courses */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-lg font-bold text-gray-900">Мое обучение</h2>
+              <h2 className="text-lg font-medium text-gray-900">Мое обучение</h2>
               <Link to="/sales/courses" className="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center">
                 Все курсы <ChevronRight className="w-4 h-4 ml-1" />
               </Link>
@@ -94,8 +94,8 @@ const SalesDashboardPage: React.FC = () => {
                   <img src={course.image} alt={course.title} className="w-16 h-16 rounded-lg object-cover mr-4" />
                   <div className="flex-1">
                     <div className="flex justify-between mb-2">
-                      <h3 className="font-bold text-gray-900">{course.title}</h3>
-                      <span className="text-sm text-gray-500">{course.progress}%</span>
+                      <h3 className="font-medium text-gray-900">{course.title}</h3>
+                      <span className="text-sm text-[#717182]">{course.progress}%</span>
                     </div>
                     <div className="w-full bg-gray-100 rounded-full h-2">
                       <div
@@ -103,13 +103,13 @@ const SalesDashboardPage: React.FC = () => {
                         style={{ width: `${course.progress}%` }}
                       ></div>
                     </div>
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-xs text-[#717182] mt-2">
                       {course.completed} из {course.total} уроков завершено
                     </p>
                   </div>
                   <Link
                     to={`/sales/course/${course.id}`}
-                    className="ml-4 p-2 text-gray-400 hover:text-blue-600 transition-colors"
+                    className="ml-4 p-2 text-[#717182] hover:text-blue-600 transition-colors"
                   >
                     <PlayCircle className="w-8 h-8" />
                   </Link>
@@ -122,43 +122,43 @@ const SalesDashboardPage: React.FC = () => {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Daily Tip */}
-          <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-xl p-6 text-white shadow-lg">
+          <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-xl p-6 text-[#030213] shadow-lg">
             <div className="flex items-center mb-4">
               <div className="bg-white/20 p-2 rounded-lg mr-3">
                 <BookOpen className="w-5 h-5" />
               </div>
-              <h3 className="font-bold">Совет дня</h3>
+              <h3 className="font-medium">Совет дня</h3>
             </div>
             <p className="text-purple-100 text-sm mb-4">
               "Используйте технику 'Именно поэтому', чтобы превратить возражение клиента в аргумент для покупки."
             </p>
-            <button className="w-full bg-white text-purple-700 py-2 rounded-lg text-sm font-bold hover:bg-purple-50 transition-colors">
+            <button className="w-full bg-white text-purple-700 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 transition-colors">
               Читать подробнее
             </button>
           </div>
 
           {/* Upcoming Events */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="font-bold text-gray-900 mb-4">Ближайшие события</h3>
+            <h3 className="font-medium text-gray-900 mb-4">Ближайшие события</h3>
             <div className="space-y-4">
               <div className="flex items-start">
                 <div className="bg-blue-50 text-blue-700 rounded-lg p-2 text-center min-w-[50px] mr-3">
-                  <span className="block text-xl font-bold">25</span>
-                  <span className="text-xs uppercase font-bold">Ноя</span>
+                  <span className="block text-xl font-medium">25</span>
+                  <span className="text-xs uppercase font-medium">Ноя</span>
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-gray-900">Мастер-класс по продажам</h4>
-                  <p className="text-xs text-gray-500 mt-1">14:00 • Zoom</p>
+                  <h4 className="text-sm font-medium text-gray-900">Мастер-класс по продажам</h4>
+                  <p className="text-xs text-[#717182] mt-1">14:00 • Zoom</p>
                 </div>
               </div>
               <div className="flex items-start">
                 <div className="bg-orange-50 text-orange-700 rounded-lg p-2 text-center min-w-[50px] mr-3">
-                  <span className="block text-xl font-bold">28</span>
-                  <span className="text-xs uppercase font-bold">Ноя</span>
+                  <span className="block text-xl font-medium">28</span>
+                  <span className="text-xs uppercase font-medium">Ноя</span>
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-gray-900">Аттестация (Теория)</h4>
-                  <p className="text-xs text-gray-500 mt-1">10:00 • Офис 304</p>
+                  <h4 className="text-sm font-medium text-gray-900">Аттестация (Теория)</h4>
+                  <p className="text-xs text-[#717182] mt-1">10:00 • Офис 304</p>
                 </div>
               </div>
             </div>

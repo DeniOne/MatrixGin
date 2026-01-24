@@ -68,7 +68,7 @@ const RegistryForm: React.FC<RegistryFormProps> = ({ initialData, onSubmit, isSu
         <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
             {/* CODE FIELD */}
             <div>
-                <label className="block text-xs uppercase font-bold text-slate-500 mb-1">
+                <label className="block text-xs uppercase font-medium text-[#717182] mb-1">
                     {UI_TEXT.LABEL_CODE}
                 </label>
                 <input
@@ -77,9 +77,9 @@ const RegistryForm: React.FC<RegistryFormProps> = ({ initialData, onSubmit, isSu
                     onChange={(e) => handleChange(setCode, e.target.value)}
                     disabled={isEditMode || isSubmitting}
                     className={`
-                        w-full bg-slate-900 border rounded px-3 py-2 font-mono text-sm text-indigo-300
+                        w-full bg-white border rounded px-3 py-2 font-mono text-sm text-indigo-300
                         focus:outline-none focus:ring-2 focus:ring-indigo-500/50
-                        disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-950
+                        disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-[#F3F3F5]
                         ${errors.code ? 'border-red-500' : 'border-slate-700'}
                     `}
                     placeholder="e.g. org_unit_type"
@@ -99,7 +99,7 @@ const RegistryForm: React.FC<RegistryFormProps> = ({ initialData, onSubmit, isSu
 
             {/* NAME FIELD */}
             <div>
-                <label className="block text-xs uppercase font-bold text-slate-500 mb-1">
+                <label className="block text-xs uppercase font-medium text-[#717182] mb-1">
                     {UI_TEXT.LABEL_NAME}
                 </label>
                 <input
@@ -108,7 +108,7 @@ const RegistryForm: React.FC<RegistryFormProps> = ({ initialData, onSubmit, isSu
                     onChange={(e) => handleChange(setName, e.target.value)}
                     disabled={isSubmitting}
                     className={`
-                        w-full bg-slate-900 border rounded px-3 py-2 text-sm text-slate-200
+                        w-full bg-white border rounded px-3 py-2 text-sm text-slate-200
                         focus:outline-none focus:ring-2 focus:ring-indigo-500/50
                         ${errors.name ? 'border-red-500' : 'border-slate-700'}
                     `}
@@ -121,7 +121,7 @@ const RegistryForm: React.FC<RegistryFormProps> = ({ initialData, onSubmit, isSu
 
             {/* DESCRIPTION FIELD */}
             <div>
-                <label className="block text-xs uppercase font-bold text-slate-500 mb-1">
+                <label className="block text-xs uppercase font-medium text-[#717182] mb-1">
                     {UI_TEXT.LABEL_DESC}
                 </label>
                 <textarea
@@ -129,21 +129,21 @@ const RegistryForm: React.FC<RegistryFormProps> = ({ initialData, onSubmit, isSu
                     onChange={(e) => handleChange(setDescription, e.target.value)}
                     disabled={isSubmitting}
                     rows={4}
-                    className="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-y"
+                    className="w-full bg-white border border-slate-700 rounded px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 resize-y"
                     placeholder="Опциональные детали..."
                 />
             </div>
 
             {/* ACTION BAR */}
-            <div className="pt-4 border-t border-slate-800">
+            <div className="pt-4 border-t border-black/10">
                 <button
                     type="submit"
                     disabled={!isDirty || isSubmitting} // Disable if no changes or submitting
                     className={`
-                        flex items-center gap-2 px-6 py-2 rounded text-sm font-bold uppercase tracking-wider transition-all
+                        flex items-center gap-2 px-6 py-2 rounded text-sm font-medium uppercase tracking-wider transition-all
                         ${!isDirty || isSubmitting
-                            ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-                            : 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-lg shadow-indigo-500/20'
+                            ? 'bg-slate-800 text-[#717182] cursor-not-allowed'
+                            : 'bg-indigo-600 text-[#030213] hover:bg-indigo-500 shadow-lg shadow-indigo-500/20'
                         }
                     `}
                 >

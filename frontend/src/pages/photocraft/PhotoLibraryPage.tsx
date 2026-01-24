@@ -98,7 +98,7 @@ const PhotoLibraryPage: React.FC = () => {
             case 'guide': return <FileText className="w-5 h-5 text-blue-500" />;
             case 'checklist': return <FileText className="w-5 h-5 text-green-500" />;
             case 'video': return <Video className="w-5 h-5 text-red-500" />;
-            default: return <FileText className="w-5 h-5 text-gray-500" />;
+            default: return <FileText className="w-5 h-5 text-[#717182]" />;
         }
     };
 
@@ -110,12 +110,12 @@ const PhotoLibraryPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Библиотека ресурсов</h1>
-                    <p className="text-gray-500 mt-1">Пресеты, гайды, чек-листы и полезные материалы</p>
+                    <h1 className="text-3xl font-medium text-gray-900">Библиотека ресурсов</h1>
+                    <p className="text-[#717182] mt-1">Пресеты, гайды, чек-листы и полезные материалы</p>
                 </div>
                 <div className="mt-4 md:mt-0 flex space-x-3 w-full md:w-auto">
                     <div className="relative flex-1 md:w-64">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#717182] w-4 h-4" />
                         <input
                             type="text"
                             placeholder="Поиск материалов..."
@@ -125,13 +125,13 @@ const PhotoLibraryPage: React.FC = () => {
                     <div className="bg-white border border-gray-200 rounded-lg p-1 flex">
                         <button
                             onClick={() => setViewMode('grid')}
-                            className={`p-2 rounded transition-colors ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
+                            className={`p-2 rounded transition-colors ${viewMode === 'grid' ? 'bg-gray-100 text-gray-900' : 'text-[#717182] hover:text-gray-600'}`}
                         >
                             <Grid className="w-4 h-4" />
                         </button>
                         <button
                             onClick={() => setViewMode('list')}
-                            className={`p-2 rounded transition-colors ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-gray-400 hover:text-gray-600'}`}
+                            className={`p-2 rounded transition-colors ${viewMode === 'list' ? 'bg-gray-100 text-gray-900' : 'text-[#717182] hover:text-gray-600'}`}
                         >
                             <List className="w-4 h-4" />
                         </button>
@@ -146,7 +146,7 @@ const PhotoLibraryPage: React.FC = () => {
                         key={type}
                         onClick={() => setFilterType(type)}
                         className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${filterType === type
-                            ? 'bg-indigo-600 text-white'
+                            ? 'bg-indigo-600 text-[#030213]'
                             : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
                             }`}
                     >
@@ -172,11 +172,11 @@ const PhotoLibraryPage: React.FC = () => {
                                     </div>
                                 )}
                                 {resource.isNew && (
-                                    <span className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+                                    <span className="absolute top-2 right-2 bg-green-500 text-[#030213] text-xs font-medium px-2 py-1 rounded-full shadow-sm">
                                         NEW
                                     </span>
                                 )}
-                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <div className="absolute inset-0 bg-white/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                     <button className="bg-white text-gray-900 px-4 py-2 rounded-lg font-medium text-sm flex items-center shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
                                         <Download className="w-4 h-4 mr-2" />
                                         Скачать
@@ -185,23 +185,23 @@ const PhotoLibraryPage: React.FC = () => {
                             </div>
                             <div className="p-4">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{resource.category}</span>
-                                    <div className="flex items-center text-yellow-500 text-xs font-bold">
+                                    <span className="text-xs font-medium text-[#717182] uppercase tracking-wider">{resource.category}</span>
+                                    <div className="flex items-center text-yellow-500 text-xs font-medium">
                                         <Star className="w-3 h-3 mr-1 fill-current" />
                                         {resource.rating}
                                     </div>
                                 </div>
-                                <h3 className="font-bold text-gray-900 mb-1 line-clamp-1" title={resource.title}>{resource.title}</h3>
-                                <div className="flex items-center text-xs text-gray-500 mb-4">
+                                <h3 className="font-medium text-gray-900 mb-1 line-clamp-1" title={resource.title}>{resource.title}</h3>
+                                <div className="flex items-center text-xs text-[#717182] mb-4">
                                     <span className="mr-2">{resource.author}</span>
                                     <span>• {resource.date}</span>
                                 </div>
                                 <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                                    <div className="flex items-center text-gray-400 text-xs">
+                                    <div className="flex items-center text-[#717182] text-xs">
                                         {getIcon(resource.type)}
                                         <span className="ml-2 capitalize">{resource.type}</span>
                                     </div>
-                                    <span className="text-xs font-medium text-gray-400">{resource.size}</span>
+                                    <span className="text-xs font-medium text-[#717182]">{resource.size}</span>
                                 </div>
                             </div>
                         </div>
@@ -213,12 +213,12 @@ const PhotoLibraryPage: React.FC = () => {
                     <table className="w-full">
                         <thead className="bg-gray-50 border-b border-gray-100">
                             <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Название</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Категория</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Автор</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Дата</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Размер</th>
-                                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">Название</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">Категория</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">Автор</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">Дата</th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-[#717182] uppercase tracking-wider">Размер</th>
+                                <th className="px-6 py-3 text-right text-xs font-medium text-[#717182] uppercase tracking-wider">Действия</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -231,24 +231,24 @@ const PhotoLibraryPage: React.FC = () => {
                                             </div>
                                             <div>
                                                 <div className="text-sm font-medium text-gray-900">{resource.title}</div>
-                                                <div className="text-xs text-gray-500 flex items-center mt-0.5">
+                                                <div className="text-xs text-[#717182] flex items-center mt-0.5">
                                                     <Download className="w-3 h-3 mr-1" /> {resource.downloads} скачиваний
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#717182]">
                                         <span className="px-2 py-1 bg-gray-100 rounded-full text-xs font-medium text-gray-600">
                                             {resource.category}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#717182]">
                                         {resource.author}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#717182]">
                                         {resource.date}
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-right">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#717182] text-right">
                                         {resource.size}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

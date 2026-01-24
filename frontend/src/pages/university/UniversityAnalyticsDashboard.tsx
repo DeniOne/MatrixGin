@@ -112,7 +112,7 @@ export const UniversityAnalyticsDashboard: React.FC = () => {
                                 <div>
                                     <div className="flex justify-between mb-2">
                                         <Text strong>Процент завершения (Completion Rate)</Text>
-                                        <Text className="text-indigo-600 font-bold">{analytics.learning.completionRate.toFixed(1)}%</Text>
+                                        <Text className="text-indigo-600 font-medium">{analytics.learning.completionRate.toFixed(1)}%</Text>
                                     </div>
                                     <Progress
                                         percent={analytics.learning.completionRate}

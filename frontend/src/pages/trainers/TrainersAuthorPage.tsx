@@ -10,8 +10,8 @@ const TrainersAuthorPage: React.FC = () => {
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Конструктор Курсов</h1>
-                <button className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 flex items-center">
+                <h1 className="text-3xl font-medium text-gray-900">Конструктор Курсов</h1>
+                <button className="px-6 py-3 bg-indigo-600 text-[#030213] rounded-lg font-medium hover:bg-indigo-700 flex items-center">
                     <Plus className="w-5 h-5 mr-2" />
                     Создать курс
                 </button>
@@ -21,7 +21,7 @@ const TrainersAuthorPage: React.FC = () => {
                 <div className="flex items-center">
                     <Sparkles className="w-8 h-8 text-purple-600 mr-4" />
                     <div>
-                        <h3 className="font-bold text-gray-900 mb-1">AI Помощник</h3>
+                        <h3 className="font-medium text-gray-900 mb-1">AI Помощник</h3>
                         <p className="text-sm text-gray-600">Генерируйте контент курса с помощью ИИ</p>
                     </div>
                 </div>
@@ -32,10 +32,10 @@ const TrainersAuthorPage: React.FC = () => {
                     <div key={course.id} className="bg-white p-6 rounded-xl border hover:shadow-md transition-shadow">
                         <div className="flex items-center justify-between mb-4">
                             <div>
-                                <h3 className="font-bold text-lg text-gray-900">{course.title}</h3>
-                                <p className="text-sm text-gray-500">{course.modules} модулей • {course.students} учеников</p>
+                                <h3 className="font-medium text-lg text-gray-900">{course.title}</h3>
+                                <p className="text-sm text-[#717182]">{course.modules} модулей • {course.students} учеников</p>
                             </div>
-                            <span className={`text-xs font-bold px-3 py-1 rounded ${course.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                            <span className={`text-xs font-medium px-3 py-1 rounded ${course.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
                                 }`}>
                                 {course.status === 'published' ? 'Опубликован' : 'Черновик'}
                             </span>
@@ -46,7 +46,7 @@ const TrainersAuthorPage: React.FC = () => {
                                 Редактировать
                             </button>
                             {course.status === 'draft' && (
-                                <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700">
+                                <button className="px-4 py-2 bg-indigo-600 text-[#030213] rounded-lg text-sm font-medium hover:bg-indigo-700">
                                     Опубликовать
                                 </button>
                             )}

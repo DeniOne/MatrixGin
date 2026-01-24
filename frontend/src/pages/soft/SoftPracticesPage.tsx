@@ -74,21 +74,21 @@ const SoftPracticesPage: React.FC = () => {
     return (
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center mb-10">
-                <h1 className="text-3xl font-bold text-gray-900">Микро-практики</h1>
-                <p className="text-gray-500 mt-2">Маленькие шаги к большим изменениям. Выполняйте задания ежедневно.</p>
+                <h1 className="text-3xl font-medium text-gray-900">Микро-практики</h1>
+                <p className="text-[#717182] mt-2">Маленькие шаги к большим изменениям. Выполняйте задания ежедневно.</p>
             </div>
 
             {/* Streak Card */}
-            <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-6 text-white shadow-lg mb-8 flex items-center justify-between">
+            <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-2xl p-6 text-[#030213] shadow-lg mb-8 flex items-center justify-between">
                 <div>
                     <div className="flex items-center space-x-2 mb-1">
                         <Flame className="w-6 h-6 animate-pulse" />
-                        <span className="font-bold text-lg">5 дней подряд!</span>
+                        <span className="font-medium text-lg">5 дней подряд!</span>
                     </div>
-                    <p className="text-white/90 text-sm">Вы в ударе! Продолжайте в том же духе.</p>
+                    <p className="text-[#030213]/90 text-sm">Вы в ударе! Продолжайте в том же духе.</p>
                 </div>
                 <div className="text-right">
-                    <div className="text-3xl font-bold">Уровень 5</div>
+                    <div className="text-3xl font-medium">Уровень 5</div>
                     <div className="text-xs opacity-80">Мастер привычек</div>
                 </div>
             </div>
@@ -100,12 +100,12 @@ const SoftPracticesPage: React.FC = () => {
                         key={day.day}
                         onClick={() => setSelectedDay(day.day)}
                         className={`flex flex-col items-center justify-center w-12 h-16 rounded-lg transition-all ${selectedDay === day.day
-                            ? 'bg-indigo-600 text-white shadow-md transform scale-105'
-                            : 'hover:bg-gray-50 text-gray-500'
+                            ? 'bg-indigo-600 text-[#030213] shadow-md transform scale-105'
+                            : 'hover:bg-gray-50 text-[#717182]'
                             }`}
                     >
                         <span className="text-xs font-medium mb-1">{day.name}</span>
-                        <span className="text-lg font-bold">{day.day}</span>
+                        <span className="text-lg font-medium">{day.day}</span>
                         {day.status === 'completed' && (
                             <div className="w-1.5 h-1.5 bg-green-400 rounded-full mt-1"></div>
                         )}
@@ -135,10 +135,10 @@ const SoftPracticesPage: React.FC = () => {
 
                             <div className="flex-1">
                                 <div className="flex justify-between items-start mb-1">
-                                    <h3 className={`font-bold text-lg ${practice.completed ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
+                                    <h3 className={`font-medium text-lg ${practice.completed ? 'text-[#717182] line-through' : 'text-gray-900'}`}>
                                         {practice.title}
                                     </h3>
-                                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full flex items-center">
+                                    <span className="text-xs font-medium text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full flex items-center">
                                         <Zap className="w-3 h-3 mr-1" />
                                         +{practice.xp} XP
                                     </span>
@@ -146,13 +146,13 @@ const SoftPracticesPage: React.FC = () => {
                                 <p className="text-gray-600 mb-3">{practice.description}</p>
 
                                 <div className="flex items-center justify-between">
-                                    <div className="flex items-center text-sm text-gray-400">
+                                    <div className="flex items-center text-sm text-[#717182]">
                                         <div className="w-4 h-4 mr-1" />
                                         {practice.duration}
                                     </div>
 
                                     {!practice.completed && (
-                                        <button className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
+                                        <button className="px-4 py-2 bg-indigo-600 text-[#030213] text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors">
                                             Выполнить
                                         </button>
                                     )}
@@ -166,7 +166,7 @@ const SoftPracticesPage: React.FC = () => {
             {/* Empty State / Motivation */}
             <div className="mt-8 text-center p-6 bg-indigo-50 rounded-xl border border-indigo-100">
                 <Smile className="w-10 h-10 text-indigo-400 mx-auto mb-3" />
-                <h3 className="font-bold text-indigo-900">Все задания на сегодня?</h3>
+                <h3 className="font-medium text-indigo-900">Все задания на сегодня?</h3>
                 <p className="text-indigo-700 text-sm mt-1">Вы можете выбрать дополнительные практики из библиотеки или просто отдохнуть.</p>
             </div>
         </div>

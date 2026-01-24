@@ -10,7 +10,7 @@ const SalesCourseListPage: React.FC = () => {
   const params = useMemo(() => ({ academyId }), [academyId]);
   const { data, isLoading, error } = useGetCoursesQuery(academyId ? params : undefined);
 
-  if (loadingAcademy) return <div className="text-white">Загрузка академии…</div>;
+  if (loadingAcademy) return <div className="text-[#030213]">Загрузка академии…</div>;
   if (academyError || !academyId) return <div className="text-red-400">Не удалось определить академию "Продажи и сервис".</div>;
 
   const courses = (data?.data || []).filter((c) =>
@@ -18,16 +18,16 @@ const SalesCourseListPage: React.FC = () => {
   );
 
   return (
-    <div className="max-w-7xl mx-auto text-white">
-      <h1 className="text-2xl font-bold mb-4">Продажи и сервис — Курсы</h1>
+    <div className="max-w-7xl mx-auto text-[#030213]">
+      <h1 className="text-2xl font-medium mb-4">Продажи и сервис — Курсы</h1>
 
-      <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 mb-6">
-        <label className="block text-sm text-gray-400 mb-1">Поиск</label>
+      <div className="bg-white border border-black/10 rounded-lg p-4 mb-6">
+        <label className="block text-sm text-[#717182] mb-1">Поиск</label>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Название курса…"
-          className="w-full bg-gray-800 text-white rounded px-3 py-2 border border-gray-700"
+          className="w-full bg-gray-800 text-[#030213] rounded px-3 py-2 border border-gray-700"
         />
       </div>
 
@@ -36,7 +36,7 @@ const SalesCourseListPage: React.FC = () => {
       ) : error ? (
         <div className="text-red-400">Ошибка загрузки курсов.</div>
       ) : courses.length === 0 ? (
-        <div className="text-gray-400">Курсы не найдены.</div>
+        <div className="text-[#717182]">Курсы не найдены.</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {courses.map((course) => (

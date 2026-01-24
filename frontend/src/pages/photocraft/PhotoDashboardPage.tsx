@@ -35,7 +35,7 @@ const PhotoDashboardPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+        <h1 className="text-3xl font-medium text-gray-900 flex items-center">
           <Camera className="w-8 h-8 mr-3 text-blue-600" />
           Факультет Фотомастерства
         </h1>
@@ -54,12 +54,12 @@ const PhotoDashboardPage: React.FC = () => {
             <div className="relative z-10">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900">Ваш прогресс</h2>
+                  <h2 className="text-lg font-medium text-gray-900">Ваш прогресс</h2>
                   <p className="text-sm text-blue-600 font-medium">{progress.currentLevel}</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-2xl font-bold text-gray-900">{progress.percent}%</span>
-                  <p className="text-xs text-gray-500">до следующего уровня</p>
+                  <span className="text-2xl font-medium text-gray-900">{progress.percent}%</span>
+                  <p className="text-xs text-[#717182]">до следующего уровня</p>
                 </div>
               </div>
 
@@ -70,7 +70,7 @@ const PhotoDashboardPage: React.FC = () => {
                 ></div>
               </div>
 
-              <div className="flex justify-between text-xs text-gray-500">
+              <div className="flex justify-between text-xs text-[#717182]">
                 <span>{progress.xp} XP</span>
                 <span>{progress.nextLevelXp} XP ({progress.nextLevel})</span>
               </div>
@@ -80,7 +80,7 @@ const PhotoDashboardPage: React.FC = () => {
           {/* Active Courses */}
           <div>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-900">Активные курсы</h2>
+              <h2 className="text-xl font-medium text-gray-900">Активные курсы</h2>
               <Link to="/photocraft/courses" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
                 Все курсы &rarr;
               </Link>
@@ -89,14 +89,14 @@ const PhotoDashboardPage: React.FC = () => {
               {activeCourses.map(course => (
                 <div key={course.id} className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-semibold text-gray-900">{course.title}</h3>
+                    <h3 className="font-medium text-gray-900">{course.title}</h3>
                     <span className="text-sm font-medium text-blue-600">{course.progress}%</span>
                   </div>
                   <div className="w-full bg-gray-100 rounded-full h-1.5 mb-3">
                     <div className="bg-blue-600 h-1.5 rounded-full" style={{ width: `${course.progress}%` }}></div>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
-                    <PlayCircle className="w-4 h-4 mr-2 text-gray-400" />
+                    <PlayCircle className="w-4 h-4 mr-2 text-[#717182]" />
                     <span>Далее: {course.nextLesson}</span>
                     <Link
                       to={`/photocraft/course/${course.id}`}
@@ -112,7 +112,7 @@ const PhotoDashboardPage: React.FC = () => {
 
           {/* Recent Achievements */}
           <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Последние достижения</h2>
+            <h2 className="text-xl font-medium text-gray-900 mb-4">Последние достижения</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <BadgeCard
                 title="Мастер света"
@@ -141,8 +141,8 @@ const PhotoDashboardPage: React.FC = () => {
         {/* Sidebar */}
         <div className="space-y-8">
           {/* Quick Actions */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 text-white shadow-lg">
-            <h3 className="font-bold text-lg mb-4">Быстрые действия</h3>
+          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 text-[#030213] shadow-lg">
+            <h3 className="font-medium text-lg mb-4">Быстрые действия</h3>
             <div className="space-y-3">
               <Link to="/photocraft/shifts" className="flex items-center p-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors">
                 <Calendar className="w-5 h-5 mr-3 text-blue-300" />
@@ -158,11 +158,11 @@ const PhotoDashboardPage: React.FC = () => {
           {/* Notifications */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900 flex items-center">
+              <h3 className="font-medium text-gray-900 flex items-center">
                 <Bell className="w-4 h-4 mr-2" />
                 Уведомления
               </h3>
-              <span className="bg-red-100 text-red-800 text-xs font-bold px-2 py-0.5 rounded-full">3</span>
+              <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-0.5 rounded-full">3</span>
             </div>
             <div className="space-y-4">
               {notifications.map(notif => (
@@ -172,8 +172,8 @@ const PhotoDashboardPage: React.FC = () => {
                     }`}></div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">{notif.title}</p>
-                    <p className="text-xs text-gray-500 mb-1">{notif.message}</p>
-                    <div className="flex items-center text-[10px] text-gray-400">
+                    <p className="text-xs text-[#717182] mb-1">{notif.message}</p>
+                    <div className="flex items-center text-[10px] text-[#717182]">
                       <Clock className="w-3 h-3 mr-1" />
                       {notif.time}
                     </div>
@@ -181,7 +181,7 @@ const PhotoDashboardPage: React.FC = () => {
                 </div>
               ))}
             </div>
-            <button className="w-full mt-4 text-center text-sm text-gray-500 hover:text-gray-700">
+            <button className="w-full mt-4 text-center text-sm text-[#717182] hover:text-gray-700">
               Показать все
             </button>
           </div>

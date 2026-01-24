@@ -63,14 +63,14 @@ export default function RegistrationList() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Регистрация сотрудников</h2>
+          <h2 className="text-2xl font-medium text-gray-900">Регистрация сотрудников</h2>
           <p className="text-sm text-gray-600 mt-1">
             Управление заявками на регистрацию через Telegram бот
           </p>
         </div>
         <button
           onClick={() => setShowInviteModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-[#030213] rounded-lg hover:bg-blue-700 transition-colors"
         >
           <UserPlus className="w-4 h-4" />
           Отправить приглашение
@@ -82,7 +82,7 @@ export default function RegistrationList() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#717182]" />
             <input
               type="text"
               placeholder="Поиск по имени или email..."
@@ -94,7 +94,7 @@ export default function RegistrationList() {
 
           {/* Status Filter */}
           <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[#717182]" />
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -113,7 +113,7 @@ export default function RegistrationList() {
           <div className="flex items-center gap-4 text-sm">
             <div>
               <span className="text-gray-600">Всего:</span>
-              <span className="ml-2 font-semibold">{data?.pagination.total || 0}</span>
+              <span className="ml-2 font-medium">{data?.pagination.total || 0}</span>
             </div>
           </div>
         </div>
@@ -122,31 +122,31 @@ export default function RegistrationList() {
       {/* Table */}
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         {isLoading ? (
-          <div className="p-8 text-center text-gray-500">Загрузка...</div>
+          <div className="p-8 text-center text-[#717182]">Загрузка...</div>
         ) : filteredData && filteredData.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                     Кандидат
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                     Контакты
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                     Должность
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                     Статус
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                     Шаг
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#717182] uppercase tracking-wider">
                     Дата
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-[#717182] uppercase tracking-wider">
                     Действия
                   </th>
                 </tr>
@@ -164,7 +164,7 @@ export default function RegistrationList() {
                           />
                         ) : (
                           <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                            <span className="text-gray-600 font-semibold">
+                            <span className="text-gray-600 font-medium">
                               {registration.first_name[0]}{registration.last_name[0]}
                             </span>
                           </div>
@@ -174,30 +174,30 @@ export default function RegistrationList() {
                             {registration.last_name} {registration.first_name}
                           </div>
                           {registration.middle_name && (
-                            <div className="text-sm text-gray-500">{registration.middle_name}</div>
+                            <div className="text-sm text-[#717182]">{registration.middle_name}</div>
                           )}
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{registration.email}</div>
-                      <div className="text-sm text-gray-500">{registration.phone}</div>
+                      <div className="text-sm text-[#717182]">{registration.phone}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{registration.position}</div>
                       {registration.department_name && (
-                        <div className="text-sm text-gray-500">{registration.department_name}</div>
+                        <div className="text-sm text-[#717182]">{registration.department_name}</div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${STATUS_COLORS[registration.status]}`}>
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-medium rounded-full ${STATUS_COLORS[registration.status]}`}>
                         {STATUS_LABELS[registration.status]}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#717182]">
                       {registration.current_step}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-[#717182]">
                       {new Date(registration.created_at).toLocaleDateString('ru-RU')}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -235,7 +235,7 @@ export default function RegistrationList() {
             </table>
           </div>
         ) : (
-          <div className="p-8 text-center text-gray-500">
+          <div className="p-8 text-center text-[#717182]">
             Нет заявок на регистрацию
           </div>
         )}

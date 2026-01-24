@@ -33,7 +33,7 @@ export const HistoryTimeline: React.FC<HistoryTimelineProps> = ({ entityUrn }) =
 
     return (
         <div className="mt-8">
-            <h3 className="text-lg font-bold mb-4">История аудита</h3>
+            <h3 className="text-lg font-medium mb-4">История аудита</h3>
             <Timeline mode="left">
                 {events.map(ev => (
                     <Timeline.Item

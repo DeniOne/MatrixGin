@@ -25,14 +25,14 @@ const TasksPage: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-white">Задачи</h1>
-                    <p className="text-sm text-gray-400 mt-1">
+                    <h1 className="text-2xl font-medium text-[#030213]">Задачи</h1>
+                    <p className="text-sm text-[#717182] mt-1">
                         Управляйте задачами и отслеживайте их
                     </p>
                 </div>
                 <button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-[#030213] rounded-lg transition-colors"
                 >
                     <Plus className="w-5 h-5" />
                     Создать задачу
@@ -44,13 +44,13 @@ const TasksPage: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Search */}
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#717182]" />
                         <input
                             type="text"
                             placeholder="Поиск задач..."
                             value={filters.search}
                             onChange={(e) => handleFilterChange('search', e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full pl-10 pr-4 py-2 bg-white border border-gray-700 rounded-lg text-[#030213] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         />
                     </div>
 
@@ -58,7 +58,7 @@ const TasksPage: React.FC = () => {
                     <select
                         value={filters.status || ''}
                         onChange={(e) => handleFilterChange('status', e.target.value || undefined)}
-                        className="px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="px-4 py-2 bg-white border border-gray-700 rounded-lg text-[#030213] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
                         <option value="">Все статусы</option>
                         <option value={TaskStatus.TODO}>Нужно сделать</option>
@@ -72,7 +72,7 @@ const TasksPage: React.FC = () => {
                     <select
                         value={filters.priority || ''}
                         onChange={(e) => handleFilterChange('priority', e.target.value || undefined)}
-                        className="px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="px-4 py-2 bg-white border border-gray-700 rounded-lg text-[#030213] focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     >
                         <option value="">Все приоритеты</option>
                         <option value={TaskPriority.LOW}>Низкий</option>
@@ -88,7 +88,7 @@ const TasksPage: React.FC = () => {
                 {isLoading && (
                     <div className="text-center py-12">
                         <div className="inline-block w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
-                        <p className="text-gray-400 mt-4">Загрузка задач...</p>
+                        <p className="text-[#717182] mt-4">Загрузка задач...</p>
                     </div>
                 )}
 
@@ -100,7 +100,7 @@ const TasksPage: React.FC = () => {
 
                 {data && data.data.length === 0 && (
                     <div className="text-center py-12 bg-gray-800 rounded-xl border border-gray-700">
-                        <p className="text-gray-400">Задачи не найдены</p>
+                        <p className="text-[#717182]">Задачи не найдены</p>
                         <button
                             onClick={() => setIsCreateModalOpen(true)}
                             className="mt-4 text-indigo-400 hover:text-indigo-300"
@@ -118,13 +118,13 @@ const TasksPage: React.FC = () => {
             {/* Pagination */}
             {data && data.total > data.limit && (
                 <div className="flex justify-center gap-2 mt-6">
-                    <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                    <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-[#030213] rounded-lg transition-colors">
                         Назад
                     </button>
-                    <span className="px-4 py-2 text-gray-400">
+                    <span className="px-4 py-2 text-[#717182]">
                         Страница {data.page} из {Math.ceil(data.total / data.limit)}
                     </span>
-                    <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors">
+                    <button className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-[#030213] rounded-lg transition-colors">
                         Вперед
                     </button>
                 </div>

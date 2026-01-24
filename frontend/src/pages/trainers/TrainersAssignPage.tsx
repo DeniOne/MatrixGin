@@ -22,8 +22,8 @@ const TrainersAssignPage: React.FC = () => {
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex justify-between items-center mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Назначения Наставников</h1>
-                <button className="px-4 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 flex items-center">
+                <h1 className="text-3xl font-medium text-gray-900">Назначения Наставников</h1>
+                <button className="px-4 py-2 bg-indigo-600 text-[#030213] rounded-lg font-medium hover:bg-indigo-700 flex items-center">
                     <UserPlus className="w-5 h-5 mr-2" />
                     Новое назначение
                 </button>
@@ -36,16 +36,16 @@ const TrainersAssignPage: React.FC = () => {
                             <div className="flex items-center">
                                 <img src={assign.avatar} alt={assign.student} className="w-12 h-12 rounded-full mr-4" />
                                 <div>
-                                    <h3 className="font-bold text-gray-900">{assign.student}</h3>
-                                    <p className="text-sm text-gray-500">{assign.role}</p>
+                                    <h3 className="font-medium text-gray-900">{assign.student}</h3>
+                                    <p className="text-sm text-[#717182]">{assign.role}</p>
                                 </div>
                             </div>
                             <div className="flex items-center space-x-4">
                                 {assign.trainer ? (
                                     <>
-                                        <ArrowRight className="w-5 h-5 text-gray-400" />
+                                        <ArrowRight className="w-5 h-5 text-[#717182]" />
                                         <div className="text-right">
-                                            <p className="text-sm text-gray-500">Наставник:</p>
+                                            <p className="text-sm text-[#717182]">Наставник:</p>
                                             <p className="font-medium text-gray-900">{assign.trainer}</p>
                                         </div>
                                     </>

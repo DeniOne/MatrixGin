@@ -113,7 +113,7 @@ export const AssignStatusModal: React.FC<AssignStatusModalProps> = ({
                             <button
                                 type="submit"
                                 disabled={assigning || fetchingStatuses || reason.trim().length < 10}
-                                className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-white focus:outline-none sm:ml-3 sm:w-auto sm:text-sm ${assigning || reason.trim().length < 10 ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                                className={`w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 text-base font-medium text-[#030213] focus:outline-none sm:ml-3 sm:w-auto sm:text-sm ${assigning || reason.trim().length < 10 ? 'bg-blue-300 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
                                     }`}
                             >
                                 {assigning ? 'Назначение...' : 'Подтвердить'}

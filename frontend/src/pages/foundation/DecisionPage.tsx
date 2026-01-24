@@ -39,7 +39,7 @@ export const DecisionPage: React.FC = () => {
                 <Scale size={64} />
             </div>
 
-            <h2 className="text-3xl font-bold text-center mb-6 text-gray-900">Финальное решение</h2>
+            <h2 className="text-3xl font-medium text-center mb-6 text-gray-900">Финальное решение</h2>
 
             <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-8 prose prose-sm text-gray-600">
                 <p>
@@ -54,7 +54,7 @@ export const DecisionPage: React.FC = () => {
                     <li>Результат важнее усилий (MDR).</li>
                     <li>Экономика основана на заслугах.</li>
                 </ul>
-                <p className="font-bold text-gray-900 mt-4">
+                <p className="font-medium text-gray-900 mt-4">
                     Решение обязательно и записано в Аудит-лог.
                 </p>
             </div>
@@ -78,10 +78,10 @@ export const DecisionPage: React.FC = () => {
                     onClick={handleAccept}
                     disabled={!agreed || submitting}
                     className={`
-                        w-full flex justify-center items-center px-6 py-4 rounded-lg text-lg font-bold shadow-md transition-all
+                        w-full flex justify-center items-center px-6 py-4 rounded-lg text-lg font-medium shadow-md transition-all
                         ${(!agreed || submitting)
-                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                            : 'bg-green-600 text-white hover:bg-green-700 hover:scale-[1.01]'
+                            ? 'bg-gray-200 text-[#717182] cursor-not-allowed'
+                            : 'bg-green-600 text-[#030213] hover:bg-green-700 hover:scale-[1.01]'
                         }
                     `}
                 >
@@ -91,7 +91,7 @@ export const DecisionPage: React.FC = () => {
                 <button
                     onClick={handleDecline}
                     disabled={submitting}
-                    className="w-full py-3 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+                    className="w-full py-3 text-[#717182] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
                 >
                     Отказываюсь (Выход)
                 </button>

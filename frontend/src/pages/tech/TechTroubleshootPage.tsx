@@ -11,10 +11,10 @@ const TechTroubleshootPage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Устранение Неполадок</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-8">Устранение Неполадок</h1>
 
             <div className="relative mb-8">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#717182] w-5 h-5" />
                 <input
                     type="text"
                     placeholder="Поиск решений..."
@@ -26,13 +26,13 @@ const TechTroubleshootPage: React.FC = () => {
                 {guides.map(guide => (
                     <div key={guide.id} className="bg-white p-4 rounded-lg border hover:border-indigo-300 hover:bg-indigo-50 transition-all cursor-pointer group flex items-center justify-between">
                         <div className="flex items-center">
-                            <BookOpen className="w-5 h-5 text-gray-400 mr-3 group-hover:text-indigo-600" />
+                            <BookOpen className="w-5 h-5 text-[#717182] mr-3 group-hover:text-indigo-600" />
                             <div>
                                 <h3 className="font-medium text-gray-900">{guide.title}</h3>
-                                <p className="text-xs text-gray-500">{guide.category} • {guide.views} просмотров</p>
+                                <p className="text-xs text-[#717182]">{guide.category} • {guide.views} просмотров</p>
                             </div>
                         </div>
-                        <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-600" />
+                        <ChevronRight className="w-5 h-5 text-[#717182] group-hover:text-indigo-600" />
                     </div>
                 ))}
             </div>

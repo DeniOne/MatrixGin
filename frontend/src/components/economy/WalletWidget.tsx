@@ -11,8 +11,8 @@ const WalletWidget: React.FC = () => {
     if (isLoading) {
         return (
             <div className="flex items-center gap-2 px-4 py-2 bg-gray-800 rounded-lg">
-                <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-                <span className="text-sm text-gray-400">Загрузка...</span>
+                <Loader2 className="w-4 h-4 animate-spin text-[#717182]" />
+                <span className="text-sm text-[#717182]">Загрузка...</span>
             </div>
         );
     }
@@ -30,24 +30,24 @@ const WalletWidget: React.FC = () => {
                 >
                     <div className="flex items-center gap-2">
                         <Coins className="w-5 h-5 text-yellow-500" />
-                        <span className="text-sm font-semibold text-white">
+                        <span className="text-sm font-medium text-[#030213]">
                             {wallet.mcBalance.toLocaleString()}
                         </span>
-                        <span className="text-xs text-gray-400">MC</span>
+                        <span className="text-xs text-[#717182]">MC</span>
                     </div>
 
                     <div className="flex items-center gap-2 border-l border-gray-700 pl-3">
                         <Gem className="w-5 h-5 text-purple-500" />
-                        <span className="text-sm font-semibold text-white">
+                        <span className="text-sm font-medium text-[#030213]">
                             {wallet.gmcBalance.toLocaleString()}
                         </span>
-                        <span className="text-xs text-gray-400">GMC</span>
+                        <span className="text-xs text-[#717182]">GMC</span>
                     </div>
 
                     {isExpanded ? (
-                        <ChevronUp className="w-4 h-4 text-gray-400" />
+                        <ChevronUp className="w-4 h-4 text-[#717182]" />
                     ) : (
-                        <ChevronDown className="w-4 h-4 text-gray-400" />
+                        <ChevronDown className="w-4 h-4 text-[#717182]" />
                     )}
                 </button>
 
@@ -55,23 +55,23 @@ const WalletWidget: React.FC = () => {
                     <div className="absolute right-0 mt-2 w-64 bg-gray-800 rounded-lg shadow-xl border border-gray-700 z-50">
                         <div className="p-4 space-y-3">
                             <div>
-                                <div className="text-xs text-gray-400 mb-1">Баланс MatrixCoin</div>
+                                <div className="text-xs text-[#717182] mb-1">Баланс MatrixCoin</div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-lg font-bold text-yellow-500">
+                                    <span className="text-lg font-medium text-yellow-500">
                                         {wallet.mcBalance.toLocaleString()} MC
                                     </span>
                                 </div>
                                 {wallet.mcFrozen && wallet.mcFrozen > 0 && (
-                                    <div className="text-xs text-gray-500 mt-1">
+                                    <div className="text-xs text-[#717182] mt-1">
                                         Заморожено: {wallet.mcFrozen.toLocaleString()} MC
                                     </div>
                                 )}
                             </div>
 
                             <div className="border-t border-gray-700 pt-3">
-                                <div className="text-xs text-gray-400 mb-1">Баланс GoldenMatrixCoin</div>
+                                <div className="text-xs text-[#717182] mb-1">Баланс GoldenMatrixCoin</div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-lg font-bold text-purple-500">
+                                    <span className="text-lg font-medium text-purple-500">
                                         {wallet.gmcBalance.toLocaleString()} GMC
                                     </span>
                                 </div>
@@ -82,7 +82,7 @@ const WalletWidget: React.FC = () => {
                                     setShowHistory(true);
                                     setIsExpanded(false);
                                 }}
-                                className="w-full mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors"
+                                className="w-full mt-3 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-[#030213] text-sm font-medium rounded-md transition-colors"
                             >
                                 Посмотреть историю транзакций
                             </button>

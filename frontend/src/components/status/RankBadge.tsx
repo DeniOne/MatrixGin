@@ -24,7 +24,7 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ code, description, gmcBala
                 {getRankName(code)}
             </span>
             <span className="text-sm text-gray-600">{description}</span>
-            <span className="text-xs text-gray-500">({gmcBalance} GMC)</span>
+            <span className="text-xs text-[#717182]">({gmcBalance} GMC)</span>
         </div>
     );
 };

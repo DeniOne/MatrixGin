@@ -13,11 +13,11 @@ const PersonalAnalyticsPage: React.FC = () => {
     return (
         <div className="p-8 space-y-8 max-w-7xl mx-auto">
             <header className="flex flex-col gap-2">
-                <h1 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+                <h1 className="text-3xl font-medium text-[#030213] tracking-tight flex items-center gap-3">
                     <TrendingUp className="w-8 h-8 text-indigo-400" />
                     Моя Аналитика
                 </h1>
-                <p className="text-gray-400 font-light max-w-2xl">
+                <p className="text-[#717182] font-light max-w-2xl">
                     Ваш личный тренд активности и участия в экономике MatrixGin. Объективные данные о ваших достижениях.
                 </p>
             </header>
@@ -43,9 +43,9 @@ const PersonalAnalyticsPage: React.FC = () => {
                 />
             </div>
 
-            <section className="bg-gray-900/50 border border-gray-800 rounded-2xl p-8">
-                <h2 className="text-xl font-bold text-white mb-6">Динамика вклада</h2>
-                <div className="h-64 flex items-center justify-center border border-dashed border-gray-800 rounded-xl bg-black/20">
+            <section className="bg-white/50 border border-black/10 rounded-2xl p-8">
+                <h2 className="text-xl font-medium text-[#030213] mb-6">Динамика вклада</h2>
+                <div className="h-64 flex items-center justify-center border border-dashed border-black/10 rounded-xl bg-white/20">
                     <span className="text-gray-600 italic">График динамики будет доступен после накопления данных за 7 дней.</span>
                 </div>
             </section>
@@ -70,24 +70,24 @@ const StatCard: React.FC<StatCardProps> = ({ title, stats, icon, color }) => {
     return (
         <div className={`border rounded-2xl p-6 transition-all duration-300 hover:shadow-2xl hover:shadow-${color}-500/10 ${colorClasses[color]}`}>
             <div className="flex items-center gap-3 mb-4">
-                <div className={`p-2 rounded-lg bg-gray-900 border border-gray-800`}>
+                <div className={`p-2 rounded-lg bg-white border border-black/10`}>
                     {icon}
                 </div>
-                <h3 className="text-sm font-bold uppercase tracking-widest text-gray-300">{title}</h3>
+                <h3 className="text-sm font-medium uppercase tracking-widest text-gray-300">{title}</h3>
             </div>
 
             <div className="space-y-4">
                 <div>
-                    <p className="text-xs text-gray-500 mb-1">Транзакции (MC)</p>
-                    <p className="text-2xl font-black text-white">{stats?.totalTransaction || 0}</p>
+                    <p className="text-xs text-[#717182] mb-1">Транзакции (MC)</p>
+                    <p className="text-2xl font-medium text-[#030213]">{stats?.totalTransaction || 0}</p>
                 </div>
                 <div>
-                    <p className="text-xs text-gray-500 mb-1">Награды за задачи</p>
-                    <p className="text-2xl font-black text-white">{stats?.totalReward || 0}</p>
+                    <p className="text-xs text-[#717182] mb-1">Награды за задачи</p>
+                    <p className="text-2xl font-medium text-[#030213]">{stats?.totalReward || 0}</p>
                 </div>
-                <div className="pt-4 border-t border-gray-800/50 flex justify-between items-center">
-                    <span className="text-xs text-gray-500">Всего операций</span>
-                    <span className="text-sm font-bold text-gray-300">{stats?.transactionCount || 0}</span>
+                <div className="pt-4 border-t border-black/10/50 flex justify-between items-center">
+                    <span className="text-xs text-[#717182]">Всего операций</span>
+                    <span className="text-sm font-medium text-gray-300">{stats?.transactionCount || 0}</span>
                 </div>
             </div>
         </div>

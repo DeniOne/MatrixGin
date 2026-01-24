@@ -5,14 +5,14 @@ export default function HierarchyView() {
   const { data, isLoading } = useGetHierarchyStructureQuery();
 
   if (isLoading) {
-    return <div className="text-center py-8 text-gray-500">Загрузка...</div>;
+    return <div className="text-center py-8 text-[#717182]">Загрузка...</div>;
   }
 
   const levels = data?.data || [];
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-gray-900">
+      <h2 className="text-2xl font-medium text-gray-900">
         7-уровневая иерархия (из Конституции)
       </h2>
 
@@ -20,11 +20,11 @@ export default function HierarchyView() {
         <div key={level.level_number} className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-full bg-blue-600 text-[#030213] flex items-center justify-center font-medium">
                 {level.level_number}
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-medium text-gray-900">
                   {level.level_name_ru}
                 </h3>
                 <p className="text-sm text-gray-600">{level.description}</p>
@@ -53,7 +53,7 @@ export default function HierarchyView() {
               ))}
             </div>
           ) : (
-            <p className="text-sm text-gray-500 italic mt-4">
+            <p className="text-sm text-[#717182] italic mt-4">
               Пока нет подразделений на этом уровне
             </p>
           )}

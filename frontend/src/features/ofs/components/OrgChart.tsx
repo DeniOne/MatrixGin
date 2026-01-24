@@ -17,7 +17,7 @@ function TreeNode({ node, level }: TreeNodeProps) {
         {hasChildren && (
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="mt-1 text-gray-400 hover:text-gray-600"
+            className="mt-1 text-[#717182] hover:text-gray-600"
           >
             {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           </button>
@@ -29,7 +29,7 @@ function TreeNode({ node, level }: TreeNodeProps) {
             <div className="flex items-center gap-2">
               <Building2 className="w-5 h-5 text-blue-600" />
               <div>
-                <h4 className="font-semibold text-gray-900">{node.name}</h4>
+                <h4 className="font-medium text-gray-900">{node.name}</h4>
                 {node.description && (
                   <p className="text-sm text-gray-600">{node.description}</p>
                 )}
@@ -74,16 +74,16 @@ export default function OrgChart() {
   const { data, isLoading } = useGetOrgChartQuery({ depth: 10 });
 
   if (isLoading) {
-    return <div className="text-center py-8 text-gray-500">Загрузка...</div>;
+    return <div className="text-center py-8 text-[#717182]">Загрузка...</div>;
   }
 
   if (!data?.data) {
-    return <div className="text-center py-8 text-gray-500">Нет данных</div>;
+    return <div className="text-center py-8 text-[#717182]">Нет данных</div>;
   }
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">
+      <h2 className="text-xl font-medium text-gray-900 mb-6">
         Организационная структура
       </h2>
       {Array.isArray(data.data) ? (

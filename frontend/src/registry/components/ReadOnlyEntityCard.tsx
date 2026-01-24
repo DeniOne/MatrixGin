@@ -18,11 +18,11 @@ export const ReadOnlyEntityCard: React.FC<ReadOnlyEntityCardProps> = ({ entity, 
         <div className="bg-gray-100 p-6 rounded-lg pointer-events-none opacity-90">
             {/* Header */}
             <div className="mb-6 border-b pb-4">
-                <h2 className="text-xl font-bold text-gray-700">{entity.name || 'Unnamed Entity'}</h2>
+                <h2 className="text-xl font-medium text-gray-700">{entity.name || 'Unnamed Entity'}</h2>
                 <span className="bg-gray-200 text-gray-600 px-2 py-1 text-xs rounded">
                     СНИМОК ТОЛЬКО ДЛЯ ЧТЕНИЯ
                 </span>
-                <p className="text-xs text-gray-500 mt-1">URN: {entity.urn}</p>
+                <p className="text-xs text-[#717182] mt-1">URN: {entity.urn}</p>
             </div>
 
             {/* Attributes */}
@@ -45,7 +45,7 @@ export const ReadOnlyEntityCard: React.FC<ReadOnlyEntityCardProps> = ({ entity, 
 
             {/* Relationships (Read Only) */}
             <div className="border-t pt-4">
-                <h3 className="font-semibold text-gray-700 mb-2">Связи (Снимок)</h3>
+                <h3 className="font-medium text-gray-700 mb-2">Связи (Снимок)</h3>
                 {/* 
                     We need a ReadOnly mode for RelationshipBlock. 
                     Or we simply list them here manually to avoid 'Add' buttons appearing 

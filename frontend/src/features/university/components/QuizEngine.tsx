@@ -112,7 +112,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ materialId, enrollmentId
                     }
                     subTitle={
                         <Space direction="vertical" align="center" size="large" className="w-full">
-                            <Text className="text-gray-500 text-lg">
+                            <Text className="text-[#717182] text-lg">
                                 Ваш результат: <Text strong className={result.passed ? 'text-emerald-600' : 'text-rose-600'}>{result.score.toFixed(1)}%</Text> (необходимо {quiz.pass_score}%)
                             </Text>
                             <Progress
@@ -154,7 +154,7 @@ export const QuizEngine: React.FC<QuizEngineProps> = ({ materialId, enrollmentId
             title={
                 <div className="flex justify-between items-center py-2">
                     <Space direction="vertical" size={0}>
-                        <Text type="secondary" className="uppercase text-xs font-bold tracking-wider">Вопрос {currentQuestionIndex + 1} из {questions.length}</Text>
+                        <Text type="secondary" className="uppercase text-xs font-medium tracking-wider">Вопрос {currentQuestionIndex + 1} из {questions.length}</Text>
                         <Title level={4} className="m-0">{quiz.title}</Title>
                     </Space>
                     <div className="w-32">

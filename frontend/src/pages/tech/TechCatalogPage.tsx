@@ -52,7 +52,7 @@ const TechCatalogPage: React.FC = () => {
 
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Каталог Оборудования</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-8">Каталог Оборудования</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {equipment.map(item => (
                     <div key={item.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-shadow">
@@ -60,13 +60,13 @@ const TechCatalogPage: React.FC = () => {
                             <div className="p-3 bg-indigo-50 rounded-lg text-indigo-600">
                                 {item.icon}
                             </div>
-                            <span className={`text-xs font-bold px-2 py-1 rounded ${getStatusColor(item.status)}`}>
+                            <span className={`text-xs font-medium px-2 py-1 rounded ${getStatusColor(item.status)}`}>
                                 {getStatusText(item.status)}
                             </span>
                         </div>
-                        <h3 className="font-bold text-lg text-gray-900 mb-2">{item.name}</h3>
-                        <p className="text-sm text-gray-500 mb-1">{item.category}</p>
-                        <p className="text-sm text-gray-500 mb-4">📍 {item.location}</p>
+                        <h3 className="font-medium text-lg text-gray-900 mb-2">{item.name}</h3>
+                        <p className="text-sm text-[#717182] mb-1">{item.category}</p>
+                        <p className="text-sm text-[#717182] mb-4">📍 {item.location}</p>
                         {item.manual && (
                             <button className="w-full py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 flex items-center justify-center">
                                 <FileText className="w-4 h-4 mr-2" />

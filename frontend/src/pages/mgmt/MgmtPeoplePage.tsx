@@ -11,10 +11,10 @@ const MgmtPeoplePage: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">People Ops</h1>
+            <h1 className="text-3xl font-medium text-gray-900 mb-8">People Ops</h1>
 
             <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl p-6 mb-8 border border-indigo-100">
-                <h2 className="font-bold text-gray-900 mb-2">Инструменты для управления людьми</h2>
+                <h2 className="font-medium text-gray-900 mb-2">Инструменты для управления людьми</h2>
                 <p className="text-sm text-gray-600">Готовые шаблоны и гайды для эффективной работы с командой</p>
             </div>
 
@@ -27,11 +27,11 @@ const MgmtPeoplePage: React.FC = () => {
                                     {tool.icon}
                                 </div>
                                 <div>
-                                    <h3 className="font-bold text-gray-900">{tool.title}</h3>
-                                    <p className="text-xs text-gray-500 capitalize">{tool.type}</p>
+                                    <h3 className="font-medium text-gray-900">{tool.title}</h3>
+                                    <p className="text-xs text-[#717182] capitalize">{tool.type}</p>
                                 </div>
                             </div>
-                            <Download className="w-5 h-5 text-gray-400 group-hover:text-indigo-600" />
+                            <Download className="w-5 h-5 text-[#717182] group-hover:text-indigo-600" />
                         </div>
                     </div>
                 ))}

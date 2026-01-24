@@ -12,7 +12,7 @@ function RegistrationDetailModal({ registrationId, onClose }: Props) {
 
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-8">
           <div className="text-center">Загрузка...</div>
         </div>
@@ -23,14 +23,14 @@ function RegistrationDetailModal({ registrationId, onClose }: Props) {
   if (!registration) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Детали регистрации</h2>
+          <h2 className="text-xl font-medium">Детали регистрации</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-[#717182] hover:text-gray-600 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -48,12 +48,12 @@ function RegistrationDetailModal({ registrationId, onClose }: Props) {
               />
             ) : (
               <div className="w-32 h-32 rounded-lg bg-gray-200 flex items-center justify-center">
-                <User className="w-16 h-16 text-gray-400" />
+                <User className="w-16 h-16 text-[#717182]" />
               </div>
             )}
 
             <div className="flex-1">
-              <h3 className="text-2xl font-bold text-gray-900">
+              <h3 className="text-2xl font-medium text-gray-900">
                 {registration.last_name} {registration.first_name} {registration.middle_name}
               </h3>
               <div className="mt-2 space-y-2">
@@ -114,7 +114,7 @@ function RegistrationDetailModal({ registrationId, onClose }: Props) {
           {/* Addresses */}
           {(registration.registration_address || registration.residential_address) && (
             <div className="space-y-4">
-              <h4 className="font-semibold text-gray-900">Адреса</h4>
+              <h4 className="font-medium text-gray-900">Адреса</h4>
               {registration.registration_address && (
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-sm text-gray-600 mb-1">Адрес регистрации</p>
@@ -133,7 +133,7 @@ function RegistrationDetailModal({ registrationId, onClose }: Props) {
           {/* Documents */}
           {registration.passport_scan_url && (
             <div className="space-y-4">
-              <h4 className="font-semibold text-gray-900">Документы</h4>
+              <h4 className="font-medium text-gray-900">Документы</h4>
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <FileText className="w-5 h-5 text-gray-600" />
@@ -153,7 +153,7 @@ function RegistrationDetailModal({ registrationId, onClose }: Props) {
 
           {registration.additional_documents && registration.additional_documents.length > 0 && (
             <div className="space-y-2">
-              <h4 className="font-semibold text-gray-900">Дополнительные документы</h4>
+              <h4 className="font-medium text-gray-900">Дополнительные документы</h4>
               {registration.additional_documents.map((doc: any, index: number) => (
                 <div key={index} className="bg-gray-50 rounded-lg p-3">
                   <a
@@ -174,11 +174,11 @@ function RegistrationDetailModal({ registrationId, onClose }: Props) {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-600">Статус:</span>
-                <span className="ml-2 font-semibold">{registration.status}</span>
+                <span className="ml-2 font-medium">{registration.status}</span>
               </div>
               <div>
                 <span className="text-gray-600">Текущий шаг:</span>
-                <span className="ml-2 font-semibold">{registration.current_step}</span>
+                <span className="ml-2 font-medium">{registration.current_step}</span>
               </div>
               <div>
                 <span className="text-gray-600">Создано:</span>

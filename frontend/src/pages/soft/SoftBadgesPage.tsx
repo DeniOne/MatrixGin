@@ -86,21 +86,21 @@ const SoftBadgesPage: React.FC = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center mb-12">
-                <h1 className="text-3xl font-bold text-gray-900">Стена Достижений</h1>
-                <p className="text-gray-500 mt-2">Коллекционируйте награды за свое развитие и активность</p>
+                <h1 className="text-3xl font-medium text-gray-900">Стена Достижений</h1>
+                <p className="text-[#717182] mt-2">Коллекционируйте награды за свое развитие и активность</p>
             </div>
 
             {/* Level Overview */}
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-white shadow-lg mb-12 max-w-4xl mx-auto relative overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-2xl p-8 text-[#030213] shadow-lg mb-12 max-w-4xl mx-auto relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full transform translate-x-1/3 -translate-y-1/3"></div>
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between">
                     <div className="flex items-center mb-6 md:mb-0">
                         <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center border-4 border-white/30 mr-6">
-                            <Award className="w-12 h-12 text-white" />
+                            <Award className="w-12 h-12 text-[#030213]" />
                         </div>
                         <div>
                             <div className="text-sm font-medium opacity-80 uppercase tracking-wider">Текущий уровень</div>
-                            <div className="text-4xl font-bold">Уровень 5</div>
+                            <div className="text-4xl font-medium">Уровень 5</div>
                             <div className="text-sm opacity-90 mt-1">Гуру коммуникации</div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@ const SoftBadgesPage: React.FC = () => {
                             <span>1,250 XP</span>
                             <span>1,500 XP</span>
                         </div>
-                        <div className="w-full bg-black/20 rounded-full h-3">
+                        <div className="w-full bg-white/20 rounded-full h-3">
                             <div className="bg-white h-3 rounded-full shadow-sm" style={{ width: '83%' }}></div>
                         </div>
                         <div className="text-right text-xs opacity-70 mt-2">Осталось 250 XP до следующего уровня</div>
@@ -129,17 +129,17 @@ const SoftBadgesPage: React.FC = () => {
                             {badge.icon}
                         </div>
 
-                        <h3 className="text-lg font-bold text-gray-900 mb-2">{badge.title}</h3>
-                        <p className="text-sm text-gray-500 mb-4 h-10">{badge.description}</p>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">{badge.title}</h3>
+                        <p className="text-sm text-[#717182] mb-4 h-10">{badge.description}</p>
 
                         <div className="w-full mt-auto">
                             {badge.unlocked ? (
-                                <div className="text-xs font-bold text-green-600 bg-green-50 py-1 px-3 rounded-full inline-block">
+                                <div className="text-xs font-medium text-green-600 bg-green-50 py-1 px-3 rounded-full inline-block">
                                     Получен {badge.dateUnlocked}
                                 </div>
                             ) : (
                                 <div className="w-full">
-                                    <div className="flex justify-between text-xs text-gray-400 mb-1">
+                                    <div className="flex justify-between text-xs text-[#717182] mb-1">
                                         <span>Прогресс</span>
                                         <span>{badge.progress}%</span>
                                     </div>

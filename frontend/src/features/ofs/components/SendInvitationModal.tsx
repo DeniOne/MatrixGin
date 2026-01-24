@@ -39,14 +39,14 @@ function SendInvitationModal({ onClose, onSuccess }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-white bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-md w-full">
         {/* Header */}
         <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Отправить приглашение</h2>
+          <h2 className="text-xl font-medium">Отправить приглашение</h2>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-[#717182] hover:text-gray-600 transition-colors"
           >
             <X className="w-6 h-6" />
           </button>
@@ -72,7 +72,7 @@ function SendInvitationModal({ onClose, onSuccess }: Props) {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-[#717182]">
               Попросите кандидата написать боту /start для получения ID
             </p>
           </div>
@@ -108,7 +108,7 @@ function SendInvitationModal({ onClose, onSuccess }: Props) {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-[#717182]">
               Укажите UUID локации из базы данных
             </p>
           </div>
@@ -125,7 +125,7 @@ function SendInvitationModal({ onClose, onSuccess }: Props) {
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-[#030213] rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 'Отправка...'

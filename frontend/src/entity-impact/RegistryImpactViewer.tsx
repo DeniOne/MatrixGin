@@ -102,7 +102,7 @@ export const RegistryImpactViewer: React.FC<RegistryImpactViewerProps> = ({ enti
                                 avatar={<Tag color={severityColors[item.severity]}>{item.severity.toUpperCase()}</Tag>}
                                 title={<Text strong>{item.label}</Text>}
                                 description={
-                                    <div className="text-xs text-gray-500">
+                                    <div className="text-xs text-[#717182]">
                                         Тип: {item.impactType} | Relation: {item.relation} | Path: {item.path.join(' -> ')}
                                     </div>
                                 }

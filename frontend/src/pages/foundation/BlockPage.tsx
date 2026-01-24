@@ -46,7 +46,7 @@ export const BlockPage: React.FC = () => {
         <div className="bg-white p-0">
             {/* Header / Progress Indicator (Simple) */}
             <div className="bg-gray-50 border-b border-gray-100 px-6 py-4 flex justify-between items-center">
-                <span className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                <span className="text-sm font-medium text-[#717182] uppercase tracking-wider">
                     Блок {BLOCK_ORDER.indexOf(currentBlockId) + 1} из {BLOCK_ORDER.length}
                 </span>
                 <div className="flex space-x-1">
@@ -63,19 +63,19 @@ export const BlockPage: React.FC = () => {
 
             <div className="p-8 md:p-10">
                 <div className="flex items-center mb-6">
-                    <h2 className="text-3xl font-extrabold text-gray-900">{content.title}</h2>
+                    <h2 className="text-3xl font-medium text-gray-900">{content.title}</h2>
                 </div>
 
                 <div className="prose prose-lg text-gray-700 space-y-8">
                     <section>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">Значение</h3>
+                        <h3 className="text-xl font-medium text-gray-900 mb-2">Значение</h3>
                         <p className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 text-blue-900">
                             {content.meaning}
                         </p>
                     </section>
 
                     <section>
-                        <h3 className="text-xl font-bold text-gray-900 mb-2 text-red-700">Последствия</h3>
+                        <h3 className="text-xl font-medium text-gray-900 mb-2 text-red-700">Последствия</h3>
                         <p className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500 text-red-900 font-medium">
                             {content.consequences}
                         </p>
@@ -87,10 +87,10 @@ export const BlockPage: React.FC = () => {
                         onClick={handleConfirm}
                         disabled={submitting}
                         className={`
-                            w-full flex justify-center items-center px-6 py-4 rounded-lg text-lg font-bold shadow-md transition-all
+                            w-full flex justify-center items-center px-6 py-4 rounded-lg text-lg font-medium shadow-md transition-all
                             ${submitting
-                                ? 'bg-gray-100 text-gray-400 cursor-wait'
-                                : 'bg-gray-900 text-white hover:bg-black hover:scale-[1.01]'
+                                ? 'bg-gray-100 text-[#717182] cursor-wait'
+                                : 'bg-white text-[#030213] hover:bg-white hover:scale-[1.01]'
                             }
                         `}
                     >
@@ -101,7 +101,7 @@ export const BlockPage: React.FC = () => {
                             </>
                         )}
                     </button>
-                    <p className="text-center text-xs text-gray-400 mt-4">
+                    <p className="text-center text-xs text-[#717182] mt-4">
                         Нажимая, вы подтверждаете прочтение блока. <br />
                         Действие записано в лог.
                     </p>
