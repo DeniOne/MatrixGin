@@ -1,16 +1,5 @@
-/**
- * Trainer Service
- * Module 13: Corporate University - Trainer Institute
- * 
- * CANON:
- * - Accreditation != Role (Decoupled weight/level)
- * - NO direct wallet updates (Event-driven rewards via Reward Engine)
- * - Mentorship is a formal period (PROBATION, ACTIVE, COMPLETED)
- * - Dashboard is strictly READ-ONLY
- */
-
 import { prisma } from '../config/prisma';
-import { MentorshipStatus } from '@prisma/client';
+import { MentorshipStatus, TrainerStatus } from '@prisma/client';
 import { antiFraudEngine } from '../engines/anti-fraud.engine';
 import { logger } from '../config/logger';
 
@@ -29,15 +18,15 @@ export class TrainerService {
                     take: 1
                 },
                 mentorships: {
-                    orderBy: { created_at: 'desc' }
+                    orderBy: { start_at: 'desc' }
                 }
             }
         });
 
         if (!trainer) throw new Error('Trainer not found');
 
-        const activeTrainees = trainer.mentorships.filter(m => m.status === 'PROBATION' || m.status === 'ACTIVE');
-        const completedTrainees = trainer.mentorships.filter(m => m.status === 'COMPLETED');
+        const activeTrainees = trainer.mentorships.filter(m => m.status === MentorshipStatus.PROBATION || m.status === MentorshipStatus.ACTIVE);
+        const completedTrainees = trainer.mentorships.filter(m => m.status === MentorshipStatus.COMPLETED);
 
         return {
             trainerId: trainer.id,
@@ -108,7 +97,7 @@ export class TrainerService {
             data: {
                 trainer_id: params.trainerId,
                 trainee_id: params.traineeId,
-                status: 'PROBATION',
+                status: MentorshipStatus.PROBATION,
                 expected_end_at: expectedEnd,
                 plan: params.plan
             }
@@ -129,7 +118,7 @@ export class TrainerService {
      */
     async completeMentorship(params: {
         periodId: string;
-        status: 'COMPLETED' | 'FAILED';
+        status: MentorshipStatus;
         notes: string;
         metrics: {
             nps_score?: number;
@@ -144,7 +133,7 @@ export class TrainerService {
         });
 
         if (!period) throw new Error('Mentorship period not found');
-        if (period.status === 'COMPLETED' || period.status === 'FAILED') {
+        if (period.status === MentorshipStatus.COMPLETED || period.status === MentorshipStatus.FAILED) {
             throw new Error('Mentorship period is already finalized');
         }
 
@@ -169,7 +158,7 @@ export class TrainerService {
         });
 
         // 3. Update trainer global stats if successful
-        if (params.status === 'COMPLETED') {
+        if (params.status === MentorshipStatus.COMPLETED) {
             await prisma.trainer.update({
                 where: { id: period.trainer_id },
                 data: { trainees_successful: { increment: 1 } }
@@ -227,8 +216,12 @@ export class TrainerService {
      * Get all trainers with filters
      */
     async getTrainers(filters?: { specialty?: any; status?: string }) {
+        const where: any = {};
+        if (filters?.specialty) where.specialty = filters.specialty;
+        if (filters?.status) where.status = filters.status as TrainerStatus;
+
         return await prisma.trainer.findMany({
-            where: filters,
+            where,
             include: { accreditations: { where: { is_active: true } } },
             orderBy: { rating: 'desc' }
         });
@@ -245,7 +238,7 @@ export class TrainerService {
             data: {
                 user_id: userId,
                 specialty,
-                status: 'CANDIDATE'
+                status: TrainerStatus.CANDIDATE
             }
         });
     }

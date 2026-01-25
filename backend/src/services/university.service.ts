@@ -10,6 +10,8 @@
  */
 
 import { prisma } from '../config/prisma';
+import { foundationService } from './foundation.service';
+import { FOUNDATION_VERSION } from '../config/foundation.constants';
 import { CourseGrade, TargetMetric, CourseScope } from '@prisma/client';
 
 interface VisibilityConfig {
@@ -245,16 +247,32 @@ export class UniversityService {
                 const requiredGradeLevel = grades[course.required_grade as string] || 0;
                 return requiredGradeLevel <= userGradeLevel;
             })
-            .map((course) => ({
-                id: course.id,
-                title: course.title,
-                description: course.description,
-                academyName: course.academy?.name,
-                requiredGrade: course.required_grade,
-                recognitionMC: course.recognition_mc,
-                isMandatory: course.is_mandatory,
-                modulesCount: course._count.modules,
-            }));
+            .map((course) => {
+                // CANON v2.2: Add UX hint about locking
+                let isLocked = false;
+                let lockReason: string | null = null;
+
+                if (course.type === 'APPLIED') {
+                    const hasAccess = acceptance?.decision === 'ACCEPTED' && acceptance?.version === FOUNDATION_VERSION;
+                    if (!hasAccess) {
+                        isLocked = true;
+                        lockReason = 'FOUNDATION_REQUIRED';
+                    }
+                }
+
+                return {
+                    id: course.id,
+                    title: course.title,
+                    description: course.description,
+                    academyName: course.academy?.name,
+                    requiredGrade: course.required_grade,
+                    recognitionMC: course.recognition_mc,
+                    isMandatory: course.is_mandatory,
+                    modulesCount: course._count.modules,
+                    isLocked,
+                    lockReason,
+                };
+            });
     }
 
     /**
@@ -315,16 +333,32 @@ export class UniversityService {
             recognitionMC: course.recognition_mc,
             rewardGMC: course.reward_gmc,
             isMandatory: course.is_mandatory,
+            type: course.type, // Added for Canon v2.2 gating
             createdBy: course.created_by,
             totalDuration,
         };
     }
 
-    /**
-     * Alias for getCourseById to follow the plan
-     */
-    async getCourseDetails(id: string) {
-        return this.getCourseById(id);
+    async getCourseDetails(id: string, userId?: string) {
+        const courseDetails = await this.getCourseById(id);
+
+        let isLocked = false;
+        let lockReason: string | null = null;
+
+        if (courseDetails.type === 'APPLIED' && userId) {
+            const acceptance = await prisma.foundationAcceptance.findUnique({
+                where: { person_id: userId }
+            });
+
+            isLocked = !acceptance || acceptance.decision !== 'ACCEPTED' || acceptance.version !== FOUNDATION_VERSION;
+            lockReason = isLocked ? 'FOUNDATION_REQUIRED' : null;
+        }
+
+        return {
+            ...courseDetails,
+            isLocked,
+            lockReason
+        };
     }
 
     /**
@@ -520,14 +554,12 @@ export class UniversityService {
             throw new Error('User not found');
         }
 
-        // CANON v2.2: Foundation Check
+        // CANON v2.2: Foundation Check for UX
         const acceptance = await prisma.foundationAcceptance.findUnique({
             where: { person_id: userId }
         });
 
-        if (!acceptance || acceptance.decision !== 'ACCEPTED') {
-            return []; // No applied recommendations until Foundation is accepted
-        }
+        const hasAccess = acceptance?.decision === 'ACCEPTED' && acceptance?.version === FOUNDATION_VERSION;
 
         // TODO: Integrate with PhotoCompany service to get real metrics
         const photocompanyMetrics = {

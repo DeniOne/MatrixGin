@@ -202,18 +202,18 @@ COURSE_COMPLETED
 
 ---
 
-## Remaining Components (Other Modules)
-6. **Component 6:** RBAC enforcement
+### 6. Foundation Layer (Admission Contour) - Completed 2026-01-25
+- **Суть:** Проектирование нормативного слоя как "Контура Допуска".
+- **Документация:**
+  - `FOUNDATION_ACCEPTANCE_PRINCIPLES.md`: Принципы проектирования.
+  - `FOUNDATION_ACCEPTANCE_RESEARCH1.md`: Исследование психологии подчинения.
+- **Блоки:**
+  - Блок 1: Внутренняя Конституция.
+  - Блок 2: Код поведения и антифрод.
+  - Блок 3: Золотой Стандарт.
+  - Блок 4: Ролевая модель.
+  - Блок 5: Мотивация и последствия.
+- **Лингвистика:** Полный перевод на русский язык. Ебашить теперь проще.
 
-## Связанные файлы
-
-- `documentation/01-modules/13-Corporate-University/MODULE-SPEC.md`
-- `documentation/01-modules/13-Corporate-University/TECHNICAL_RESEARCH_UNIVERSITY.md`
-- `documentation/01-modules/13-Corporate-University/deep_research_corporate_university.md`
-- `documentation/01-modules/13-Corporate-University/DEVELOPMENT-CHECKLIST.md`
-
-## GitHub
-
-**Commit:** 15b8a8c  
-**Branch:** main  
-**Files changed:** 5 files, 1198 insertions(+), 1292 deletions(-)
+## Следующие шаги
+... (unchanged)

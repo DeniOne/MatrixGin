@@ -1,14 +1,11 @@
-
 import { Injectable, Logger } from '@nestjs/common';
-import { PrismaService } from '../../../database/src/prisma.service';
+import { prisma } from '../config/prisma';
 import { FoundationAuditLog } from '@prisma/client';
 
 export interface CreateFoundationAuditDto {
   userId: string;
-  acceptedBy: string; // 'SYSTEM' or Admin ID
-  basisCourses: string[]; // Array of Course IDs
-  constitutionVersion?: string;
-  codexVersion?: string;
+  eventType: string; // 'BLOCK_VIEWED', 'DECISION_MADE', 'BLOCKED_ACCESS'
+  foundationVersion?: string;
   metadata?: Record<string, any>;
 }
 
@@ -16,29 +13,25 @@ export interface CreateFoundationAuditDto {
 export class FoundationAuditService {
   private readonly logger = new Logger(FoundationAuditService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
-
   async createAuditLog(dto: CreateFoundationAuditDto): Promise<FoundationAuditLog> {
-    const { userId, acceptedBy, basisCourses, constitutionVersion, codexVersion, metadata } = dto;
+    const { userId, eventType, foundationVersion, metadata } = dto;
 
-    this.logger.log(`Creating Foundation Audit Log for user ${userId} by ${acceptedBy}`);
+    this.logger.log(`Creating Foundation Audit Log for user ${userId} - ${eventType}`);
 
-    return this.prisma.foundationAuditLog.create({
+    return prisma.foundationAuditLog.create({
       data: {
         user_id: userId,
-        accepted_by: acceptedBy,
-        basis_courses: JSON.stringify(basisCourses), // Store as JSON
-        constitution_version: constitutionVersion,
-        codex_version: codexVersion,
-        metadata: metadata ? JSON.stringify(metadata) : undefined,
+        event_type: eventType,
+        foundation_version: foundationVersion,
+        metadata: metadata || {},
       },
     });
   }
 
   async getAuditLog(userId: string): Promise<FoundationAuditLog | null> {
-    return this.prisma.foundationAuditLog.findFirst({
+    return prisma.foundationAuditLog.findFirst({
       where: { user_id: userId },
-      orderBy: { accepted_at: 'desc' },
+      orderBy: { timestamp: 'desc' },
     });
   }
 }

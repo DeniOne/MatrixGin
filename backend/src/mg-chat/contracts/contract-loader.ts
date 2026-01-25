@@ -20,8 +20,8 @@ export class MGChatContractLoader {
 
     constructor() {
         // Contracts are in documentation/ai/mg-chat/
-        // From backend/src/mg-chat → go up 3 levels to project root
-        this.contractsDir = path.join(__dirname, '..', '..', '..', 'documentation', 'ai', 'mg-chat');
+        // From backend/src/mg-chat/contracts → go up 4 levels to project root
+        this.contractsDir = path.join(__dirname, '..', '..', '..', '..', 'documentation', 'ai', 'mg-chat');
     }
 
     /**

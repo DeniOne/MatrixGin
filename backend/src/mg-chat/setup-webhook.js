@@ -5,8 +5,16 @@
  */
 
 const axios = require('axios');
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
-const BOT_TOKEN = process.env.BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE';
+const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+
+if (!BOT_TOKEN || BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') {
+    console.error('❌ Error: TELEGRAM_BOT_TOKEN is not set in .env file!');
+    process.exit(1);
+}
+
 const WEBHOOK_URL = process.argv[2];
 
 if (!WEBHOOK_URL) {

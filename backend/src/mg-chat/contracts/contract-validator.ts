@@ -21,8 +21,8 @@ export class MGChatContractValidator {
     constructor() {
         this.ajv = new Ajv({ allErrors: true });
         // Schemas are in documentation/ai/mg-chat/schemas/
-        // From backend/src/mg-chat → go up 3 levels to project root
-        this.schemasDir = path.join(__dirname, '..', '..', '..', 'documentation', 'ai', 'mg-chat', 'schemas');
+        // From backend/src/mg-chat/contracts → go up 4 levels to project root
+        this.schemasDir = path.join(__dirname, '..', '..', '..', '..', 'documentation', 'ai', 'mg-chat', 'schemas');
     }
 
     /**

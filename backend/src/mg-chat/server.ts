@@ -8,12 +8,15 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { handleTelegramWebhook } from './integration';
 import { initializeMGChat } from './index';
+import * as path from 'path';
 
 // Load environment variables
-dotenv.config({ path: __dirname + '/.env' });
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+// MG Chat MUST run on 3001 to avoid conflict with main backend (3000)
+const PORT = 3001;
+console.log(`[MG Chat Server] Configuration: Using Port ${PORT} (env.PORT was ${process.env.PORT})`);
 
 // Middleware
 app.use(express.json());

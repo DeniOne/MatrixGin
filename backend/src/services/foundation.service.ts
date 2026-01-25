@@ -124,61 +124,45 @@ export class FoundationService {
     }
 
     /**
-     * Final Acceptance Action
+     * Assert user has accepted current Foundation version
+     * Throws error if not accepted or version mismatch
      */
-    async acceptFoundation(userId: string) {
-        // 1. Verify all blocks viewed
-        const state = await this.getImmersionState(userId);
-
-        if (!state.canAccept) {
-            throw new Error('IMMERSION_INCOMPLETE: You must complete all Foundation Blocks before accepting.');
-        }
-
-        // 2. Create Acceptance Record
-        const acceptance = await prisma.foundationAcceptance.upsert({
-            where: { person_id: userId },
-            update: {
-                version: FOUNDATION_VERSION,
-                decision: FoundationDecision.ACCEPTED,
-                accepted_at: new Date(),
-                valid_until: null // Indefinite until revocation or version bump
-            },
-            create: {
-                person_id: userId,
-                version: FOUNDATION_VERSION,
-                decision: FoundationDecision.ACCEPTED,
-                accepted_at: new Date()
-            }
+    async assertFoundationAccessForApplied(userId: string) {
+        const acceptance = await prisma.foundationAcceptance.findUnique({
+            where: { person_id: userId }
         });
 
-        // 3. Log Decision
+        if (!acceptance || acceptance.decision !== FoundationDecision.ACCEPTED) {
+            await this.logGatingViolation(userId, 'ACCESS_DENIED_NO_ACCEPTANCE');
+            throw new Error('FOUNDATION_REQUIRED: You must accept the Foundation to access Applied content.');
+        }
+
+        if (acceptance.version !== FOUNDATION_VERSION) {
+            await this.logGatingViolation(userId, 'ACCESS_DENIED_VERSION_MISMATCH', {
+                userVersion: acceptance.version,
+                requiredVersion: FOUNDATION_VERSION
+            });
+            throw new Error(`FOUNDATION_VERSION_OUTDATED: Your acceptance is for version ${acceptance.version}, but ${FOUNDATION_VERSION} is required.`);
+        }
+    }
+
+    /**
+     * Internal audit logging for gating violations
+     */
+    private async logGatingViolation(userId: string, reason: string, extraMetadata: any = {}) {
         await prisma.foundationAuditLog.create({
             data: {
                 user_id: userId,
-                event_type: 'DECISION_MADE',
+                event_type: 'BLOCKED_ACCESS',
                 foundation_version: FOUNDATION_VERSION,
                 metadata: {
-                    decision: 'ACCEPTED',
-                    reason: 'User explicit consent after satisfying requirements'
+                    reason,
+                    context: 'ENROLLMENT_GATE',
+                    timestamp: new Date(),
+                    ...extraMetadata
                 }
             }
         });
-
-        // 4. Emit Event
-        await prisma.event.create({
-            data: {
-                type: 'FOUNDATION_ACCEPTED' as any,
-                source: 'foundation_service',
-                subject_id: userId,
-                subject_type: 'user',
-                payload: {
-                    version: FOUNDATION_VERSION,
-                    timestamp: new Date()
-                }
-            }
-        });
-
-        return acceptance;
     }
 }
 

@@ -18,17 +18,17 @@
                 [
                     {
                         "text": "📋 Задачи",
-                        "action_id": "my_tasks"
+                        "action_id": "employee.show_my_tasks"
                     },
                     {
                         "text": "🗓 График",
-                        "action_id": "my_shifts"
+                        "action_id": "employee.show_my_schedule"
                     }
                 ],
                 [
                     {
                         "text": "🎯 Фокус",
-                        "action_id": "focus_mode"
+                        "action_id": "utility.focus_mode"
                     }
                 ]
             ]
@@ -39,11 +39,11 @@
                 [
                     {
                         "text": "🔍 Детали",
-                        "action_id": "task_details"
+                        "action_id": "utility.task_details"
                     },
                     {
                         "text": "⚠️ Проблема",
-                        "action_id": "problem_report"
+                        "action_id": "utility.problem_report"
                     }
                 ]
             ]
@@ -54,14 +54,14 @@
                 [
                     {
                         "text": "✅ Завершено",
-                        "action_id": "confirm_task_done",
+                        "action_id": "employee.confirm_task_done",
                         "style": "primary"
                     }
                 ],
                 [
                     {
                         "text": "⚠️ Сообщить о проблеме",
-                        "action_id": "problem_report"
+                        "action_id": "utility.problem_report"
                     }
                 ]
             ]
@@ -72,12 +72,12 @@
                 [
                     {
                         "text": "✅ Да",
-                        "action_id": "yes_confirm",
+                        "action_id": "utility.yes_confirm",
                         "style": "danger"
                     },
                     {
                         "text": "❌ Отмена",
-                        "action_id": "cancel"
+                        "action_id": "utility.cancel"
                     }
                 ]
             ]
@@ -88,21 +88,21 @@
                 [
                     {
                         "text": "🛠 Техника",
-                        "action_id": "problem_tech"
+                        "action_id": "utility.problem_tech"
                     },
                     {
                         "text": "👤 Клиент",
-                        "action_id": "problem_client"
+                        "action_id": "utility.problem_client"
                     }
                 ],
                 [
                     {
                         "text": "📋 Задача",
-                        "action_id": "problem_task"
+                        "action_id": "utility.problem_task"
                     },
                     {
                         "text": "❓ Другое",
-                        "action_id": "problem_other"
+                        "action_id": "utility.problem_other"
                     }
                 ]
             ]
@@ -113,7 +113,7 @@
                 [
                     {
                         "text": "💬 Комментарий",
-                        "action_id": "comment_shift"
+                        "action_id": "employee.comment_shift"
                     }
                 ]
             ]
@@ -124,11 +124,11 @@
                 [
                     {
                         "text": "📈 Прогресс",
-                        "action_id": "my_progress"
+                        "action_id": "employee.show_my_progress"
                     },
                     {
                         "text": "💰 Баланс",
-                        "action_id": "coins_balance"
+                        "action_id": "employee.show_coins_balance"
                     }
                 ]
             ]
@@ -139,17 +139,17 @@
                 [
                     {
                         "text": "❓ Почему упало",
-                        "action_id": "why_metric_down"
+                        "action_id": "employee.explain_metric_drop"
                     }
                 ],
                 [
                     {
                         "text": "🎯 Фокус",
-                        "action_id": "focus_mode"
+                        "action_id": "utility.focus_mode"
                     },
                     {
                         "text": "🤝 Помощь",
-                        "action_id": "request_help"
+                        "action_id": "utility.request_help"
                     }
                 ]
             ]
@@ -160,17 +160,17 @@
                 [
                     {
                         "text": "🎯 Фокус-режим",
-                        "action_id": "focus_mode"
+                        "action_id": "utility.focus_mode"
                     }
                 ],
                 [
                     {
                         "text": "🤝 Запросить помощь",
-                        "action_id": "request_help"
+                        "action_id": "utility.request_help"
                     },
                     {
                         "text": "⏸ Перерыв",
-                        "action_id": "take_break"
+                        "action_id": "utility.take_break"
                     }
                 ]
             ]
@@ -181,17 +181,17 @@
                 [
                     {
                         "text": "⏱ 30 мин",
-                        "action_id": "focus_30"
+                        "action_id": "utility.focus_30"
                     },
                     {
                         "text": "⏱ 60 мин",
-                        "action_id": "focus_60"
+                        "action_id": "utility.focus_60"
                     }
                 ],
                 [
                     {
                         "text": "❌ Отменить",
-                        "action_id": "cancel_focus"
+                        "action_id": "utility.cancel_focus"
                     }
                 ]
             ]
@@ -202,7 +202,7 @@
                 [
                     {
                         "text": "⬅️ Назад",
-                        "action_id": "go_back"
+                        "action_id": "utility.go_back"
                     }
                 ]
             ]

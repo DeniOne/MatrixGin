@@ -48,7 +48,7 @@ export class IntegrityActionService {
             // MatrixGin schema has Event model which is canonical for history.
             await tx.event.create({
                 data: {
-                    type: 'CERTIFICATION_INVALIDATED',
+                    type: 'CERTIFICATION_INVALIDATED' as any,
                     source: 'integrity_action_service',
                     subject_id: params.enrollmentId,
                     subject_type: 'enrollment',

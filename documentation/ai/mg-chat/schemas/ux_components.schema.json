@@ -90,7 +90,7 @@
                                     },
                                     "action_id": {
                                         "type": "string",
-                                        "pattern": "^[a-z][a-z0-9_]*$"
+                                        "pattern": "^[a-z][a-z0-9_\\.]*$"
                                     },
                                     "style": {
                                         "type": "string",

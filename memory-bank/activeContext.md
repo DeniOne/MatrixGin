@@ -21,26 +21,19 @@ MatrixGin должен трансформироваться из **систем�
 - **Sprint 14 Completed**: **Module 09 (Status & Ranks)** implementation.
   - **Backend**: Managed statuses (MANUAL) and automated Ranks (GMC-based).
   - **Frontend**: Status Management Admin UI and Profile badges.
-- **Language Migration (Frontend)**: ✅ **COMPLETED 2026-01-24**.
-  - Frontend UI fully translated to Russian (Foundation, Manager Hub, Profile, Wallet).
-  - Scripts `generate-translation-registry.ts` and `apply-translation.ts` added to `backend/scripts`.
-- **UI Design Standardization (Geist Canon)**: ✅ **COMPLETED 2026-01-24**.
-  - Global font face enforced (Geist 100-900).
-  - Weights standardized to `medium` (500) and `normal` (400) project-wide (670+ occurrences).
-  - Legacy dark theme patterns replaced with "MatrixGin Light" design system.
-  - **Source of Truth established**: `f:\Matrix_Gin\memory-bank\UI_DESIGN_CANON.md`.
-- **Module 13: Corporate University (Foundation)**: ✅ **COMPLETED 2026-01-24**.
-  - Implemented **Canon v2.2 Foundation Gate**.
-  - Single Source of Truth: `FoundationAcceptance` model.
-  - Backend Guards: `FoundationGuard` enforces strict access control.
-  - Frontend Immersion UI: Isolated Layout, 5 Blocks, Decision Gate.
-  - Migration: Script `migrate:foundation` successfully backfilled audit logs.
+- **Language Migration (Docs)**: ✅ **COMPLETED 2026-01-25**.
+  - All documents in `FOUNDATIONAL` directory translated to Russian.
+  - Terms standardized: `ФУНДАМЕНТАЛЬНЫЙ УРОВЕНЬ`, `Контур Допуска`, `Красные Правила`.
+- **Module 13: Corporate University (Foundation Layer)**: ✅ **COMPLETED 2026-01-25**.
+  - Implemented 5 blocks of the admission contour.
+  - Defined `FOUNDATION_ACCEPTANCE_PRINCIPLES.md` (metaphysics of the law).
+  - Research document `FOUNDATION_ACCEPTANCE_RESEARCH1.md` refactored and translated.
 
-## GAP-анализ модулей (Updated 2026-01-24)
+## GAP-анализ модулей (Updated 2026-01-25)
 
 | Модуль | Статус | Приоритет |
 |--------|--------|-----------|
-| 13 Corporate University (Foundation) | ✅ CLOSED | DONE |
+| 13 Corporate University (Foundation) | ✅ CLOSED | DONE (Охуенно) |
 | 09 Status & Ranks | ✅ CLOSED | DONE |
 | 33 Personnel HR Records | 🟡 Database Layer ✅ | Sprint 1 (Backend Services next) |
 | 29 Library & Archive | 📋 Spec готов | Sprint 2-3 |

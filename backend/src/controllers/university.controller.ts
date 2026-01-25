@@ -123,7 +123,8 @@ export class UniversityController {
     async getCourseById(req: Request, res: Response) {
         try {
             const { id } = req.params;
-            const course = await universityService.getCourseById(id);
+            const userId = (req as any).user?.id;
+            const course = await universityService.getCourseDetails(id, userId);
             res.json({
                 success: true,
                 data: course,
@@ -268,6 +269,15 @@ export class UniversityController {
                 },
             });
         } catch (error: any) {
+            // Mapping domain errors to HTTP statuses
+            if (error.message.includes('FOUNDATION_REQUIRED') || error.message.includes('FOUNDATION_VERSION_OUTDATED')) {
+                return res.status(403).json({
+                    success: false,
+                    error: error.message,
+                    reason: 'FOUNDATION_REQUIRED'
+                });
+            }
+
             res.status(400).json({
                 success: false,
                 error: error.message,
@@ -590,100 +600,101 @@ export class UniversityController {
                 error: error.message,
             });
         }
+    }
 
     /**
      * GET /api/university/security/signals
      * Get anti-fraud signals (Admin/HR only)
      */
     async getSecuritySignals(req: Request, res: Response) {
-            try {
-                const signals = await integrityActionService.getSecuritySignals();
-                res.json({
-                    success: true,
-                    data: signals,
-                });
-            } catch (error: any) {
-                res.status(500).json({
-                    success: false,
-                    error: error.message,
-                });
-            }
+        try {
+            const signals = await integrityActionService.getSecuritySignals();
+            res.json({
+                success: true,
+                data: signals,
+            });
+        } catch (error: any) {
+            res.status(500).json({
+                success: false,
+                error: error.message,
+            });
         }
+    }
 
     /**
      * POST /api/university/security/signals/:id/validate
      * Validate a signal (Admin/HR only)
      */
     async validateSignal(req: Request, res: Response) {
-            try {
-                const { id } = req.params;
-                const { comment } = req.body;
-                const actorId = (req as any).user.id;
+        try {
+            const { id } = req.params;
+            const { comment } = req.body;
+            const actorId = (req as any).user.id;
 
-                if (!comment) throw new Error('Comment is mandatory for validation');
+            if (!comment) throw new Error('Comment is mandatory for validation');
 
-                const signal = await integrityActionService.validateSignal(id, comment, actorId);
-                res.json({
-                    success: true,
-                    data: signal,
-                });
-            } catch (error: any) {
-                res.status(400).json({
-                    success: false,
-                    error: error.message,
-                });
-            }
+            const signal = await integrityActionService.validateSignal(id, comment, actorId);
+            res.json({
+                success: true,
+                data: signal,
+            });
+        } catch (error: any) {
+            res.status(400).json({
+                success: false,
+                error: error.message,
+            });
         }
+    }
 
     /**
      * POST /api/university/security/certifications/:id/invalidate
      * Invalidate a certification (Admin/HR only)
      */
     async invalidateCertification(req: Request, res: Response) {
-            try {
-                const { id } = req.params;
-                const { reason, evidenceLinks } = req.body;
-                const actorId = (req as any).user.id;
+        try {
+            const { id } = req.params;
+            const { reason, evidenceLinks } = req.body;
+            const actorId = (req as any).user.id;
 
-                if (!reason) throw new Error('Reason is mandatory for invalidation');
+            if (!reason) throw new Error('Reason is mandatory for invalidation');
 
-                const updated = await integrityActionService.invalidateCertification({
-                    enrollmentId: id,
-                    reason,
-                    evidenceLinks: evidenceLinks || [],
-                    actorId
-                });
+            const updated = await integrityActionService.invalidateCertification({
+                enrollmentId: id,
+                reason,
+                evidenceLinks: evidenceLinks || [],
+                actorId
+            });
 
-                res.json({
-                    success: true,
-                    data: updated,
-                });
-            } catch (error: any) {
-                res.status(400).json({
-                    success: false,
-                    error: error.message,
-                });
-            }
+            res.json({
+                success: true,
+                data: updated,
+            });
+        } catch (error: any) {
+            res.status(400).json({
+                success: false,
+                error: error.message,
+            });
         }
+    }
 
     /**
      * GET /api/university/analytics/overview
      * Get university analytics overview (Admin/HR only)
      */
     async getAnalyticsOverview(req: Request, res: Response) {
-            try {
-                const overview = await universityService.getAnalyticsOverview();
-                res.json({
-                    success: true,
-                    data: overview,
-                });
-            } catch (error: any) {
-                res.status(500).json({
-                    success: false,
-                    error: error.message,
-                });
-            }
+        try {
+            const overview = await universityService.getAnalyticsOverview();
+            res.json({
+                success: true,
+                data: overview,
+            });
+        } catch (error: any) {
+            res.status(500).json({
+                success: false,
+                error: error.message,
+            });
         }
     }
+}
 
-    export const universityController = new UniversityController();
+export const universityController = new UniversityController();

@@ -1,348 +1,500 @@
 {
-    "$schema": "./schemas/mg_intent_map.schema.json",
-    "version": "2.0.0",
-    "description": "MG Chat intent map with management namespaces (employee / manager / exec).",
+    "$schema": "./schemas/intent.schema.json",
+    "version": "2.2",
+    "agent": "MatrixGinChat",
+    "language": "ru",
+    "principles": {
+        "ai_role": "advisory_only",
+        "no_auto_actions": true,
+        "human_confirmation_required": true,
+        "one_screen_response": true,
+        "max_cta_buttons": 4
+    },
+    "description": "MG Chat intent map with management namespaces and utility intents.",
     "intents": [
         {
             "id": "employee.show_my_schedule",
-            "contour": "employee",
-            "scope": "self",
+            "category": "shifts",
             "description": "Show personal work schedule",
             "examples": [
                 "мой график",
                 "моя смена",
                 "когда я работаю",
-                "мое расписание",
-                "во сколько мне на работу"
+                "расписание"
             ],
             "response": {
-                "text": "Твой график на сегодня:",
+                "type": "details",
+                "template": "Твой график на сегодня:",
                 "actions": [
                     "employee.show_my_tasks",
                     "employee.explain_status"
                 ]
             },
-            "entry_points": [
-                "text",
-                "action"
-            ],
-            "confidence_threshold": 0.6,
             "confirmation_required": false
         },
         {
             "id": "employee.show_my_tasks",
-            "contour": "employee",
-            "scope": "self",
+            "category": "tasks",
             "description": "Show personal task list",
             "examples": [
                 "мои задачи",
                 "что мне делать",
-                "мой список дел",
-                "какие у меня задачи"
+                "список дел"
             ],
             "response": {
-                "text": "Твои текущие задачи:",
+                "type": "list",
+                "template": "Твои текущие задачи:",
                 "actions": [
                     "employee.show_my_schedule",
                     "employee.guide_next_step"
                 ]
             },
-            "entry_points": [
-                "text",
-                "action"
-            ],
-            "confidence_threshold": 0.6,
             "confirmation_required": false
         },
         {
             "id": "employee.show_my_kpi",
-            "contour": "employee",
-            "scope": "self",
+            "category": "analytics",
             "description": "Show personal KPI snapshot",
             "examples": [
-                "мои показатели",
                 "мой KPI",
-                "как я работаю",
-                "моя статистика"
+                "показатели",
+                "статистика"
             ],
             "response": {
-                "text": "Твои показатели:",
+                "type": "summary",
+                "template": "Твои показатели:",
                 "actions": [
                     "employee.explain_status"
                 ]
             },
-            "entry_points": [
-                "text",
-                "action"
-            ],
-            "confidence_threshold": 0.6,
             "confirmation_required": false
         },
         {
             "id": "employee.explain_status",
-            "contour": "employee",
-            "scope": "self",
+            "category": "utility",
             "description": "Explain current personal status or rules",
             "examples": [
                 "объясни мой статус",
-                "почему такой статус",
-                "что со мной не так",
-                "почему я в этом статусе"
+                "что с моим статусом"
             ],
             "response": {
-                "text": "Твой текущий статус:",
+                "type": "explanation",
+                "template": "Твой текущий статус:",
                 "actions": [
                     "employee.show_my_kpi",
                     "employee.guide_next_step"
                 ]
             },
-            "entry_points": [
-                "text"
-            ],
-            "confidence_threshold": 0.6,
             "confirmation_required": false
         },
         {
             "id": "employee.guide_next_step",
-            "contour": "employee",
-            "scope": "self",
+            "category": "support",
             "description": "Guide user to next action step",
             "examples": [
-                "что делать дальше",
-                "следующий шаг",
-                "куда идти",
-                "что мне нужно сделать"
+                "что дальше",
+                "следующий шаг"
             ],
             "response": {
-                "text": "Следующий шаг:",
+                "type": "action",
+                "template": "Следующий шаг:",
                 "actions": [
                     "employee.show_my_tasks"
                 ]
             },
-            "entry_points": [
-                "text",
-                "action"
-            ],
-            "confidence_threshold": 0.6,
             "confirmation_required": false
         },
         {
             "id": "manager.show_shift_status",
-            "contour": "manager",
-            "scope": "own_unit",
-            "description": "Show current shift status for manager scope",
+            "category": "shifts",
+            "description": "Show current shift status for managers",
             "examples": [
                 "статус смены",
-                "кто на смене",
-                "текущая смена",
-                "смена сейчас",
-                "обзор смены"
+                "кто на смене"
             ],
             "response": {
-                "text": "Статус текущей смены:",
+                "type": "details",
+                "template": "Статус текущей смены:",
                 "actions": [
                     "manager.show_absences",
                     "manager.show_team_overview"
                 ]
             },
-            "entry_points": [
-                "text",
-                "action"
-            ],
-            "confidence_threshold": 0.65,
             "confirmation_required": false
         },
         {
             "id": "manager.show_team_overview",
-            "contour": "manager",
-            "scope": "own_unit",
+            "category": "analytics",
             "description": "Show aggregated team overview",
             "examples": [
                 "обзор команды",
-                "моя команда",
-                "статус команды",
-                "как команда"
+                "моя команда"
             ],
             "response": {
-                "text": "Обзор твоей команды:",
+                "type": "summary",
+                "template": "Обзор твоей команды:",
                 "actions": [
                     "manager.show_shift_status",
                     "manager.show_absences"
                 ]
             },
-            "entry_points": [
-                "text",
-                "action"
-            ],
-            "confidence_threshold": 0.65,
             "confirmation_required": false
         },
         {
             "id": "manager.show_absences",
-            "contour": "manager",
-            "scope": "own_unit",
+            "category": "shifts",
             "description": "Show absences and no-shows",
             "examples": [
-                "отсутствия",
                 "кто отсутствует",
-                "кого нет",
-                "больничные"
+                "отсутствия"
             ],
             "response": {
-                "text": "Текущие отсутствия:",
+                "type": "list",
+                "template": "Текущие отсутствия:",
                 "actions": [
                     "manager.manage_shift_reassign"
                 ]
             },
-            "entry_points": [
-                "text",
-                "action"
-            ],
-            "confidence_threshold": 0.65,
             "confirmation_required": false
         },
         {
             "id": "manager.resolve_incident",
-            "contour": "manager",
-            "scope": "own_unit",
+            "category": "tasks",
             "description": "Start incident resolution scenario",
             "examples": [
-                "решить инцидент",
-                "закрыть инцидент",
-                "обработать проблему"
+                "решить инцидент"
             ],
             "response": {
-                "text": "Какой инцидент нужно решить?",
+                "type": "action",
+                "template": "Какой инцидент нужно решить?",
                 "actions": [
                     "manager.show_shift_status"
                 ]
             },
-            "entry_points": [
-                "action"
-            ],
-            "confidence_threshold": 0.7,
             "confirmation_required": true
         },
         {
             "id": "manager.manage_shift_reassign",
-            "contour": "manager",
-            "scope": "own_unit",
+            "category": "shifts",
             "description": "Manage shift reassignment",
             "examples": [
-                "переназначить смену",
-                "изменить график",
-                "перераспределить смену"
+                "переназначить смену"
             ],
             "response": {
-                "text": "Переназначение смены:",
+                "type": "action",
+                "template": "Переназначение смены:",
                 "actions": [
                     "manager.show_shift_status"
                 ]
             },
-            "entry_points": [
-                "action"
-            ],
-            "confidence_threshold": 0.7,
             "confirmation_required": true
         },
         {
             "id": "exec.show_system_health",
-            "contour": "exec",
-            "scope": "global",
-            "description": "Show high-level system health signals",
+            "category": "analytics",
+            "description": "Show system health signals",
             "examples": [
                 "здоровье системы",
-                "общий статус",
-                "что происходит",
-                "системный обзор",
-                "как дела"
+                "общий статус"
             ],
             "response": {
-                "text": "Системный обзор:",
+                "type": "details",
+                "template": "Системный обзор:",
                 "actions": [
                     "exec.show_kpi_summary",
                     "exec.explain_risk"
                 ]
             },
-            "entry_points": [
-                "text",
-                "action"
-            ],
-            "confidence_threshold": 0.7,
             "confirmation_required": false
         },
         {
             "id": "exec.show_kpi_summary",
-            "contour": "exec",
-            "scope": "global",
+            "category": "analytics",
             "description": "Show executive KPI summary",
             "examples": [
                 "сводка KPI",
-                "ключевые показатели",
-                "метрики",
-                "показатели системы"
+                "метрики"
             ],
             "response": {
-                "text": "Сводка ключевых показателей:",
+                "type": "summary",
+                "template": "Сводка ключевых показателей:",
                 "actions": [
                     "exec.explain_risk",
                     "exec.navigate_dashboard"
                 ]
             },
-            "entry_points": [
-                "text",
-                "action"
-            ],
-            "confidence_threshold": 0.7,
             "confirmation_required": false
         },
         {
             "id": "exec.explain_risk",
-            "contour": "exec",
-            "scope": "global",
-            "description": "Explain detected risk or deviation",
+            "category": "analytics",
+            "description": "Explain detected risk",
             "examples": [
-                "объясни риск",
-                "какие риски",
-                "что может пойти не так",
-                "проблемные зоны"
+                "объясни риск"
             ],
             "response": {
-                "text": "Анализ рисков:",
+                "type": "explanation",
+                "template": "Анализ рисков:",
                 "actions": [
                     "exec.show_system_health",
                     "exec.navigate_dashboard"
                 ]
             },
-            "entry_points": [
-                "text"
-            ],
-            "confidence_threshold": 0.7,
             "confirmation_required": false
         },
         {
             "id": "exec.navigate_dashboard",
-            "contour": "exec",
-            "scope": "global",
-            "description": "Provide navigation link to executive dashboard",
+            "category": "navigation",
+            "description": "Executive dashboard navigation",
             "examples": [
                 "дашборд",
-                "панель управления",
-                "показать дашборд",
-                "навигация"
+                "панель управления"
             ],
             "response": {
-                "text": "Навигация по дашборду:",
+                "type": "action",
+                "template": "Навигация по дашборду:",
                 "actions": [
                     "exec.show_system_health",
                     "exec.show_kpi_summary"
                 ]
             },
-            "entry_points": [
-                "action"
-            ],
-            "confidence_threshold": 0.75,
             "confirmation_required": false
+        },
+        {
+            "id": "utility.focus_mode",
+            "category": "utility",
+            "description": "Activate focus mode session",
+            "examples": [
+                "фокус",
+                "режим тишины"
+            ],
+            "response": {
+                "type": "action",
+                "template": "Активировать фокус-режим?",
+                "actions": [
+                    "utility.focus_30",
+                    "utility.focus_60"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "utility.request_help",
+            "category": "support",
+            "description": "Request immediate help from manager/team",
+            "examples": [
+                "нужна помощь",
+                "запросить помощь"
+            ],
+            "response": {
+                "type": "support",
+                "template": "Ваш запрос передан команде.",
+                "actions": [
+                    "utility.go_back"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "utility.take_break",
+            "category": "utility",
+            "description": "Take a short break",
+            "examples": [
+                "перерыв",
+                "пауза"
+            ],
+            "response": {
+                "type": "action",
+                "template": "Хотите сделать перерыв?",
+                "actions": [
+                    "utility.yes_confirm",
+                    "utility.cancel"
+                ]
+            },
+            "confirmation_required": false
+        },
+        {
+            "id": "utility.go_back",
+            "category": "navigation",
+            "description": "Navigate to previous screen",
+            "response": {
+                "type": "action",
+                "template": "Возвращаю назад...",
+                "actions": []
+            }
+        },
+        {
+            "id": "utility.cancel",
+            "category": "utility",
+            "description": "Cancel current operation",
+            "response": {
+                "type": "action",
+                "template": "Отменено.",
+                "actions": []
+            }
+        },
+        {
+            "id": "utility.task_details",
+            "category": "tasks",
+            "description": "Show specific task details",
+            "response": {
+                "type": "details",
+                "template": "Детали задачи:",
+                "actions": [
+                    "employee.confirm_task_done",
+                    "utility.problem_report"
+                ]
+            }
+        },
+        {
+            "id": "utility.problem_report",
+            "category": "support",
+            "description": "Report a problem with task/shift",
+            "response": {
+                "type": "action",
+                "template": "О какой проблеме хотите сообщить?",
+                "actions": [
+                    "utility.problem_tech",
+                    "utility.problem_client",
+                    "utility.problem_task"
+                ]
+            }
+        },
+        {
+            "id": "employee.confirm_task_done",
+            "category": "tasks",
+            "description": "Confirm task completion",
+            "response": {
+                "type": "confirmation",
+                "template": "Задача выполнена?",
+                "actions": [
+                    "utility.yes_confirm"
+                ]
+            }
+        },
+        {
+            "id": "utility.yes_confirm",
+            "category": "utility",
+            "description": "Generic confirmation yes",
+            "response": {
+                "type": "action",
+                "template": "Подтверждено.",
+                "actions": []
+            }
+        },
+        {
+            "id": "utility.problem_tech",
+            "category": "support",
+            "description": "Technical problem report",
+            "response": {
+                "type": "action",
+                "template": "Техническая проблема зафиксирована.",
+                "actions": []
+            }
+        },
+        {
+            "id": "utility.problem_client",
+            "category": "support",
+            "description": "Client problem report",
+            "response": {
+                "type": "action",
+                "template": "Проблема с клиентом зафиксирована.",
+                "actions": []
+            }
+        },
+        {
+            "id": "utility.problem_task",
+            "category": "support",
+            "description": "Task-related problem report",
+            "response": {
+                "type": "action",
+                "template": "Проблема с задачей зафиксирована.",
+                "actions": []
+            }
+        },
+        {
+            "id": "utility.problem_other",
+            "category": "support",
+            "description": "General problem report",
+            "response": {
+                "type": "action",
+                "template": "Запрос передан на уточнение.",
+                "actions": []
+            }
+        },
+        {
+            "id": "employee.comment_shift",
+            "category": "shifts",
+            "description": "Add comment to shift record",
+            "response": {
+                "type": "input",
+                "template": "Введите ваш комментарий:",
+                "actions": []
+            }
+        },
+        {
+            "id": "employee.show_my_progress",
+            "category": "analytics",
+            "description": "Show detailed career progress",
+            "response": {
+                "type": "details",
+                "template": "Ваш прогресс:",
+                "actions": [
+                    "employee.show_my_kpi"
+                ]
+            }
+        },
+        {
+            "id": "employee.show_coins_balance",
+            "category": "motivation",
+            "description": "Show virtual wallet balance",
+            "response": {
+                "type": "info",
+                "template": "Ваш баланс:",
+                "actions": []
+            }
+        },
+        {
+            "id": "employee.explain_metric_drop",
+            "category": "analytics",
+            "description": "Explain why a metric dropped",
+            "response": {
+                "type": "explanation",
+                "template": "Анализ падения показателя:",
+                "actions": [
+                    "utility.request_help"
+                ]
+            }
+        },
+        {
+            "id": "utility.focus_30",
+            "category": "utility",
+            "description": "30 min focus session",
+            "response": {
+                "type": "action",
+                "template": "Фокус на 30 минут активирован.",
+                "actions": []
+            }
+        },
+        {
+            "id": "utility.focus_60",
+            "category": "utility",
+            "description": "60 min focus session",
+            "response": {
+                "type": "action",
+                "template": "Фокус на 60 минут активирован.",
+                "actions": []
+            }
+        },
+        {
+            "id": "utility.cancel_focus",
+            "category": "utility",
+            "description": "Cancel focus session",
+            "response": {
+                "type": "action",
+                "template": "Фокус-режим выключен.",
+                "actions": []
+            }
         }
     ]
 }

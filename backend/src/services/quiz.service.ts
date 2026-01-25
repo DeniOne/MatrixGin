@@ -171,7 +171,7 @@ export class QuizService {
                     ipAddress,
                     userAgent,
                     questionCount: quiz.questions.length,
-                    durationSeconds: lastAttempt ? (new Date().getTime() - lastAttempt.finished_at.getTime()) / 1000 : 60 // fallback
+                    durationSeconds: (lastAttempt && lastAttempt.finished_at) ? (new Date().getTime() - lastAttempt.finished_at.getTime()) / 1000 : 60 // fallback
                 }
             }
         });

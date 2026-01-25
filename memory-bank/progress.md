@@ -81,6 +81,13 @@
 - [x] **Frontend**: Status Management Admin Page & Profile badges
 - [x] **CANON**: Full compliance verified (no MC writes)
 
+#### Sprint 15: Foundation Layer (Admission Contour) ✅ **COMPLETED 2026-01-25**
+- [x] **Research**: Psychological mechanics of compliance (Procedural Justice, Red Rules).
+- [x] **Drafting**: 5 blocks of Foundation (Constitution, Code of Conduct, Standard, Role, Motivation).
+- [x] **Principles**: `FOUNDATION_ACCEPTANCE_PRINCIPLES.md` (Canonical).
+- [x] **Translation**: Total translation of all foundational documents to Russian.
+- [x] **Terminology**: Standardization (ФУНДАМЕНТАЛЬНЫЙ УРОВЕНЬ, Контур Допуска).
+
 ## Key Blockers
 - **None critical**: Все зависит от приоритизации спринтов.
 

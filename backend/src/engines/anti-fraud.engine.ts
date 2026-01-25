@@ -73,7 +73,7 @@ export class AntiFraudEngine {
                 id: { not: event.id }
             },
             take: 3,
-            orderBy: { created_at: 'desc' }
+            orderBy: { timestamp: 'desc' }
         });
 
         const knownIps = lastAttempts.map(e => (e.payload as any).ipAddress).filter(Boolean);
@@ -88,7 +88,7 @@ export class AntiFraudEngine {
             where: {
                 subject_id: userId,
                 type: 'QUIZ_COMPLETED',
-                created_at: { gte: new Date(Date.now() - 3600000) } // Last hour
+                timestamp: { gte: new Date(Date.now() - 3600000) } // Last hour
             }
         });
 

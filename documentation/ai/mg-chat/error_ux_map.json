@@ -18,7 +18,7 @@
                 "text": "Я не получил сообщение. Хочешь продолжить?",
                 "actions": [
                     "main_entry",
-                    "cancel"
+                    "utility.cancel"
                 ]
             }
         },
@@ -29,9 +29,9 @@
             "response": {
                 "text": "Я не понял запрос. Могу помочь с основными вещами:",
                 "actions": [
-                    "my_tasks",
-                    "my_shifts",
-                    "my_status"
+                    "employee.show_my_tasks",
+                    "employee.show_my_schedule",
+                    "employee.explain_status"
                 ]
             }
         },
@@ -42,7 +42,7 @@
             "response": {
                 "text": "Мне не хватает контекста. Давай уточним.",
                 "actions": [
-                    "go_back",
+                    "utility.go_back",
                     "main_entry"
                 ]
             }
@@ -55,7 +55,7 @@
                 "text": "Кажется, мы зациклились. Как лучше продолжить?",
                 "actions": [
                     "main_entry",
-                    "request_help"
+                    "utility.request_help"
                 ]
             }
         },
@@ -66,7 +66,7 @@
             "response": {
                 "text": "Давай чуть замедлимся. Я готов помочь.",
                 "actions": [
-                    "focus_mode",
+                    "utility.focus_mode",
                     "main_entry"
                 ]
             }
@@ -78,9 +78,9 @@
             "response": {
                 "text": "Понимаю, что сейчас напряжённо. Давай попробуем спокойно разобраться.",
                 "actions": [
-                    "request_help",
-                    "focus_mode",
-                    "cancel"
+                    "utility.request_help",
+                    "utility.focus_mode",
+                    "utility.cancel"
                 ]
             }
         },
@@ -92,7 +92,7 @@
                 "text": "Я здесь, чтобы помочь. Давай вернёмся к задаче.",
                 "actions": [
                     "main_entry",
-                    "request_help"
+                    "utility.request_help"
                 ]
             }
         },
@@ -103,9 +103,9 @@
             "response": {
                 "text": "Похоже, тебе сейчас тяжело. Хочешь выбрать вариант?",
                 "actions": [
-                    "focus_mode",
-                    "request_help",
-                    "take_break"
+                    "utility.focus_mode",
+                    "utility.request_help",
+                    "utility.take_break"
                 ]
             }
         },
@@ -116,9 +116,9 @@
             "response": {
                 "text": "Я вижу несколько разных запросов. С чего начнём?",
                 "actions": [
-                    "my_tasks",
-                    "my_shifts",
-                    "my_status"
+                    "employee.show_my_tasks",
+                    "employee.show_my_schedule",
+                    "employee.explain_status"
                 ]
             }
         },
@@ -138,8 +138,7 @@
             "trigger": "ACL_FORBIDDEN",
             "severity": "high",
             "response": {
-                "text": "❌ У вас нет доступа к этой функции.",
-                "actions": []
+                "text": "❌ У вас нет доступа к этой функции."
             }
         },
         {
@@ -147,8 +146,7 @@
             "trigger": "ACL_OUT_OF_SCOPE",
             "severity": "high",
             "response": {
-                "text": "❌ Эта функция недоступна в вашей области ответственности.",
-                "actions": []
+                "text": "❌ Эта функция недоступна в вашей области ответственности."
             }
         },
         {
