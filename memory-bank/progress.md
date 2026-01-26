@@ -11,6 +11,7 @@
 - [x] **Phase 4.5: AI Feedback Loop** (Human-in-the-Loop)
 - [x] **Phase 5: Motivational Organism (Employee Layer)** ✅ **COMPLETED 2026-01-19**
 - [x] **Phase 5.5: UI Standardization & Canon Enforcement** ✅ **COMPLETED 2026-01-24**
+- [x] **Phase 5.6: Backend Stability & Dashboard Reframing** ✅ **COMPLETED 2026-01-27**
 - [ ] **Phase 6: Advanced Motivation & Managerial Layer** ← ТЕКУЩАЯ ФАЗА
 
 ## Module Status (Audit 2026-01-25)
@@ -89,6 +90,10 @@
 - [x] **Terminology**: Standardization (ФУНДАМЕНТАЛЬНЫЙ УРОВЕНЬ, Контур Допуска).
 - [x] **Seeding**: Automated `v2.2-canon` seeding with SHA-256 hash validation.
 
+#### Sprint 16: Stability & Reframing ✅ **COMPLETED 2026-01-27**
+- [x] **Process Audit**: Identified and killed duplicate Node.js processes causing 500 errors.
+- [x] **UI Refinement**: Component `StartGrowthWeb3D` refactored (Geist typography, glassmorphism, accent indigo).
+
 ## Key Blockers
 - **None critical**: Все зависит от приоритизации спринтов.
 
@@ -100,3 +105,5 @@
 - **2026-01-24**: Выполнен тотальный рефакторинг UI (Geist Canon).
 - **2026-01-24**: Создан `UI_DESIGN_CANON.md` как несгибаемый стандарт дизайна.
 - **2026-01-24**: Проведена "дезинфекция" 900+ файлов от старых классов жирности и темной темы.
+- **2026-01-27**: Устранена критическая ошибка 500 при логине, нормализована среда выполнения Node.js.
+- **2026-01-27**: Рефрейминг Dashboard: `StartGrowthWeb3D` канонизирован под Geist Design System.

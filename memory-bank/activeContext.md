@@ -1,4 +1,4 @@
-# Active Context: MatrixGin (2026-01-20)
+# Active Context: MatrixGin (2026-01-27)
 
 ## Current Project State
 Проект находится в фазе **Трансформации мотивационной системы**.
@@ -24,10 +24,14 @@ MatrixGin должен трансформироваться из **систем�
 - **Language Migration (Docs)**: ✅ **COMPLETED 2026-01-25**.
   - All documents in `FOUNDATIONAL` directory translated to Russian.
   - Terms standardized: `ФУНДАМЕНТАЛЬНЫЙ УРОВЕНЬ`, `Контур Допуска`, `Красные Правила`.
-- **Module 13: Corporate University (Foundation Layer)**: ✅ **COMPLETED 2026-01-25**.
+- **Module 13: Corporate University (Foundation Layer)**: ✅ **COMPLETED 2026-01-26**.
   - Implemented 5 blocks of the admission contour.
   - Defined `FOUNDATION_ACCEPTANCE_PRINCIPLES.md` (metaphysics of the law).
   - Research document `FOUNDATION_ACCEPTANCE_RESEARCH1.md` refactored and translated.
+  - **Seeding**: `seed-foundation-gate.ts` implemented with hash-audit logic (v2.2-canon).
+- **Backend & UI Stabilization**: ✅ **COMPLETED 2026-01-27**.
+  - **Backend**: Resolved 500 error on login by eliminating duplicate Node.js processes.
+  - **UI (Dashboard)**: Refactored `StartGrowthWeb3D.tsx` to align with Geist Canon (glassmorphism, premium typography, optimized SVG).
 
 ## GAP-анализ модулей (Updated 2026-01-25)
 
@@ -43,3 +47,4 @@ MatrixGin должен трансформироваться из **систем�
 ## Active Decisions
 - MatrixCoin Economy (Module 08) = **CANONICAL** — НЕ ТРОГАТЬ
 - Status System = **CANONICAL** — изменения только через Governance
+- **Foundation Admission Gate** = **SCRIPT-ONLY** — редактирование через UI запрещено. Markdown в `FOUNDATIONAL` папке — единственный источник истины.

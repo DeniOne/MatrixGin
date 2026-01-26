@@ -1,158 +1,176 @@
-import React, { useRef, useMemo } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Html } from '@react-three/drei';
-
-// --- TYPES ---
-interface GrowthNode {
-    id: string;
-    label: string;
-    value: number; // 0..100
-    color: string;
-    position: [number, number, number];
-}
+import React, { useMemo } from 'react';
 
 interface StartGrowthWeb3DProps {
-    quality: number; // 0..100
-    speed: number;   // 0..100
-    sales: number;   // 0..100
-    team: number;    // 0..100
+    quality: number;
+    speed: number;
+    sales: number;
+    team: number;
 }
 
-// --- CONSTANTS ---
-const NODE_COLOR_ACTIVE = '#10B981'; // Emerald-500
-const CONNECTION_COLOR = '#64748b'; // Slate-500 (visible on white)
-
-// --- SUB-COMPONENTS ---
-
-/* Represents a single competency node */
-function SkillNode({ node }: { node: GrowthNode }) {
-    const meshRef = useRef<any>(null);
-
-    // Gentle pulse animation
-    useFrame((state) => {
-        if (meshRef.current) {
-            const t = state.clock.getElapsedTime();
-            const scale = 1 + Math.sin(t * 2 + node.value) * 0.1;
-            meshRef.current.scale.set(scale, scale, scale);
-        }
-    });
-
-    return (
-        <group position={node.position}>
-            <mesh ref={meshRef}>
-                <sphereGeometry args={[0.3, 32, 32]} />
-                <meshStandardMaterial color={node.color} emissive={node.color} emissiveIntensity={0.5} />
-            </mesh>
-            <Html distanceFactor={10}>
-                <div className="bg-white/90 text-[#030213] text-xs px-2 py-1 rounded backdrop-blur-sm whitespace-nowrap border border-black/10 shadow-sm font-medium">
-                    {node.label}: {node.value}%
-                </div>
-            </Html>
-        </group>
-    );
-}
-
-/* Connects nodes to center to form a web */
-function WebConnections({ nodes }: { nodes: GrowthNode[] }) {
-    // Create a line segment for each connection
-    return (
-        <group>
-            {nodes.map((node, i) => (
-                <line key={i}>
-                    {/* @ts-ignore */}
-                    <bufferGeometry>
-                        <float32BufferAttribute
-                            attach="attributes-position"
-                            args={[new Float32Array([0, 0, 0, ...node.position]), 3]}
-                        />
-                    </bufferGeometry>
-                    <lineBasicMaterial color={CONNECTION_COLOR} transparent opacity={0.3} />
-                </line>
-            ))}
-        </group>
-    );
-}
-
-function WebPolygons({ nodes }: { nodes: GrowthNode[] }) {
-    // Basic visualization of the area covered
-    // For simplicity in this iteration, we just show lines. 
-    // A full polygon needs proper order of vertices.
-    // We assume nodes are passed in circular order.
-
-    const positions = useMemo(() => {
-        const pos: number[] = [];
-        // Connect each node to next
-        for (let i = 0; i < nodes.length; i++) {
-            const curr = nodes[i];
-            const next = nodes[(i + 1) % nodes.length];
-            pos.push(...curr.position);
-            pos.push(...next.position);
-        }
-        return new Float32Array(pos);
-    }, [nodes]);
-
-    return (
-        <lineSegments>
-            <bufferGeometry>
-                <float32BufferAttribute
-                    attach="attributes-position"
-                    args={[positions, 3]}
-                />
-            </bufferGeometry>
-            <lineBasicMaterial color={NODE_COLOR_ACTIVE} transparent opacity={0.6} />
-        </lineSegments>
-    )
-
-}
-
-
-// --- MAIN COMPONENT ---
-
+/**
+ * Canon Matrix Growth Chart (Geist Design System)
+ * High-contrast, thin lines, premium Geist typography.
+ */
 export const StartGrowthWeb3D: React.FC<StartGrowthWeb3DProps> = ({ quality, speed, sales, team }) => {
+    const size = 400;
+    const center = size / 2;
+    const radius = 130;
 
-    // Map props to 3D Nodes
-    // Normalize 0..100 to radius 0..3
-    const getPos = (val: number, angleDeg: number): [number, number, number] => {
-        const r = (val / 100) * 3;
-        const rad = (angleDeg * Math.PI) / 180;
-        return [r * Math.cos(rad), r * Math.sin(rad), 0];
-    };
-
-    const nodes: GrowthNode[] = useMemo(() => [
-        { id: 'q', label: 'Качество', value: quality, color: '#f87171', position: getPos(quality, 90) }, // Top
-        { id: 's', label: 'Скорость', value: speed, color: '#fbbf24', position: getPos(speed, 0) },   // Right
-        { id: 'sl', label: 'Продажи', value: sales, color: '#34d399', position: getPos(sales, 270) }, // Bottom
-        { id: 'tm', label: 'Команда', value: team, color: '#60a5fa', position: getPos(team, 180) },    // Left
+    const data = useMemo(() => [
+        { label: 'Качество', value: quality, angle: -Math.PI / 2 },
+        { label: 'Скорость', value: speed, angle: 0 },
+        { label: 'Продажи', value: sales, angle: Math.PI / 2 },
+        { label: 'Команда', value: team, angle: Math.PI },
     ], [quality, speed, sales, team]);
 
+    const points = useMemo(() => {
+        return data.map(d => {
+            const r = (d.value / 100) * radius;
+            return `${center + r * Math.cos(d.angle)},${center + r * Math.sin(d.angle)}`;
+        }).join(' ');
+    }, [data, center, radius]);
+
+    const averagePulse = Math.round((quality + speed + sales + team) / 4);
+
     return (
-        <div className="h-64 w-full bg-white rounded-2xl overflow-hidden border border-black/10 shadow-sm relative">
-            {/* Instruction Overlay (Read-Only) */}
-            <div className="absolute top-2 left-2 z-10 pointer-events-none">
-                <span className="text-xs text-[#717182] bg-white/80 border border-black/5 px-2 py-1 rounded backdrop-blur-sm font-medium">
-                    Используйте мышь для вращения • Только чтение
-                </span>
+        <div className="w-full h-full bg-white/80 backdrop-blur-md rounded-3xl border border-black/10 flex flex-col items-center justify-center p-8 relative min-h-[460px] shadow-sm hover:shadow-md transition-all duration-500 overflow-hidden">
+            {/* Background Decorative Element */}
+            <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl -z-10" />
+
+            {/* Header with Canon Typography */}
+            <div className="absolute top-8 left-8 flex flex-col">
+                <div className="flex items-center gap-2 mb-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
+                    <span className="text-[10px] font-medium text-indigo-600 uppercase tracking-[0.3em]">
+                        Matrix Pulse
+                    </span>
+                </div>
+                <h3 className="text-xl font-medium text-[#030213] tracking-tight">Growth Dynamics</h3>
             </div>
 
-            <Canvas camera={{ position: [0, 0, 6], fov: 50 }}>
-                <ambientLight intensity={0.8} />
-                <pointLight position={[10, 10, 10]} intensity={1.2} />
+            <svg
+                viewBox={`0 0 ${size} ${size}`}
+                className="w-full h-full relative z-0 overflow-visible max-w-[340px] drop-shadow-2xl"
+            >
+                <defs>
+                    <linearGradient id="growthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#4F46E5" stopOpacity="0.15" />
+                        <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.05" />
+                    </linearGradient>
+                </defs>
 
-                {/* Central Core */}
-                <mesh position={[0, 0, 0]}>
-                    <sphereGeometry args={[0.2, 16, 16]} />
-                    <meshStandardMaterial color="#4f46e5" />
-                </mesh>
+                {/* Grid Rings (Thin & Subtle) */}
+                {[0.2, 0.4, 0.6, 0.8, 1].map((step, i) => {
+                    const ringPoints = data.map(d => {
+                        const r = radius * step;
+                        return `${center + r * Math.cos(d.angle)},${center + r * Math.sin(d.angle)}`;
+                    }).join(' ');
+                    return (
+                        <polygon
+                            key={i}
+                            points={ringPoints}
+                            fill="none"
+                            stroke="rgba(0,0,0,0.04)"
+                            strokeWidth="0.5"
+                        />
+                    );
+                })}
 
-                <WebConnections nodes={nodes} />
-                <WebPolygons nodes={nodes} />
-
-                {nodes.map(node => (
-                    <SkillNode key={node.id} node={node} />
+                {/* Axial Lines */}
+                {data.map((d, i) => (
+                    <line
+                        key={i}
+                        x1={center}
+                        y1={center}
+                        x2={center + radius * Math.cos(d.angle)}
+                        y2={center + radius * Math.sin(d.angle)}
+                        stroke="rgba(0,0,0,0.06)"
+                        strokeWidth="1"
+                        strokeDasharray="4 4"
+                    />
                 ))}
 
-                <OrbitControls enableZoom={false} autoRotate autoRotateSpeed={0.5} />
-            </Canvas>
+                {/* Growth Area with Glassy Gradient */}
+                <polygon
+                    points={points}
+                    fill="url(#growthGradient)"
+                    stroke="#4F46E5"
+                    strokeWidth="1.5"
+                    strokeLinejoin="round"
+                    className="transition-all duration-1000 ease-in-out"
+                />
+
+                {/* Data Nodes & Premium Labels */}
+                {data.map((d, i) => {
+                    const r = (d.value / 100) * radius;
+                    const x = center + r * Math.cos(d.angle);
+                    const y = center + r * Math.sin(d.angle);
+
+                    const labelR = radius + 35;
+                    const lx = center + labelR * Math.cos(d.angle);
+                    const ly = center + labelR * Math.sin(d.angle);
+
+                    return (
+                        <g key={i}>
+                            <circle
+                                cx={x}
+                                cy={y}
+                                r="3.5"
+                                fill="white"
+                                stroke="#4F46E5"
+                                strokeWidth="2"
+                                className="transition-all duration-1000 shadow-sm"
+                            />
+                            <text
+                                x={lx}
+                                y={ly - 4}
+                                textAnchor="middle"
+                                className="fill-[#030213] text-[11px] font-medium uppercase tracking-wider select-none font-geist"
+                            >
+                                {d.label}
+                            </text>
+                            <text
+                                x={lx}
+                                y={ly + 10}
+                                textAnchor="middle"
+                                className="fill-[#717182] text-[10px] font-medium select-none"
+                            >
+                                {d.value}%
+                            </text>
+                        </g>
+                    );
+                })}
+
+                {/* Central Core */}
+                <circle cx={center} cy={center} r="4" fill="#030213" className="shadow-lg" />
+            </svg>
+
+            {/* Power Index HUD (Geist Style) */}
+            <div className="absolute bottom-8 right-8 flex flex-col items-end">
+                <span className="text-[10px] font-medium text-[#717182] uppercase tracking-[0.2em] mb-0.5">
+                    Sync Pulse
+                </span>
+                <div className="flex items-baseline gap-1">
+                    <span className="text-5xl font-medium text-[#030213] tracking-tighter leading-none">
+                        {averagePulse}
+                    </span>
+                    <span className="text-sm font-medium text-indigo-600">%</span>
+                </div>
+            </div>
+
+            {/* Mini Legend / Status Pill */}
+            <div className="absolute bottom-8 left-8">
+                <div className="flex items-center gap-3 bg-[#F3F3F5] px-4 py-2 rounded-xl border border-black/5">
+                    <div className="flex -space-x-1">
+                        {[1, 2, 3].map(i => (
+                            <div key={i} className={`w-2 h-2 rounded-full ${i === 1 ? 'bg-indigo-600' : 'bg-black/10'}`} />
+                        ))}
+                    </div>
+                    <span className="text-[10px] font-medium text-[#717182] uppercase tracking-wide">
+                        Optimal Flow
+                    </span>
+                </div>
+            </div>
         </div>
     );
 };
