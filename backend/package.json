@@ -15,7 +15,8 @@
     "prisma": "prisma",
     "prisma:dev": "prisma migrate dev",
     "prisma:generate": "prisma generate",
-    "migrate:foundation": "ts-node scripts/backfill-foundation.ts"
+    "migrate:foundation": "ts-node scripts/backfill-foundation.ts",
+    "seed:foundation": "ts-node scripts/seed-foundation-gate.ts"
   },
   "keywords": [],
   "author": "",
