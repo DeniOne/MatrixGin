@@ -90,9 +90,10 @@
 - [x] **Terminology**: Standardization (ФУНДАМЕНТАЛЬНЫЙ УРОВЕНЬ, Контур Допуска).
 - [x] **Seeding**: Automated `v2.2-canon` seeding with SHA-256 hash validation.
 
-#### Sprint 16: Stability & Reframing ✅ **COMPLETED 2026-01-27**
+#### Sprint 16: Stability & Reframing ✅ **COMPLETED 2026-01-28**
 - [x] **Process Audit**: Identified and killed duplicate Node.js processes causing 500 errors.
 - [x] **UI Refinement**: Component `StartGrowthWeb3D` refactored (Geist typography, glassmorphism, accent indigo).
+- [x] **Foundation & Registration Fix**: Corrected video paths, fixed `::uuid` SQL errors, added Telegram selection buttons, and unblocked admin.
 
 ## Key Blockers
 - **None critical**: Все зависит от приоритизации спринтов.
@@ -107,3 +108,4 @@
 - **2026-01-24**: Проведена "дезинфекция" 900+ файлов от старых классов жирности и темной темы.
 - **2026-01-27**: Устранена критическая ошибка 500 при логине, нормализована среда выполнения Node.js.
 - **2026-01-27**: Рефрейминг Dashboard: `StartGrowthWeb3D` канонизирован под Geist Design System.
+- **2026-01-28**: Фикс "Методологической блокировки" Foundation Gate. Видео-пути исправлены, админ принудительно разблокирован через `ACCEPTED` статус.

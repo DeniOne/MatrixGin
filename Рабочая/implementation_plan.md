@@ -1,46 +1,48 @@
-# ПЛАН_ВНЕДРЕНИЯ: Запуск «Контура Допуска» (Foundation Admission Gate)
+# План реализации: Открытая регистрация и Foundation Admission Gate
 
-## Цель
-Загрузить фундаментальные блоки (`BLOCK_01` – `BLOCK_05`) как **Контур Допуска (Admission Gate)**. Это НЕ обучение, а жесткое условие входа в систему. Прохождение этих блоков ведет к получению статуса `ACCEPTED` в модели `FoundationAcceptance`.
+Данный документ описывает внедрение защищенного процесса регистрации и системы Foundation Admission Gate. 
+**ОБНОВЛЕНИЕ**: Добавлена «Открытая регистрация» (Self-Registration), чтобы HR не ебался с ручным вводом ID каждого нового сотрудника.
 
-## 1. Семантический сдвиг (Методология)
-- **НЕ Академия:** Это `Foundation Zone` (Зона Фундамента).
-- **НЕ Курс:** Это `Admission Container` (Контейнер Допуска — v2.2).
-- **НЕ Модули:** Это `Admission Blocks` (Блоки Допуска).
-- **Результат:** Вместо `course.completed` система должна зафиксировать `FoundationAcceptance.decision = ACCEPTED`.
+## Обзор текущей реализации
 
-## 2. Маппинг данных (DB Strategy)
-Несмотря на использование таблиц Университета для хранения текста (для экономии кода), семантически флаги будут иными:
-- **Course (Контейнер):**
-    - `type: FOUNDATIONAL` (флаг для фронта: «это Гейт, а не курс»).
-    - `is_mandatory: true`.
-    - `expected_effect: "Юридический и операционный допуск"`.
-- **Material (Блоки):**
-    - 5 блоков на базе `BLOCK_01` – `BLOCK_05`.
-    - Каждый блок содержит **Маркер Принятия (Acceptance Marker)** — формулировку, которую пользователь обязан «подписать» (подтвердить).
+### 1. Процесс регистрации (Personnel Module)
+- **Приглашение**: HR инициирует `POST /api/registration/invite`.
+- **Telegram бот**: [EmployeeRegistrationService](file:///f:/Matrix_Gin/backend/src/services/employee-registration.service.ts#62-913) управляет 11-шаговым визардом (фото, ФИО, адрес, паспорт и др.).
+- **Одобрение**: `EmployeeRegistrationService.approveRegistration` создает записи [User](file:///f:/Matrix_Gin/frontend/src/features/auth/authApi.ts#3-13) и [Employee](file:///f:/Matrix_Gin/backend/src/controllers/employee-registration.controller.ts#8-44), после чего генерирует событие `employee.onboarded`.
 
-## 3. Скрипт сидирования (`backend/scripts/seed-foundation-gate.ts`) [NEW]
-Специализированный скрипт:
-1. Вычитывает markdown-файлы.
-2. Создает/обновляет `Course` с типом `FOUNDATIONAL` как системный объект.
-3. Создает 5 `Material` (текстовых блоков).
-4. **Важно:** В метаданные материалов записывает флаг `is_admission_block: true`.
-5. Генерирует или обновляет системную запись в `FoundationAuditLog` о создании текущей версии контура (v2.2).
+### 2. Интеграция с Университетом (Module 13)
+- **Onboarding Listener**: [UniversityOnboardingListener](file:///f:/Matrix_Gin/backend/src/services/university-onboarding.listener.ts#15-128) ловит событие `employee.onboarded`.
+- **Инициализация**: Устанавливается грейд `INTERN` (Photon) и осуществляется автоматическая запись на `is_mandatory` курсы.
 
-## 4. Логика допуска (Logic Flow)
-1. Пользователь заходит в систему.
-2. Система проверяет `FoundationAcceptance`. Если записи нет или она `NOT_ACCEPTED` — включается режим **Lockout**.
-3. Пользователю доступен ТРИУМВИРАТ принятия (Только 5 блоков гейта).
-4. После подтверждения последнего блока (BLOCK_05):
-    - Скрипт/API создает запись `FoundationAcceptance { decision: ACCEPTED, version: "v2.2" }`.
-    - Только после этого открывается Side Menu и доступ к другим Академиям.
+### 3. Foundation Admission Gate
+- **Блокировка (Backend)**: [foundationMiddleware](file:///f:/Matrix_Gin/backend/src/middleware/foundation.middleware.ts#10-59) проверяет наличие записи в `foundationAcceptance` для всех маршрутов Университета.
+- **Погружение (Frontend)**: Принудительный Flow через `/foundation/*` страницы (Constitution, Codex, и др.).
+- **Доступ**: До завершения Foundation пользователь не может получить доступ к "Прикладным знаниям" (Applied courses).
 
-## 5. Шаги выполнения
-1. Создать сид-скрипт `backend/scripts/seed-foundation-gate.ts`.
-2. Добавить команду в [package.json](file:///f:/Matrix_Gin/backend/package.json): `"seed:foundation": "ts-node scripts/seed-foundation-gate.ts"`.
-3. Запустить загрузку гейта.
+## План действий (Next Steps)
 
-## 6. Верификация
-- В БД должен появиться один `Course` с `type: FOUNDATIONAL`.
-- В таблице `Material` должно быть 5 записей с текстами конституции и кодекса.
-- Проверить наличие `Acceptance Marker` в конце каждого текстового блока.
+### Компонент 1: Email-уведомления, Безопасность и Открытая регистрация
+- [ ] **[MODIFY] Telegram Bot**: Позволить новым пользователям начинать регистрацию по кнопке `/start` (Self-Registration).
+- [ ] **[MODIFY] Email Service**: Реализовать реальную отправку email с временным паролем.
+- [ ] **[MODIFY] Password Reset**: Добавить флаг `must_reset_password` в модель [User](file:///f:/Matrix_Gin/frontend/src/features/auth/authApi.ts#3-13) и форсировать смену пароля.
+- [ ] **[MODIFY] Admin Approval**: Позволить HR назначать Отдел/Локацию прямо в момент одобрения заявки.
+
+### Компонент 2: Foundation UX & Logic
+- [ ] **[VERIFY] Decision Flow**: Протестировать сквозной Flow от просмотра 5 блоков до записи в `foundationAcceptance`.
+- [ ] **[MODIFY] Dashboard Integration**: Добавить виджет на главном экране, уведомляющий о необходимости прохождения Foundation, если он не пройден (в дополнение к блокировке в Университете).
+
+### Компонент 3: Тестирование
+- [ ] **[NEW] Integration Test**: Добавить тест, проверяющий, что после [approveRegistration](file:///f:/Matrix_Gin/backend/src/controllers/employee-registration.controller.ts#156-179) пользователь действительно заблокирован [foundationMiddleware](file:///f:/Matrix_Gin/backend/src/middleware/foundation.middleware.ts#10-59) в маршрутах Университета до момента отправки Decision.
+
+## План верификации
+
+### Автоматизированные тесты
+- Запуск существующих тестов: `npm test backend/src/modules/personnel/__tests__/integration/employee-onboarding.test.ts`
+- Создание нового теста: `backend/src/modules/university/__tests__/foundation-gate.test.ts`
+
+### Ручная проверка
+1. Создать приглашение для нового Telegram ID.
+2. Пройти регистрацию в боте.
+3. Одобрить регистрацию через Admin API.
+4. Залогиниться под новым пользователем и убедиться в редиректе на `/foundation/start`.
+5. Попытаться дернуть API `/api/university/courses/available` без принятого Foundation (должен быть 403).

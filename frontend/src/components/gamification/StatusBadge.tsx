@@ -96,15 +96,15 @@ const StatusBadge: React.FC = () => {
                     <Trophy className="w-5 h-5 text-yellow-500" />
                     <span className="text-sm font-medium text-[#717182]">Статус</span>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(status.status)}`}>
-                    {getStatusLabel(status.status)}
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(status?.status || EmployeeStatus.PHOTON)}`}>
+                    {getStatusLabel(status?.status || EmployeeStatus.PHOTON)}
                 </span>
             </div>
 
             <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[#717182]">Ранг</span>
-                <span className={`text-sm font-medium ${getRankColor(status.rank)}`}>
-                    {getRankLabel(status.rank)}
+                <span className={`text-sm font-medium ${getRankColor(status?.rank || EmployeeRank.TRAINEE)}`}>
+                    {getRankLabel(status?.rank || EmployeeRank.TRAINEE)}
                 </span>
             </div>
 
@@ -112,26 +112,26 @@ const StatusBadge: React.FC = () => {
                 <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-[#717182]">Прогресс до следующего статуса</span>
                     <span className="text-xs font-medium text-[#030213]">
-                        {status.progressPercent.toFixed(1)}%
+                        {(status?.progressPercent || 0).toFixed(1)}%
                     </span>
                 </div>
                 <div className="w-full bg-[#F3F3F5] rounded-full h-2">
                     <div
                         className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.min(status.progressPercent, 100)}%` }}
+                        style={{ width: `${Math.min(status?.progressPercent || 0, 100)}%` }}
                     />
                 </div>
                 <div className="flex items-center justify-between mt-1">
                     <span className="text-xs text-[#717182]">
-                        {status.currentGMC.toLocaleString()} GMC
+                        {(status?.currentGMC || 0).toLocaleString()} GMC
                     </span>
                     <span className="text-xs text-[#717182]">
-                        {status.nextStatusThreshold.toLocaleString()} GMC
+                        {(status?.nextStatusThreshold || 0).toLocaleString()} GMC
                     </span>
                 </div>
             </div>
 
-            {status.privileges && status.privileges.length > 0 && (
+            {status?.privileges && status.privileges.length > 0 && (
                 <div className="pt-3 border-t border-black/5">
                     <div className="text-xs font-medium text-[#717182] mb-2">Привилегии</div>
                     <div className="flex flex-wrap gap-1">

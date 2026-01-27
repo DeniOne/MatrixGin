@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { foundationApi } from '../../features/foundation/api/foundation.api';
-import { FoundationStatus } from '../../features/foundation/types/foundation.types';
+import { FoundationStatus, ImmersionState } from '../../features/foundation/types/foundation.types';
 import { AlertTriangle, ArrowRight, ShieldAlert } from 'lucide-react';
 
 export const StartPage: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [state, setState] = useState<ImmersionState | null>(null);
 
     useEffect(() => {
         checkStatus();
@@ -16,6 +17,7 @@ export const StartPage: React.FC = () => {
     const checkStatus = async () => {
         try {
             const state = await foundationApi.getStatus();
+            setState(state);
             // Intelligent Routing based on Status
             if (state.status === FoundationStatus.ACCEPTED) {
                 navigate('/'); // Go to Dashboard
@@ -40,47 +42,56 @@ export const StartPage: React.FC = () => {
     };
 
     const handleBegin = () => {
-        // Start with Block 1 (Constitution)
-        // Or fetch strict order from API types/constants
-        navigate('/foundation/immersion/CONSTITUTION');
+        if (state && state.blocks.length > 0) {
+            // Start with the first block from the API (ordered)
+            navigate(`/foundation/immersion/${state.blocks[0].id}`);
+        } else {
+            // Fallback just in case
+            navigate('/foundation/immersion/CONSTITUTION');
+        }
     };
 
     if (isLoading) return <div className="p-12 text-center text-[#717182]">Подключение к ядру...</div>;
 
     return (
-        <div className="p-8 md:p-12">
-            <div className="flex justify-center mb-6 text-amber-500">
-                <ShieldAlert size={64} />
-            </div>
-
-            <h2 className="text-3xl font-medium text-center mb-4 text-gray-900">Доступ ограничен</h2>
-
-            <p className="text-lg text-gray-600 mb-8 text-center leading-relaxed">
-                Добро пожаловать в Университет. <br />
-                Перед доступом к <strong>Прикладным Знаниям</strong> и <strong>Экономике</strong>,
-                вам необходимо завершить <strong>Фундаментальное погружение</strong>.
-            </p>
-
-            <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-8">
-                <div className="flex">
-                    <div className="flex-shrink-0">
-                        <AlertTriangle className="h-5 w-5 text-amber-500" aria-hidden="true" />
-                    </div>
-                    <div className="ml-3">
-                        <p className="text-sm text-amber-700">
-                            {error || "Этот процесс обязателен. Ваши действия фиксируются в Аудит-логе Фундамента."}
-                        </p>
-                    </div>
+        <div className="flex-grow flex flex-col items-center justify-center p-6 bg-[#F3F3F5]">
+            <div className="w-full max-w-lg bg-white shadow-2xl rounded-3xl overflow-hidden border border-black/5 p-12">
+                <div className="flex justify-center mb-8 text-amber-500">
+                    <ShieldAlert size={64} strokeWidth={1.5} />
                 </div>
+
+                <h2 className="text-4xl font-medium text-center mb-6 text-[#030213] tracking-tight">Доступ ограничен</h2>
+
+                <p className="text-lg text-[#030213]/80 mb-10 text-center leading-relaxed">
+                    Добро пожаловать в Университет. <br />
+                    Перед доступом к <strong className="text-[#030213]">Прикладным Знаниям</strong> и <strong className="text-[#030213]">Экономике</strong>,
+                    вам необходимо завершить <strong className="text-indigo-600">Фундаментальное погружение</strong>.
+                </p>
+
+                {error && (
+                    <div className="bg-amber-50/50 border border-amber-200 rounded-2xl p-4 mb-8">
+                        <div className="flex items-center">
+                            <AlertTriangle className="h-5 w-5 text-amber-600 mr-3 shrink-0" />
+                            <p className="text-xs font-medium text-amber-900 uppercase tracking-wide">
+                                {error}
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                <button
+                    onClick={handleBegin}
+                    className="w-full flex justify-center items-center px-8 py-5 text-lg font-medium rounded-2xl text-white bg-indigo-600 hover:bg-indigo-700 transition-all shadow-xl hover:shadow-indigo-200 active:scale-[0.98]"
+                >
+                    Начать погружение
+                    <ArrowRight className="ml-3 h-5 w-5" />
+                </button>
             </div>
 
-            <button
-                onClick={handleBegin}
-                className="w-full flex justify-center items-center px-6 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-lg"
-            >
-                Начать погружение
-                <ArrowRight className="ml-2 -mr-1 h-5 w-5" />
-            </button>
+            <footer className="mt-12 text-center text-[#717182] text-[10px] font-medium uppercase tracking-[0.3em] opacity-60">
+                <p>Операционная Система MatrixGin v2.2</p>
+                <p className="mt-2">Доступ строго контролируется. Действия логируются.</p>
+            </footer>
         </div>
     );
 };

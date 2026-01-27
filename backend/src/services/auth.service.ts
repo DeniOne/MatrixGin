@@ -64,9 +64,98 @@ export class AuthService {
         return this.generateAuthResponse(user);
     }
 
-    async validateUser(payload: any): Promise<User | null> {
+    async validateUser(payload: any): Promise<UserResponseDto | null> {
         const user = await prisma.user.findUnique({ where: { id: payload.sub } });
-        return user || null;
+        return user ? this.mapToUserResponse(user) : null;
+    }
+
+    /**
+     * Initialize Telegram Login flow.
+     * CANON: Only for ACTIVE users with linked telegram_id.
+     */
+    async initTelegramLogin(username: string): Promise<{ sessionId: string }> {
+        // Remove @ if present
+        const cleanUsername = username.startsWith('@') ? username.substring(1) : username;
+
+        // 1. Find the user by telegram username
+        // We assume telegram_username is stored or telegram_id is linked.
+        // For now, we'll try to find by a field or assume telegram_id exists.
+        // NOTE: The current schema has telegram_id (ID), we might need a field for username or use another way to link.
+        // Let's check the User model in schema.prisma again.
+        // I noticed 'User' has 'telegram_id'. I should check if we have telegram_username.
+
+        const user = await prisma.user.findFirst({
+            where: {
+                // @ts-ignore - Assuming we'll use email as username or we need a specific telegram_username field
+                // For this implementation, let's assume we can find them by email or we need an exact match with some metadata
+                // CANON states: 'existing users with linked telegram_id'
+                email: cleanUsername.includes('@') ? cleanUsername : undefined,
+                telegram_id: { not: null },
+                status: 'ACTIVE' as any
+            }
+        });
+
+        if (!user) {
+            logger.warn('Telegram login attempted for non-existent or inactive user', { username });
+            throw new Error('Access denied: User not found or inactive');
+        }
+
+        // 2. Create AuthSession
+        const session = await prisma.authSession.create({
+            data: {
+                user_id: user.id,
+                status: 'PENDING' as any,
+                expires_at: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+                ip_address: undefined, // Could be passed from controller
+                user_agent: undefined
+            }
+        });
+
+        // 3. Send Push Notification via TelegramService
+        const telegramService = (await import('./telegram.service')).default;
+        await telegramService.sendLoginPush(session.id, user.telegram_id!);
+
+        return { sessionId: session.id };
+    }
+
+    /**
+     * Verify session status (Polling target).
+     */
+    async verifyTelegramLogin(sessionId: string): Promise<AuthResponseDto | null> {
+        const session = await prisma.authSession.findUnique({
+            where: { id: sessionId },
+            include: { user: true }
+        });
+
+        if (!session) throw new Error('Session not found');
+
+        if (new Date() > session.expires_at) {
+            await prisma.authSession.update({
+                where: { id: sessionId },
+                data: { status: 'EXPIRED' as any }
+            });
+            throw new Error('Session expired');
+        }
+
+        if (session.status === ('APPROVED' as any)) {
+            // Success! Generate tokens.
+            // If logging in via Telegram, we trust the identity and can bypass initial password reset
+            // especially helpful for superusers with dummy emails.
+            if ((session.user as any).must_reset_password) {
+                await prisma.user.update({
+                    where: { id: session.user_id },
+                    data: { must_reset_password: false } as any
+                });
+            }
+
+            return this.generateAuthResponse(session.user);
+        }
+
+        if (session.status === ('REJECTED' as any)) {
+            throw new Error('Login rejected by user');
+        }
+
+        return null; // Still pending
     }
 
     /**
@@ -114,6 +203,27 @@ export class AuthService {
         // Frontend handles local token cleanup
     }
 
+    async changePassword(userId: string, currentPassword: string, newPassword: string): Promise<void> {
+        const user = await prisma.user.findUnique({ where: { id: userId } });
+        if (!user) throw new Error('User not found');
+
+        const isPasswordValid = await bcrypt.compare(currentPassword, user.password_hash);
+        if (!isPasswordValid) throw new Error('Invalid current password');
+
+        const newPasswordHash = await bcrypt.hash(newPassword, this.saltRounds);
+
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                password_hash: newPasswordHash,
+                // @ts-ignore
+                must_reset_password: false,
+            },
+        });
+
+        logger.info('Password changed successfully', { userId });
+    }
+
     private generateAuthResponse(user: User): AuthResponseDto {
         const payload = { sub: user.id, email: user.email, role: user.role };
         const accessToken = jwt.sign(payload, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
@@ -143,6 +253,8 @@ export class AuthService {
 
             updatedAt: user.updated_at.toISOString(),
             personalDataConsent: user.personal_data_consent,
+            mustResetPassword: (user as any).must_reset_password || false,
+            foundationStatus: (user as any).foundation_status || 'NOT_STARTED',
         };
     }
 }

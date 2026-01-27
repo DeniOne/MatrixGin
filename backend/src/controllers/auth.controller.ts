@@ -54,4 +54,52 @@ export class AuthController {
         }
         res.status(200).json({ message: 'OK' });
     }
+
+    async changePassword(req: Request, res: Response) {
+        try {
+            const user = req.user as any;
+            const { currentPassword, newPassword } = req.body;
+
+            if (!user?.id) return res.status(401).json({ message: 'Unauthorized' });
+
+            await authService.changePassword(user.id, currentPassword, newPassword);
+            res.status(200).json({ message: 'Password changed successfully' });
+        } catch (error: any) {
+            res.status(400).json({ message: error.message });
+        }
+    }
+
+    /**
+     * Start Telegram login process.
+     */
+    async initTelegramLogin(req: Request, res: Response) {
+        try {
+            const { username } = req.body;
+            if (!username) return res.status(400).json({ message: 'Username is required' });
+
+            const result = await authService.initTelegramLogin(username);
+            res.status(200).json(result);
+        } catch (error: any) {
+            res.status(403).json({ message: error.message });
+        }
+    }
+
+    /**
+     * Check Telegram login status (Polling).
+     */
+    async verifyTelegramLogin(req: Request, res: Response) {
+        try {
+            const { sessionId } = req.params;
+            if (!sessionId) return res.status(400).json({ message: 'Session ID is required' });
+
+            const result = await authService.verifyTelegramLogin(sessionId);
+            if (result) {
+                res.status(200).json(result);
+            } else {
+                res.status(202).json({ message: 'Pending approval' });
+            }
+        } catch (error: any) {
+            res.status(401).json({ message: error.message });
+        }
+    }
 }

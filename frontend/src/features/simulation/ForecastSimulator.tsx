@@ -27,20 +27,22 @@ const SALES_BONUS_RATIO = 0.01; // 1% of sales to MC (simplified)
 
 export const ForecastSimulator: React.FC<ForecastSimulatorProps> = ({ currentStats, onSuggestGoal }) => {
     const [simulated, setSimulated] = useState<SimulationState>({
-        quality: currentStats.quality,
-        speed: currentStats.speed,
-        sales: currentStats.sales,
+        quality: currentStats?.quality ?? 90,
+        speed: currentStats?.speed ?? 10,
+        sales: currentStats?.sales ?? 0,
     });
 
     const [copied, setCopied] = useState(false);
 
     // --- LOGIC: Client-Side "What If" Calculation ---
     const calculation = useMemo(() => {
+        const stats = currentStats || { quality: 90, speed: 10, sales: 0, mcEarnings: 0 };
+
         // 1. Current Income Calculation
-        const currentDailyTasks = currentStats.speed * 8; // 8 hour shift
+        const currentDailyTasks = (stats.speed || 0) * 8; // 8 hour shift
         const currentBaseMC = currentDailyTasks * BASE_RATE_MC;
-        const currentQualityBonus = currentStats.quality >= QUALITY_MULTIPLIER_THRESHOLD ? 1.2 : 1.0;
-        const currentSalesBonus = currentStats.sales * SALES_BONUS_RATIO;
+        const currentQualityBonus = (stats.quality || 0) >= QUALITY_MULTIPLIER_THRESHOLD ? 1.2 : 1.0;
+        const currentSalesBonus = (stats.sales || 0) * SALES_BONUS_RATIO;
         const currentTotalMC = Math.round((currentBaseMC * currentQualityBonus) + currentSalesBonus);
 
         // 2. Simulated Income Calculation

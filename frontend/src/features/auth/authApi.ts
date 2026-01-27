@@ -8,6 +8,8 @@ export interface User {
     role: string;
     avatar?: string;
     departmentId?: string;
+    mustResetPassword: boolean;
+    foundationStatus?: 'NOT_STARTED' | 'IN_PROGRESS' | 'ACCEPTED';
 }
 
 export interface LoginResponse {
@@ -28,7 +30,30 @@ export const authApi = api.injectEndpoints({
         getMe: builder.query<User, void>({
             query: () => '/auth/me',
         }),
+        changePassword: builder.mutation<void, any>({
+            query: (passwords) => ({
+                url: '/auth/change-password',
+                method: 'POST',
+                body: passwords,
+            }),
+        }),
+        initTelegramLogin: builder.mutation<{ sessionId: string }, { username: string }>({
+            query: (body) => ({
+                url: '/auth/telegram/init',
+                method: 'POST',
+                body,
+            }),
+        }),
+        verifyTelegramLogin: builder.query<LoginResponse, string>({
+            query: (sessionId) => `/auth/telegram/verify/${sessionId}`,
+        }),
     }),
 });
 
-export const { useLoginMutation, useGetMeQuery } = authApi;
+export const {
+    useLoginMutation,
+    useGetMeQuery,
+    useChangePasswordMutation,
+    useInitTelegramLoginMutation,
+    useLazyVerifyTelegramLoginQuery // Use lazy for polling
+} = authApi;

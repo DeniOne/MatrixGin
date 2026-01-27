@@ -26,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import { useGetEnrollmentByIdQuery, useUpdateModuleProgressMutation } from '../../features/university/api/universityApi';
 import { QuizEngine } from '../../features/university/components/QuizEngine';
+import { UniversalVideoPlayer } from '../../components/video/UniversalVideoPlayer';
 
 const { Header, Sider, Content } = Layout;
 const { Title, Text, Paragraph } = Typography;
@@ -206,12 +207,13 @@ export const CourseReaderPage: React.FC = () => {
                                                         {activeModule.material.content_text}
                                                     </Paragraph>
                                                 ) : activeModule.material?.content_url ? (
-                                                    <div className="aspect-video bg-white rounded-2xl flex items-center justify-center text-[#030213] overflow-hidden shadow-2xl">
-                                                        {/* Placeholder for video player integration */}
-                                                        <Space direction="vertical" align="center">
-                                                            <PlayCircleOutlined className="text-6xl text-indigo-500" />
-                                                            <Text className="text-[#030213]">Видео-контент: {activeModule.material.content_url}</Text>
-                                                        </Space>
+                                                    <div className="mb-10">
+                                                        <UniversalVideoPlayer
+                                                            src={activeModule.material.content_url}
+                                                            isRequired={activeModule.material.is_video_required}
+                                                            title={activeModule.material.title}
+                                                            onCompleted={handleModuleComplete}
+                                                        />
                                                     </div>
                                                 ) : (
                                                     <Empty description="Контент отсутствует" />

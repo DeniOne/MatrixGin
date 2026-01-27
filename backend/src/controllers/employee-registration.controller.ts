@@ -161,8 +161,9 @@ class EmployeeRegistrationController {
         try {
             const { id } = req.params;
             const userId = (req.user as any)?.id;
+            const { departmentId, locationId } = req.body;
 
-            await employeeRegistrationService.approveRegistration(id, userId);
+            await employeeRegistrationService.approveRegistration(id, userId, { departmentId, locationId });
 
             res.status(200).json({
                 success: true,

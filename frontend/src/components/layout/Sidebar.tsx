@@ -3,6 +3,9 @@ import React, { useState, useMemo } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { logout, selectCurrentUser } from '../../features/auth/authSlice';
+import { foundationApi } from '../../features/foundation/api/foundation.api';
+import FoundationStatusBadge from './FoundationStatusBadge';
+import { FoundationStatus } from '../../features/foundation/types/foundation.types';
 import {
     LayoutDashboard,
     CheckSquare,
@@ -89,6 +92,13 @@ const Sidebar: React.FC = () => {
     // Default to SUPERUSER in DEV for convenience, or EMPLOYEE
     const [emulatedRole, setEmulatedRole] = useState<EmulatedRole>(EmulatedRole.SUPERUSER);
 
+    const isLocked = useMemo(() => {
+        // Superuser is never locked out from a UI perspective (for dev/management)
+        if (emulatedRole === EmulatedRole.SUPERUSER) return false;
+        // Use user object from Redux
+        return user?.foundationStatus !== 'ACCEPTED';
+    }, [user, emulatedRole]);
+
     const toggleExpand = (path: string) => {
         setExpandedItems(prev =>
             prev.includes(path)
@@ -117,12 +127,19 @@ const Sidebar: React.FC = () => {
         // We trust the "EmulatedRole" array in the config.
 
         return MENU_CONFIG.filter(cluster => {
-            // Check if cluster is visible for current emulated role
+            // 0. LOCKOUT LOGIC: If locked, only Cluster B is potentially visible
+            if (isLocked && cluster.id !== 'university') return false;
+
+            // 1. Filter items based on emulated role
             if (!cluster.emulatedRoles.includes(emulatedRole)) return false;
             return true;
         }).map(cluster => {
             // Filter items inside cluster
             const validItems = cluster.items.filter(item => {
+                // LOCKOUT LOGIC: Only Admission Gate is visible in Cluster B if locked
+                if (isLocked && cluster.id === 'university') {
+                    return item.path === '/foundation/start';
+                }
                 // If item has specific roles, check against emulated "virtual" permissions
                 // Since EmulatedRole is a "Preset", we map it roughly:
                 // EMPLOYEE -> Basic roles
@@ -216,9 +233,9 @@ const Sidebar: React.FC = () => {
     return (
         <aside className="w-64 bg-[#F3F3F5] border-r border-black/10 flex flex-col h-full flex-shrink-0 font-sans relative z-20">
             {/* Header */}
-            <div className="h-16 flex items-center px-6 border-b border-black/10 bg-white">
+            <div className="h-16 flex items-center justify-between px-6 border-b border-black/10 bg-white">
                 <span className="text-xl font-medium text-[#030213] tracking-widest uppercase">MatrixGin</span>
-                <span className="ml-2 text-[10px] font-mono text-[#717182] bg-[#F3F3F5] px-1.5 py-0.5 rounded">v2.0</span>
+                <FoundationStatusBadge />
             </div>
 
             {/* Scrollable Content */}

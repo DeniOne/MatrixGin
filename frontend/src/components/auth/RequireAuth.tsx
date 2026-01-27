@@ -1,12 +1,19 @@
 import React from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
+import { useAppSelector } from '../../app/hooks';
+import { selectCurrentUser, selectIsAuthenticated } from '../../features/auth/authSlice';
 
 export const RequireAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const token = localStorage.getItem('token');
+    const isAuthenticated = useAppSelector(selectIsAuthenticated);
+    const user = useAppSelector(selectCurrentUser);
     const location = useLocation();
 
-    if (!token) {
+    if (!isAuthenticated) {
         return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+
+    if (user?.mustResetPassword && location.pathname !== '/change-password') {
+        return <Navigate to="/change-password" replace />;
     }
 
     return <>{children}</>;

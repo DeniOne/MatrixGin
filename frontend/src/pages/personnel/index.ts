@@ -4,3 +4,4 @@ export { PersonalFileDetailPage } from './PersonalFileDetailPage';
 export { OrdersListPage } from './OrdersListPage';
 export { ContractsListPage } from './ContractsListPage';
 export { HRDashboardPage } from './HRDashboardPage';
+export { RegistrationRequestsPage } from './RegistrationRequestsPage';

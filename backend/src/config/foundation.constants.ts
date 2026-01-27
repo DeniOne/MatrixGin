@@ -6,7 +6,7 @@
  * Users must "view" (audit log) all blocks before they can Accept the Foundation.
  */
 
-export const FOUNDATION_VERSION = 'v1.0';
+export const FOUNDATION_VERSION = 'v2.2-canon';
 
 export enum FoundationBlockType {
     CONSTITUTION = 'CONSTITUTION',
@@ -16,8 +16,17 @@ export enum FoundationBlockType {
     MOTIVATION = 'MOTIVATION'
 }
 
+export enum FoundationStatus {
+    NOT_STARTED = 'NOT_STARTED',
+    IN_PROGRESS = 'IN_PROGRESS',
+    ACCEPTED = 'ACCEPTED',
+    NOT_ACCEPTED = 'NOT_ACCEPTED',
+    VERSION_MISMATCH = 'VERSION_MISMATCH'
+}
+
 export interface FoundationBlock {
     id: FoundationBlockType;
+    materialId: string;
     title: string;
     description: string;
     order: number;
@@ -27,36 +36,41 @@ export interface FoundationBlock {
 export const FOUNDATION_BLOCKS: FoundationBlock[] = [
     {
         id: FoundationBlockType.CONSTITUTION,
-        title: 'Constitution',
-        description: ' The Supreme Law of the Corporation. Rights, Hierarchy, and Power.',
+        materialId: 'foundation-block-1',
+        title: 'Внутренняя Конституция',
+        description: 'Высший Устав Компании. Права, Иерархия и Власть.',
         order: 1,
         mandatory: true
     },
     {
         id: FoundationBlockType.CODEX,
-        title: 'Corporate Codex',
-        description: 'Anti-Fraud Policy, Honor Code, and Ethical Red Lines.',
+        materialId: 'foundation-block-2',
+        title: 'Код поведения и антифрод',
+        description: 'Кодекс Чести, борьба с мошенничеством и этические границы.',
         order: 2,
         mandatory: true
     },
     {
         id: FoundationBlockType.GOLDEN_STANDARD,
-        title: 'Golden Standard',
-        description: 'Cultural Values: "Client is Guest", "cleanliness", "speed".',
+        materialId: 'foundation-block-3',
+        title: 'Золотой Стандарт Фотоматрицы',
+        description: 'Ценности: "Клиент — это Гость", Чистота, Скорость.',
         order: 3,
         mandatory: true
     },
     {
         id: FoundationBlockType.ROLE_MODEL,
-        title: 'Role Model (MDR)',
-        description: 'How Roles, Results, and Responsibility Zones work.',
+        materialId: 'foundation-block-4',
+        title: 'Ролевая модель и ответственность',
+        description: 'Как работают Роли, Результаты и Зоны Ответственности.',
         order: 4,
         mandatory: true
     },
     {
         id: FoundationBlockType.MOTIVATION,
-        title: 'Motivation Core',
-        description: 'The Economy: MC, GMC, and how to earn.',
+        materialId: 'foundation-block-5',
+        title: 'Мотивация и последствия',
+        description: 'Экономика Заслуг: MC, GMC и последствия нарушений.',
         order: 5,
         mandatory: true
     }

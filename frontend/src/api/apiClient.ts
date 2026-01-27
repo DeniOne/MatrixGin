@@ -30,8 +30,20 @@ apiClient.interceptors.response.use(
         return response;
     },
     (error) => {
+        const status = error.response?.status;
+
+        // Global 401 Unauthorized handling
+        if (status === 401) {
+            console.warn('Unauthorized: Token might be invalid or expired. Logging out...');
+            localStorage.removeItem('token');
+            // Prevent redirect loop if already on login
+            if (window.location.pathname !== '/login') {
+                window.location.href = '/login';
+            }
+        }
+
         // Global Foundation Guard
-        if (error.response && error.response.status === 403) {
+        if (status === 403) {
             const message = error.response.data?.message;
             const isFoundationError =
                 message?.includes('FOUNDATION_REQUIRED') ||

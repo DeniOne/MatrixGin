@@ -1,112 +1,154 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { foundationApi } from '../../features/foundation/api/foundation.api';
-import { FoundationBlockType } from '../../features/foundation/types/foundation.types';
-import { FOUNDATION_CONTENT, BLOCK_ORDER } from '../../features/foundation/data/foundation.content';
-import { ArrowRight, CheckCircle, Lock } from 'lucide-react';
+import { FoundationBlockType, ImmersionState, FoundationBlock } from '../../features/foundation/types/foundation.types';
+import { ArrowLeft, ArrowRight, CheckCircle, Lock, Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { UniversalVideoPlayer } from '../../components/video/UniversalVideoPlayer';
 
 export const BlockPage: React.FC = () => {
     const { blockId } = useParams<{ blockId: string }>();
     const navigate = useNavigate();
     const [submitting, setSubmitting] = useState(false);
+    const [state, setState] = useState<ImmersionState | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    // Type guard for blockId
+    useEffect(() => {
+        loadState();
+    }, [blockId]);
+
+    const loadState = async () => {
+        try {
+            const data = await foundationApi.getStatus();
+            setState(data);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Failed to load immersion state', error);
+            setIsLoading(false);
+        }
+    };
+
     const currentBlockId = blockId as FoundationBlockType;
-    const content = FOUNDATION_CONTENT[currentBlockId];
+    const block = state?.blocks.find(b => b.id === currentBlockId);
+    const blockOrder = state?.blocks.map(b => b.id) || [];
 
-    if (!content) {
-        return <div className="text-center p-8 text-red-500">Неверный ID Блока</div>;
+    if (isLoading) {
+        return (
+            <div className="h-screen flex items-center justify-center bg-white">
+                <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+            </div>
+        );
+    }
+
+    if (!block) {
+        return <div className="text-center p-8 text-red-500">Блок не найден или доступ ограничен</div>;
     }
 
     const handleConfirm = async () => {
         setSubmitting(true);
+        console.log(`[MatrixGin] Confirming block: ${currentBlockId}`);
         try {
-            // 1. Mark as viewed
             await foundationApi.markBlockViewed({ blockId: currentBlockId });
 
-            // 2. Determine next step
-            const currentIndex = BLOCK_ORDER.indexOf(currentBlockId);
-            const nextBlockId = BLOCK_ORDER[currentIndex + 1];
+            const currentIndex = blockOrder.indexOf(currentBlockId);
+            const nextBlockId = blockOrder[currentIndex + 1];
 
             if (nextBlockId) {
                 navigate(`/foundation/immersion/${nextBlockId}`);
             } else {
-                // End of blocks -> Decision
                 navigate('/foundation/decision');
             }
         } catch (error) {
-            console.error('Failed to log block view', error);
-            // In strict mode, we might want to alert user.
-            // For now, allow retry.
+            console.error('[MatrixGin] Failed to log block view', error);
+        } finally {
             setSubmitting(false);
         }
     };
 
+    const isLockedByMethodology = block.isMethodologyViolated;
+
     return (
-        <div className="bg-white p-0">
-            {/* Header / Progress Indicator (Simple) */}
-            <div className="bg-gray-50 border-b border-gray-100 px-6 py-4 flex justify-between items-center">
-                <span className="text-sm font-medium text-[#717182] uppercase tracking-wider">
-                    Блок {BLOCK_ORDER.indexOf(currentBlockId) + 1} из {BLOCK_ORDER.length}
-                </span>
-                <div className="flex space-x-1">
-                    {BLOCK_ORDER.map((bid) => (
+        <div className="bg-[#F3F3F5] min-h-screen font-sans selection:bg-indigo-100/30">
+            {/* Header (Geist Canon) */}
+            <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-black/5 px-8 py-4">
+                <div className="max-w-4xl mx-auto flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#717182]">Foundation Gate</span>
+                        <div className="h-3 w-px bg-black/10" />
+                        <span className="text-xs font-medium text-[#030213]">{block.order} — 05</span>
+                    </div>
+                    <div className="w-48 h-1 bg-black/5 rounded-full overflow-hidden">
                         <div
-                            key={bid}
-                            className={`h-2 w-2 rounded-full ${bid === currentBlockId ? 'bg-blue-600' :
-                                BLOCK_ORDER.indexOf(bid) < BLOCK_ORDER.indexOf(currentBlockId) ? 'bg-green-500' : 'bg-gray-200'
-                                }`}
+                            className="h-full bg-indigo-600 transition-all duration-1000 ease-out"
+                            style={{ width: `${(block.order / 5) * 100}%` }}
                         />
-                    ))}
+                    </div>
                 </div>
-            </div>
+            </header>
 
-            <div className="p-8 md:p-10">
-                <div className="flex items-center mb-6">
-                    <h2 className="text-3xl font-medium text-gray-900">{content.title}</h2>
-                </div>
-
-                <div className="prose prose-lg text-gray-700 space-y-8">
-                    <section>
-                        <h3 className="text-xl font-medium text-gray-900 mb-2">Значение</h3>
-                        <p className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500 text-blue-900">
-                            {content.meaning}
-                        </p>
-                    </section>
-
-                    <section>
-                        <h3 className="text-xl font-medium text-gray-900 mb-2 text-red-700">Последствия</h3>
-                        <p className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500 text-red-900 font-medium">
-                            {content.consequences}
-                        </p>
-                    </section>
+            <main className="max-w-4xl mx-auto px-8 py-20 pb-40">
+                <div className="mb-14">
+                    <h2 className="text-5xl font-medium tracking-tight text-[#030213] leading-tight mb-4">
+                        {block.title}
+                    </h2>
+                    <p className="text-[#717182] text-lg">Блок фундаментального обучения (v2.2)</p>
                 </div>
 
-                <div className="mt-12 pt-8 border-t border-gray-100">
+                {/* Video Section */}
+                <div className="mb-14">
+                    <UniversalVideoPlayer
+                        src={block.videoUrl}
+                        isRequired={block.isVideoRequired}
+                        title={block.title}
+                    />
+                </div>
+
+                {/* Content Section */}
+                <article className="prose prose-slate max-w-none prose-headings:font-medium prose-headings:text-[#030213] prose-p:text-[#030213]/80 prose-li:text-[#030213]/80 leading-relaxed text-xl font-normal">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {block.contentText || 'Контент временно недоступен.'}
+                    </ReactMarkdown>
+                </article>
+
+                <footer className="mt-28 pt-12 border-t border-black/5">
                     <button
                         onClick={handleConfirm}
-                        disabled={submitting}
+                        disabled={submitting || isLockedByMethodology}
                         className={`
-                            w-full flex justify-center items-center px-6 py-4 rounded-lg text-lg font-medium shadow-md transition-all
-                            ${submitting
-                                ? 'bg-gray-100 text-[#717182] cursor-wait'
-                                : 'bg-white text-[#030213] hover:bg-white hover:scale-[1.01]'
+                            w-full flex justify-center items-center px-8 py-6 rounded-2xl text-lg font-medium shadow-sm transition-all duration-300
+                            ${submitting || isLockedByMethodology
+                                ? 'bg-white border border-black/5 text-[#717182] cursor-not-allowed'
+                                : 'bg-black text-white hover:bg-[#030213] hover:shadow-2xl active:scale-[0.99]'
                             }
                         `}
                     >
-                        {submitting ? 'Проверка...' : (
+                        {isLockedByMethodology ? (
                             <>
-                                Понимаю и Принимаю
-                                <CheckCircle className="ml-2 h-5 w-5" />
+                                <Lock className="mr-3 h-5 w-5" />
+                                Ожидание видео-дублирования
+                            </>
+                        ) : submitting ? (
+                            <Loader2 className="animate-spin h-6 w-6" />
+                        ) : (
+                            <>
+                                Понимаю и принимаю
+                                <CheckCircle className="ml-3 h-5 w-5" />
                             </>
                         )}
                     </button>
-                    <p className="text-center text-xs text-[#717182] mt-4">
-                        Нажимая, вы подтверждаете прочтение блока. <br />
-                        Действие записано в лог.
+
+                    {isLockedByMethodology && (
+                        <p className="mt-8 text-center text-[10px] font-medium uppercase tracking-[0.4em] text-red-500/60 animate-pulse">
+                            Methodology Violation: v2.2 Geit Canon
+                        </p>
+                    )}
+
+                    <p className="text-center text-[10px] font-medium uppercase tracking-[0.2em] text-[#717182] mt-8 opacity-40">
+                        MatrixGin Foundation Audit System
                     </p>
-                </div>
-            </div>
+                </footer>
+            </main>
         </div>
     );
 };

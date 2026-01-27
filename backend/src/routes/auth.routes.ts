@@ -180,5 +180,41 @@ router.get('/me', passport.authenticate('jwt', { session: false }), authControll
  */
 router.post('/logout', passport.authenticate('jwt', { session: false }), authController.logout);
 
+/**
+ * @swagger
+ * /api/auth/change-password:
+ *   post:
+ *     summary: Change user password
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [currentPassword, newPassword]
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Invalid current password
+ *       401:
+ *         description: Unauthorized
+ */
+router.post('/change-password', passport.authenticate('jwt', { session: false }), authController.changePassword);
+
+/**
+ * Telegram Passwordless Auth
+ */
+router.post('/telegram/init', authController.initTelegramLogin);
+router.get('/telegram/verify/:sessionId', authController.verifyTelegramLogin);
+
 export default router;
 

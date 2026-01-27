@@ -3,6 +3,10 @@ import telegramService from './telegram.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { prisma } from '../config/prisma';
+import emailService from './email.service';
+import * as bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
+import photoOptimizationService from './photo-optimization.service';
 
 // Registration status types
 export enum RegistrationStatus {
@@ -94,20 +98,24 @@ export class EmployeeRegistrationService {
             // Create new registration request
             const result = await prisma.$queryRaw<any[]>`
                 INSERT INTO employee_registration_requests (
+                    id,
                     telegram_id, 
                     status, 
                     current_step, 
                     invited_by,
                     department_id,
                     location_id,
-                    invitation_sent_at
+                    invitation_sent_at,
+                    updated_at
                 ) VALUES (
+                    ${randomUUID()},
                     ${telegramId}, 
                     'PENDING'::registration_status, 
                     'PHOTO'::registration_step,
-                    ${invitedByUserId}::uuid,
-                    ${departmentId || null}::uuid,
-                    ${locationId || null}::uuid,
+                    ${invitedByUserId},
+                    ${departmentId || null},
+                    ${locationId || null},
+                    NOW(),
                     NOW()
                 )
                 RETURNING id, telegram_id
@@ -139,15 +147,43 @@ export class EmployeeRegistrationService {
      */
     async startRegistration(ctx: Context): Promise<void> {
         const telegramId = ctx.from?.id.toString();
+        // @ts-ignore
+        const username = ctx.from?.username;
         if (!telegramId) return;
 
-        // Update registration status
-        await prisma.$executeRaw`
-            UPDATE employee_registration_requests
-            SET status = 'IN_PROGRESS'::registration_status,
-                current_step = 'PHOTO'::registration_step
-            WHERE telegram_id = ${telegramId}
-        `;
+        // Check/Create registration request
+        const existing = await this.getRegistrationByTelegramId(telegramId);
+
+        if (!existing) {
+            await prisma.$executeRaw`
+                INSERT INTO employee_registration_requests (
+                    id,
+                    telegram_id, 
+                    telegram_username,
+                    status, 
+                    current_step, 
+                    invitation_sent_at,
+                    updated_at
+                ) VALUES (
+                    ${randomUUID()},
+                    ${telegramId}, 
+                    ${username || null},
+                    'IN_PROGRESS'::registration_status, 
+                    'PHOTO'::registration_step,
+                    NOW(),
+                    NOW()
+                )
+            `;
+        } else {
+            // Resume logic
+            await prisma.$executeRaw`
+                UPDATE employee_registration_requests
+                SET status = 'IN_PROGRESS'::registration_status,
+                    current_step = 'PHOTO'::registration_step,
+                    updated_at = NOW()
+                WHERE telegram_id = ${telegramId}
+            `;
+        }
 
         // Send first step instructions
         await ctx.reply(
@@ -208,32 +244,41 @@ export class EmployeeRegistrationService {
 
     private async handlePhotoStep(ctx: any, registration: any): Promise<void> {
         if (!ctx.message?.photo) {
-            await ctx.reply('Пожалуйста, отправь фото (не файл)');
+            await ctx.reply('⚠️ *Пожалуйста, отправь именно фото (как картинку), а не файл.*\n\nЭто нужно для корректной работы профиля.', { parse_mode: 'Markdown' });
             return;
         }
 
-        const photo = ctx.message.photo[ctx.message.photo.length - 1];
-        const fileId = photo.file_id;
+        try {
+            const photo = ctx.message.photo[ctx.message.photo.length - 1];
+            const fileId = photo.file_id;
 
-        // In production, upload to S3/storage service
-        const photoUrl = `telegram://photo/${fileId}`;
+            await ctx.reply('⏳ _Обрабатываем фото..._', { parse_mode: 'Markdown' });
 
-        await prisma.$executeRaw`
-            UPDATE employee_registration_requests
-            SET photo_url = ${photoUrl},
-                current_step = 'FULL_NAME'::registration_step
-            WHERE id = ${registration.id}::uuid
-        `;
+            // Optimize and save photo
+            const optimizedPath = await photoOptimizationService.processTelegramPhoto(fileId, 'photos');
+            const photoUrl = optimizedPath;
 
-        await this.saveStepHistory(registration.id, 'PHOTO', { photo_url: photoUrl });
+            await prisma.$executeRaw`
+                UPDATE employee_registration_requests
+                SET photo_url = ${photoUrl},
+                    current_step = 'FULL_NAME'::registration_step,
+                    updated_at = NOW()
+                WHERE id = ${registration.id}
+            `;
 
-        await ctx.reply(
-            `✅ Фото сохранено!\n\n` +
-            `👤 *Шаг 2/11: ФИО*\n\n` +
-            `Введи свои Фамилию, Имя и Отчество в формате:\n` +
-            `_Иванов Иван Иванович_`,
-            { parse_mode: 'Markdown' }
-        );
+            await this.saveStepHistory(registration.id, 'PHOTO', { photo_url: photoUrl });
+
+            await ctx.reply(
+                `✅ Фото сохранено!\n\n` +
+                `👤 *Шаг 2/11: ФИО*\n\n` +
+                `Введи свои Фамилию, Имя и Отчество в формате:\n` +
+                `_Иванов Иван Иванович_`,
+                { parse_mode: 'Markdown' }
+            );
+        } catch (error) {
+            console.error('[EmployeeRegistrationService] Error in handlePhotoStep:', error);
+            await ctx.reply('❌ Ошибка при обработке фото. Попробуй еще раз или отправь другое фото.');
+        }
     }
 
     private async handleFullNameStep(ctx: any, registration: any): Promise<void> {
@@ -259,8 +304,9 @@ export class EmployeeRegistrationService {
             SET first_name = ${firstName},
                 last_name = ${lastName},
                 middle_name = ${middleName},
-                current_step = 'BIRTH_DATE'::registration_step
-            WHERE id = ${registration.id}::uuid
+                current_step = 'BIRTH_DATE'::registration_step,
+                updated_at = NOW()
+            WHERE id = ${registration.id}
         `;
 
         await this.saveStepHistory(registration.id, 'FULL_NAME', {
@@ -311,8 +357,9 @@ export class EmployeeRegistrationService {
         await prisma.$executeRaw`
             UPDATE employee_registration_requests
             SET birth_date = ${birthDate}::date,
-                current_step = 'REG_ADDRESS'::registration_step
-            WHERE id = ${registration.id}::uuid
+                current_step = 'REG_ADDRESS'::registration_step,
+                updated_at = NOW()
+            WHERE id = ${registration.id}
         `;
 
         await this.saveStepHistory(registration.id, 'BIRTH_DATE', { birth_date: birthDate.toISOString() });
@@ -342,8 +389,9 @@ export class EmployeeRegistrationService {
         await prisma.$executeRaw`
             UPDATE employee_registration_requests
             SET registration_address = ${address},
-                current_step = 'RES_ADDRESS'::registration_step
-            WHERE id = ${registration.id}::uuid
+                current_step = 'RES_ADDRESS'::registration_step,
+                updated_at = NOW()
+            WHERE id = ${registration.id}
         `;
 
         await this.saveStepHistory(registration.id, 'REG_ADDRESS', { registration_address: address });
@@ -381,8 +429,9 @@ export class EmployeeRegistrationService {
             UPDATE employee_registration_requests
             SET residential_address = ${address},
                 addresses_match = false,
-                current_step = 'PHONE'::registration_step
-            WHERE id = ${registration.id}::uuid
+                current_step = 'PHONE'::registration_step,
+                updated_at = NOW()
+            WHERE id = ${registration.id}
         `;
 
         await this.saveStepHistory(registration.id, 'RES_ADDRESS', {
@@ -400,8 +449,9 @@ export class EmployeeRegistrationService {
                 UPDATE employee_registration_requests
                 SET residential_address = registration_address,
                     addresses_match = true,
-                    current_step = 'PHONE'::registration_step
-                WHERE id = ${registration.id}::uuid
+                    current_step = 'PHONE'::registration_step,
+                    updated_at = NOW()
+                WHERE id = ${registration.id}
             `;
 
             await this.saveStepHistory(registration.id, 'RES_ADDRESS', { addresses_match: true });
@@ -442,8 +492,9 @@ export class EmployeeRegistrationService {
         await prisma.$executeRaw`
             UPDATE employee_registration_requests
             SET phone = ${phone},
-                current_step = 'EMAIL'::registration_step
-            WHERE id = ${registration.id}::uuid
+                current_step = 'EMAIL'::registration_step,
+                updated_at = NOW()
+            WHERE id = ${registration.id}
         `;
 
         await this.saveStepHistory(registration.id, 'PHONE', { phone });
@@ -474,43 +525,78 @@ export class EmployeeRegistrationService {
         await prisma.$executeRaw`
             UPDATE employee_registration_requests
             SET email = ${email},
-                current_step = 'POSITION'::registration_step
-            WHERE id = ${registration.id}::uuid
+                current_step = 'POSITION'::registration_step,
+                updated_at = NOW()
+            WHERE id = ${registration.id}
         `;
 
         await this.saveStepHistory(registration.id, 'EMAIL', { email });
 
+        await this.promptPositionStep(ctx);
+    }
+
+    private async promptPositionStep(ctx: any): Promise<void> {
+        // Fetch active positions
+        const positions = await prisma.$queryRaw<any[]>`
+            SELECT id, name FROM positions WHERE is_active = true ORDER BY name
+        `;
+
+        if (positions.length === 0) {
+            // Fallback to text if no positions defined
+            await ctx.reply(
+                `💼 *Шаг 8/11: Должность*\n\n` +
+                `Введи должность, на которую устраиваешься:\n` +
+                `_Например: Менеджер по продажам_`,
+                { parse_mode: 'Markdown' }
+            );
+            return;
+        }
+
+        const buttons = positions.map(p => [{
+            text: p.name,
+            callback_data: `position_${p.id}`
+        }]);
+
         await ctx.reply(
-            `✅ Email сохранен!\n\n` +
             `💼 *Шаг 8/11: Должность*\n\n` +
-            `Введи должность, на которую устраиваешься:\n` +
-            `_Например: Менеджер по продажам_`,
-            { parse_mode: 'Markdown' }
+            `Выбери должность из списка:`,
+            {
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: buttons
+                }
+            }
         );
     }
 
     private async handlePositionStep(ctx: any, registration: any): Promise<void> {
-        if (!ctx.message?.text) {
-            await ctx.reply('Пожалуйста, введи текст');
-            return;
-        }
+        await ctx.reply('⚠️ Пожалуйста, выбери должность из списка выше, нажав на кнопку.');
+    }
 
-        const position = ctx.message.text.trim();
+    async handlePositionCallback(ctx: any, registration: any, positionId: string): Promise<void> {
+        const position = await prisma.$queryRaw<any[]>`
+            SELECT name FROM positions WHERE id = ${positionId}
+        `;
 
-        if (position.length < 3) {
-            await ctx.reply('Название должности слишком короткое.');
+        if (position.length === 0) {
+            await ctx.reply('❌ Ошибка: Должность не найдена.');
             return;
         }
 
         await prisma.$executeRaw`
             UPDATE employee_registration_requests
-            SET position = ${position},
-                current_step = 'LOCATION'::registration_step
-            WHERE id = ${registration.id}::uuid
+            SET position = ${position[0].name},
+                current_step = 'LOCATION'::registration_step,
+                updated_at = NOW()
+            WHERE id = ${registration.id}
         `;
 
-        await this.saveStepHistory(registration.id, 'POSITION', { position });
+        await this.saveStepHistory(registration.id, 'POSITION', { positionId, positionName: position[0].name });
 
+        await this.promptLocationStep(ctx, registration);
+    }
+
+    private async promptLocationStep(ctx: any, registration: any): Promise<void> {
         // Fetch available locations
         const locations = await prisma.$queryRaw<any[]>`
             SELECT id, name, city FROM locations WHERE is_active = true ORDER BY name
@@ -520,8 +606,9 @@ export class EmployeeRegistrationService {
             // If no locations, skip to passport scan
             await prisma.$executeRaw`
                 UPDATE employee_registration_requests
-                SET current_step = 'PASSPORT_SCAN'::registration_step
-                WHERE id = ${registration.id}::uuid
+                SET current_step = 'PASSPORT_SCAN'::registration_step,
+                    updated_at = NOW()
+                WHERE id = ${registration.id}
             `;
             await this.promptPassportScanStep(ctx);
             return;
@@ -547,16 +634,16 @@ export class EmployeeRegistrationService {
     }
 
     private async handleLocationStep(ctx: any, registration: any): Promise<void> {
-        // This step is handled via callback query
-        await this.promptPassportScanStep(ctx);
+        await ctx.reply('⚠️ Пожалуйста, выбери локацию из списка выше, нажав на кнопку.');
     }
 
     async handleLocationCallback(ctx: any, registration: any, locationId: string): Promise<void> {
         await prisma.$executeRaw`
             UPDATE employee_registration_requests
-            SET location_id = ${locationId}::uuid,
-                current_step = 'PASSPORT_SCAN'::registration_step
-            WHERE id = ${registration.id}::uuid
+            SET location_id = ${locationId},
+                current_step = 'PASSPORT_SCAN'::registration_step,
+                updated_at = NOW()
+            WHERE id = ${registration.id}
         `;
 
         await this.saveStepHistory(registration.id, 'LOCATION', { location_id: locationId });
@@ -575,46 +662,66 @@ export class EmployeeRegistrationService {
 
     private async handlePassportScanStep(ctx: any, registration: any): Promise<void> {
         if (!ctx.message?.photo && !ctx.message?.document) {
-            await ctx.reply('Пожалуйста, отправь фото или документ');
+            await ctx.reply('⚠️ Пожалуйста, отправь фото или скан документа.');
             return;
         }
 
-        let fileId: string;
-        if (ctx.message.photo) {
-            const photo = ctx.message.photo[ctx.message.photo.length - 1];
-            fileId = photo.file_id;
-        } else {
-            fileId = ctx.message.document.file_id;
-        }
-
-        // In production, upload to S3/storage service
-        const passportUrl = `telegram://file/${fileId}`;
-
-        await prisma.$executeRaw`
-            UPDATE employee_registration_requests
-            SET passport_scan_url = ${passportUrl},
-                current_step = 'DOCUMENTS'::registration_step
-            WHERE id = ${registration.id}::uuid
-        `;
-
-        await this.saveStepHistory(registration.id, 'PASSPORT_SCAN', { passport_scan_url: passportUrl });
-
-        await ctx.reply(
-            `✅ Скан паспорта сохранен!\n\n` +
-            `📎 *Шаг 11/11: Дополнительные документы (опционально)*\n\n` +
-            `Если есть дополнительные документы (дипломы, сертификаты и т.д.), ` +
-            `можешь загрузить их сейчас.\n\n` +
-            `Если нет, нажми "Завершить регистрацию"`,
-            {
-                parse_mode: 'Markdown',
-                reply_markup: {
-                    inline_keyboard: [
-                        [{ text: '✅ Завершить регистрацию', callback_data: 'complete_registration' }],
-                        [{ text: '📎 Загрузить документы', callback_data: 'upload_more_docs' }]
-                    ]
+        try {
+            let fileId: string;
+            if (ctx.message.photo) {
+                const photo = ctx.message.photo[ctx.message.photo.length - 1];
+                fileId = photo.file_id;
+            } else {
+                fileId = ctx.message.document.file_id;
+                // Check mime type if it's a document
+                const mime = ctx.message.document.mime_type;
+                if (mime && !mime.startsWith('image/') && mime !== 'application/pdf') {
+                    await ctx.reply('❌ Неподдерживаемый формат. Пожалуйста, отправь фото (JPG/PNG) или PDF.');
+                    return;
                 }
             }
-        );
+
+            await ctx.reply('⏳ _Сохраняем скан паспорта..._', { parse_mode: 'Markdown' });
+
+            let passportUrl: string;
+            // Only optimize if it's an image
+            if (ctx.message.photo || (ctx.message.document && ctx.message.document.mime_type?.startsWith('image/'))) {
+                passportUrl = await photoOptimizationService.processTelegramPhoto(fileId, 'passports');
+            } else {
+                // For PDF or other documents, just record the TG file reference for now (or we could download it too)
+                passportUrl = `telegram://file/${fileId}`;
+            }
+
+            await prisma.$executeRaw`
+                UPDATE employee_registration_requests
+                SET passport_scan_url = ${passportUrl},
+                    current_step = 'DOCUMENTS'::registration_step,
+                    updated_at = NOW()
+                WHERE id = ${registration.id}
+            `;
+
+            await this.saveStepHistory(registration.id, 'PASSPORT_SCAN', { passport_scan_url: passportUrl });
+
+            await ctx.reply(
+                `✅ Скан паспорта сохранен!\n\n` +
+                `📎 *Шаг 11/11: Дополнительные документы (опционально)*\n\n` +
+                `Если есть дополнительные документы (дипломы, сертификаты и т.д.), ` +
+                `можешь загрузить их сейчас.\n\n` +
+                `Если нет, нажми "Завершить регистрацию"`,
+                {
+                    parse_mode: 'Markdown',
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: '✅ Завершить регистрацию', callback_data: 'complete_registration' }],
+                            [{ text: '📎 Загрузить документы', callback_data: 'upload_more_docs' }]
+                        ]
+                    }
+                }
+            );
+        } catch (error) {
+            console.error('[EmployeeRegistrationService] Error in handlePassportScanStep:', error);
+            await ctx.reply('❌ Ошибка при сохранении паспорта. Попробуй еще раз.');
+        }
     }
 
     private async handleDocumentsStep(ctx: any, registration: any): Promise<void> {
@@ -641,7 +748,7 @@ export class EmployeeRegistrationService {
         // Get current documents
         const current = await prisma.$queryRaw<any[]>`
             SELECT additional_documents FROM employee_registration_requests
-            WHERE id = ${registration.id}::uuid
+            WHERE id = ${registration.id}
         `;
 
         const documents = current[0]?.additional_documents || [];
@@ -654,8 +761,9 @@ export class EmployeeRegistrationService {
 
         await prisma.$executeRaw`
             UPDATE employee_registration_requests
-            SET additional_documents = ${JSON.stringify(documents)}::jsonb
-            WHERE id = ${registration.id}::uuid
+            SET additional_documents = ${JSON.stringify(documents)}::jsonb,
+                updated_at = NOW()
+            WHERE id = ${registration.id}
         `;
 
         await ctx.reply(
@@ -681,7 +789,7 @@ export class EmployeeRegistrationService {
             SET status = 'REVIEW'::registration_status,
                 current_step = 'COMPLETED'::registration_step,
                 completed_at = NOW()
-            WHERE id = ${registration.id}::uuid
+            WHERE id = ${registration.id}
         `;
 
         await this.saveStepHistory(registration.id, 'COMPLETED', { completed: true });
@@ -718,8 +826,15 @@ export class EmployeeRegistrationService {
      */
     private async saveStepHistory(registrationId: string, step: string, data: any): Promise<void> {
         await prisma.$executeRaw`
-            INSERT INTO registration_step_history (registration_id, step, data)
-            VALUES (${registrationId}::uuid, ${step}::registration_step, ${JSON.stringify(data)}::jsonb)
+            INSERT INTO registration_step_history (
+                id, registration_id, step, data, completed_at
+            ) VALUES (
+                ${randomUUID()},
+                ${registrationId},
+                ${step}::registration_step,
+                ${JSON.stringify(data)}::jsonb,
+                NOW()
+            );
         `;
     }
 
@@ -778,9 +893,13 @@ export class EmployeeRegistrationService {
      * Approve registration and create user account
      * CRITICAL: Emits employee.onboarded event for Module 33 integration
      */
-    async approveRegistration(registrationId: string, reviewedByUserId: string): Promise<void> {
+    async approveRegistration(
+        registrationId: string,
+        reviewedByUserId: string,
+        overrides?: { departmentId?: string; locationId?: string }
+    ): Promise<void> {
         const registration = await prisma.$queryRaw<any[]>`
-            SELECT * FROM employee_registration_requests WHERE id = ${registrationId}::uuid
+            SELECT * FROM employee_registration_requests WHERE id = ${registrationId}
         `;
 
         if (registration.length === 0) {
@@ -795,11 +914,23 @@ export class EmployeeRegistrationService {
             throw new Error('Registration already approved');
         }
 
+        // SECURITY: Generate secure token for password setup instead of temp password
+        // @ts-ignore
+        const resetToken = randomUUID();
+        const tokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+
+        // Random unguessable password hash
+        // @ts-ignore
+        const dummyPassword = randomUUID();
+        const hashedPassword = await bcrypt.hash(dummyPassword, 12);
+
+        const departmentId = overrides?.departmentId || reg.department_id;
+
         // Create user account
         const user = await prisma.user.create({
             data: {
                 email: reg.email,
-                password_hash: '$2b$12$temporaryPasswordHash', // User should reset password
+                password_hash: hashedPassword,
                 first_name: reg.first_name,
                 last_name: reg.last_name,
                 middle_name: reg.middle_name,
@@ -807,15 +938,26 @@ export class EmployeeRegistrationService {
                 telegram_id: reg.telegram_id,
                 role: 'EMPLOYEE',
                 status: 'ACTIVE',
-                department_id: reg.department_id
+                department_id: departmentId,
+                // @ts-ignore
+                must_reset_password: true,
+                // @ts-ignore
+                reset_password_token: resetToken,
+                // @ts-ignore
+                reset_token_expires_at: tokenExpiresAt,
+                // @ts-ignore
+                foundation_status: 'NOT_STARTED'
             }
         });
+
+        // Send Set Password Link via Email
+        await emailService.sendPasswordSetupLink(reg.email, resetToken);
 
         // Create employee record
         const employee = await prisma.employee.create({
             data: {
                 user_id: user.id,
-                department_id: reg.department_id,
+                department_id: departmentId,
                 position: reg.position,
                 hire_date: new Date()
             }
@@ -825,15 +967,15 @@ export class EmployeeRegistrationService {
         await prisma.$executeRaw`
             UPDATE employee_registration_requests
             SET status = 'APPROVED'::registration_status,
-                reviewed_by = ${reviewedByUserId}::uuid,
-                reviewed_at = NOW()
-            WHERE id = ${registrationId}::uuid
+                reviewed_by = ${reviewedByUserId},
+                reviewed_at = NOW(),
+                updated_at = NOW(),
+                department_id = ${departmentId},
+                location_id = ${overrides?.locationId ? overrides.locationId : reg.location_id}
+            WHERE id = ${registrationId}
         `;
 
         // CRITICAL: Emit employee.onboarded event
-        // This triggers:
-        // 1. EmployeeOnboardedListener (Module 33) -> PersonalFile creation
-        // 2. UniversityOnboardingListener (Module 13) -> Learning context initialization
         this.eventEmitter.emit('employee.onboarded', {
             employeeId: employee.id,
             userId: user.id,
@@ -853,8 +995,7 @@ export class EmployeeRegistrationService {
                 `🎉 *Поздравляем!*\n\n` +
                 `Твоя регистрация одобрена!\n\n` +
                 `Добро пожаловать в команду MatrixGin! 🚀\n\n` +
-                `Теперь ты можешь использовать все функции системы. ` +
-                `Временный пароль для входа отправлен на email: ${reg.email}`,
+                `На твой Email (${reg.email}) отправлена ссылка для установки пароля.`,
                 { parse_mode: 'Markdown' }
             );
         }
@@ -869,7 +1010,7 @@ export class EmployeeRegistrationService {
         reason: string
     ): Promise<void> {
         const registration = await prisma.$queryRaw<any[]>`
-            SELECT telegram_id FROM employee_registration_requests WHERE id = ${registrationId}::uuid
+            SELECT telegram_id FROM employee_registration_requests WHERE id = ${registrationId}
         `;
 
         if (registration.length === 0) {
@@ -879,10 +1020,11 @@ export class EmployeeRegistrationService {
         await prisma.$executeRaw`
             UPDATE employee_registration_requests
             SET status = 'REJECTED'::registration_status,
-                reviewed_by = ${reviewedByUserId}::uuid,
+                reviewed_by = ${reviewedByUserId},
                 reviewed_at = NOW(),
-                rejection_reason = ${reason}
-            WHERE id = ${registrationId}::uuid
+                rejection_reason = ${reason},
+                updated_at = NOW()
+            WHERE id = ${registrationId}
         `;
 
         // Notify employee about rejection

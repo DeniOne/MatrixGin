@@ -163,6 +163,8 @@ export class EmployeeService {
                 createdAt: emp.user.created_at.toISOString(),
                 updatedAt: emp.user.updated_at.toISOString(),
                 personalDataConsent: emp.user.personal_data_consent,
+                mustResetPassword: (emp.user as any).must_reset_password || false,
+                foundationStatus: (emp.user as any).foundation_status || 'NOT_STARTED',
             },
             department: emp.department ? {
                 id: emp.department.id,

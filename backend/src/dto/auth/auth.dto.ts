@@ -138,6 +138,13 @@ export class UserResponseDto {
 
     @IsBoolean()
     personalDataConsent: boolean;
+
+    @IsBoolean()
+    mustResetPassword: boolean;
+
+    @IsOptional()
+    @IsString()
+    foundationStatus?: 'NOT_STARTED' | 'IN_PROGRESS' | 'ACCEPTED';
 }
 
 /**

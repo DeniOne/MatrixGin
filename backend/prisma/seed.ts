@@ -899,92 +899,89 @@ async function main() {
             console.log(`  ✅ Assigned PHOTON status to ${usersWithoutStatus.length} users`);
         }
     }
-    console.log(`  ✅ Assigned PHOTON status to ${usersWithoutStatus.length} users`);
-}
+
+    // ==========================================================================
+    // CORPORATE UNIVERSITY - Seed Foundational Bundle (Priority 1)
+    // ==========================================================================
+
+    console.log('\n📋 Seeding Mandatory Foundational Bundle...');
+
+    const valuesAcademy = await prisma.academy.findFirst({
+        where: { name: 'Values & Culture Academy' }
+    });
+
+    if (valuesAcademy) {
+        const foundationalCourses = [
+            {
+                title: 'Конституция',
+                description: 'Основной закон и принципы фотоматрицы. Системное мировоззрение.',
+                academy_id: valuesAcademy.id,
+                type: 'FOUNDATIONAL' as const,
+                is_mandatory: true,
+                required_grade: 'INTERN' as const,
+                recognition_mc: 100,
+                target_metric: 'QUALITY' as const,
+                expected_effect: 'Понимание системных правил',
+                scope: 'GENERAL' as const
+            },
+            {
+                title: 'Кодекс',
+                description: 'Свод правил поведения, чести и профессиональных стандартов.',
+                academy_id: valuesAcademy.id,
+                type: 'FOUNDATIONAL' as const,
+                is_mandatory: true,
+                required_grade: 'INTERN' as const,
+                recognition_mc: 100,
+                target_metric: 'QUALITY' as const,
+                expected_effect: 'Соблюдение профессиональных стандартов',
+                scope: 'GENERAL' as const
+            },
+            {
+                title: 'Этика / Границы',
+                description: 'Нормы общения, субординация и границы ответственности.',
+                academy_id: valuesAcademy.id,
+                type: 'FOUNDATIONAL' as const,
+                is_mandatory: true,
+                required_grade: 'INTERN' as const,
+                recognition_mc: 100,
+                target_metric: 'QUALITY' as const,
+                expected_effect: 'Экологичное общение и взаимодействие',
+                scope: 'GENERAL' as const
+            }
+        ];
+
+        for (const course of foundationalCourses) {
+            // Check if exists by title
+            const existing = await prisma.course.findFirst({
+                where: { title: course.title }
+            });
+
+            if (!existing) {
+                await prisma.course.create({
+                    data: course
+                });
+                console.log(`  ✅ Created Foundational Course: ${course.title}`);
+            } else {
+                // Update to ensure it's foundational and mandatory
+                await prisma.course.update({
+                    where: { id: existing.id },
+                    data: {
+                        type: 'FOUNDATIONAL',
+                        is_mandatory: true
+                    }
+                });
+                console.log(`  🔄 Updated Foundational Course: ${course.title}`);
+            }
+        }
+        console.log('✅ Foundational Bundle seeded.');
+    } else {
+        console.error('⚠️ Values & Culture Academy not found! Skipping foundational courses.');
     }
 
-// ==========================================================================
-// CORPORATE UNIVERSITY - Seed Foundational Bundle (Priority 1)
-// ==========================================================================
-
-console.log('\n📋 Seeding Mandatory Foundational Bundle...');
-
-const valuesAcademy = await prisma.academy.findFirst({
-    where: { name: 'Values & Culture Academy' }
-});
-
-if (valuesAcademy) {
-    const foundationalCourses = [
-        {
-            title: 'Конституция',
-            description: 'Основной закон и принципы фотоматрицы. Системное мировоззрение.',
-            academy_id: valuesAcademy.id,
-            type: 'FOUNDATIONAL' as const,
-            is_mandatory: true,
-            required_grade: 'INTERN' as const,
-            recognition_mc: 100,
-            target_metric: 'QUALITY' as const,
-            expected_effect: 'Понимание системных правил',
-            scope: 'GENERAL' as const
-        },
-        {
-            title: 'Кодекс',
-            description: 'Свод правил поведения, чести и профессиональных стандартов.',
-            academy_id: valuesAcademy.id,
-            type: 'FOUNDATIONAL' as const,
-            is_mandatory: true,
-            required_grade: 'INTERN' as const,
-            recognition_mc: 100,
-            target_metric: 'QUALITY' as const,
-            expected_effect: 'Соблюдение профессиональных стандартов',
-            scope: 'GENERAL' as const
-        },
-        {
-            title: 'Этика / Границы',
-            description: 'Нормы общения, субординация и границы ответственности.',
-            academy_id: valuesAcademy.id,
-            type: 'FOUNDATIONAL' as const,
-            is_mandatory: true,
-            required_grade: 'INTERN' as const,
-            recognition_mc: 100,
-            target_metric: 'QUALITY' as const,
-            expected_effect: 'Экологичное общение и взаимодействие',
-            scope: 'GENERAL' as const
-        }
-    ];
-
-    for (const course of foundationalCourses) {
-        // Check if exists by title
-        const existing = await prisma.course.findFirst({
-            where: { title: course.title }
-        });
-
-        if (!existing) {
-            await prisma.course.create({
-                data: course
-            });
-            console.log(`  ✅ Created Foundational Course: ${course.title}`);
-        } else {
-            // Update to ensure it's foundational and mandatory
-            await prisma.course.update({
-                where: { id: existing.id },
-                data: {
-                    type: 'FOUNDATIONAL',
-                    is_mandatory: true
-                }
-            });
-            console.log(`  🔄 Updated Foundational Course: ${course.title}`);
-        }
-    }
-    console.log('✅ Foundational Bundle seeded.');
-} else {
-    console.error('⚠️ Values & Culture Academy not found! Skipping foundational courses.');
-}
-
-console.log('\n🎉 Seeding completed successfully!');
-console.log('\nAdmin credentials:');
-console.log('Email: admin@photomatrix.ru');
-console.log('Password: Admin123!');
+    console.log('\n🎉 Seeding completed successfully!');
+    console.log('\nAdmin credentials:');
+    console.log('Email: admin@photomatrix.ru');
+    console.log('Password: Admin123!');
 }
 
 main()

@@ -1,5 +1,5 @@
 import { prisma } from '../config/prisma';
-import { FOUNDATION_BLOCKS, FOUNDATION_VERSION, FoundationBlockType } from '../config/foundation.constants';
+import { FOUNDATION_BLOCKS, FOUNDATION_VERSION, FoundationBlockType, FoundationStatus } from '../config/foundation.constants';
 import { FoundationDecision } from '@prisma/client';
 import { logger } from '../config/logger';
 
@@ -27,14 +27,19 @@ export class FoundationService {
         const isAccepted = acceptance?.decision === FoundationDecision.ACCEPTED;
         const isVersionMatch = acceptance?.version === FOUNDATION_VERSION;
 
-        // 2. Calculate Block Progress (from Audit Log)
-        // We look for 'BLOCK_VIEWED' events for the current version
+        // 2. Fetch Materials for content
+        const materialIds = FOUNDATION_BLOCKS.map(b => b.materialId);
+        const materials = await prisma.material.findMany({
+            where: { id: { in: materialIds } },
+            select: { id: true, content_text: true, content_url: true, is_video_required: true }
+        });
+        const materialMap = new Map(materials.map(m => [m.id, { text: m.content_text, url: m.content_url, required: m.is_video_required }]));
+
+        // 3. Calculate Block Progress (from Audit Log)
         const blockLogs = await prisma.foundationAuditLog.findMany({
             where: {
                 user_id: userId,
                 event_type: 'BLOCK_VIEWED',
-                // Optional: filter by version in metadata if we want strict versioning on blocks
-                // For now, allow any view, but cleaner to check metadata path
             },
             select: { metadata: true }
         });
@@ -48,18 +53,38 @@ export class FoundationService {
             }
         });
 
-        const blocks = FOUNDATION_BLOCKS.map(block => ({
-            ...block,
-            status: viewedBlockIds.has(block.id) ? 'COMPLETED' : 'LOCKED' // or OPEN based on order
-        }));
+        const blocks = FOUNDATION_BLOCKS.map(block => {
+            const material = materialMap.get(block.materialId);
 
-        // Basic sequential locking logic for frontend convenience
-        // If order N is not completed, N+1 is locked.
+            // Critical Methodology Check: If video is required but content_url is missing
+            const isMethodologyViolated = material?.required && !material?.url;
+
+            return {
+                ...block,
+                contentText: material?.text || '',
+                videoUrl: material?.url || undefined,
+                isVideoRequired: material?.required || false,
+                isMethodologyViolated
+            };
+        });
+
+        // 4. Final state calculation
+        let status: FoundationStatus = FoundationStatus.NOT_STARTED;
+
+        if (isAccepted) {
+            status = isVersionMatch ? FoundationStatus.ACCEPTED : FoundationStatus.VERSION_MISMATCH;
+        } else if (viewedBlockIds.size > 0) {
+            status = FoundationStatus.IN_PROGRESS;
+        }
+
+        // Sequential locking logic
         let previousCompleted = true;
-        const blocksWithLocking = blocks.map(block => {
-            const isCompleted = block.status === 'COMPLETED';
-            const isUnlocked = previousCompleted;
-            if (!isCompleted) previousCompleted = false; // Next one will be locked
+        const blocksWithLocking = blocks.map((block, index) => {
+            const isCompleted = viewedBlockIds.has(block.id);
+            // Block is unlocked if previously completed OR if it's the 1st block OR if already accepted
+            const isUnlocked = index === 0 || previousCompleted || isAccepted;
+
+            if (!isCompleted) previousCompleted = false;
 
             return {
                 ...block,
@@ -69,11 +94,11 @@ export class FoundationService {
         });
 
         return {
-            accepted: isAccepted && isVersionMatch,
-            acceptanceRecord: acceptance,
+            status,
             currentVersion: FOUNDATION_VERSION,
             blocks: blocksWithLocking,
-            canAccept: viewedBlockIds.size === FOUNDATION_BLOCKS.length
+            canAccept: viewedBlockIds.size === FOUNDATION_BLOCKS.length,
+            acceptedAt: acceptance?.accepted_at?.toISOString()
         };
     }
 
@@ -118,6 +143,18 @@ export class FoundationService {
                     userAgent: 'API' // Context could be passed
                 }
             }
+        });
+
+        // Sync User status to IN_PROGRESS if not already
+        // @ts-ignore
+        await prisma.user.updateMany({
+            where: {
+                id: userId,
+                // @ts-ignore
+                foundation_status: 'NOT_STARTED'
+            },
+            // @ts-ignore
+            data: { foundation_status: 'IN_PROGRESS' }
         });
 
         return { success: true };

@@ -2,9 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { logger } from '../config/logger';
 
+import { FOUNDATION_VERSION } from '../config/foundation.constants';
+
 const prisma = new PrismaClient();
-// TODO: Load from config
-const ACTIVE_FOUNDATION_VERSION = 'v1.0';
+const ACTIVE_FOUNDATION_VERSION = FOUNDATION_VERSION;
 
 /**
  * FoundationMiddleware (Express)

@@ -81,17 +81,45 @@ export const MENU_CONFIG: MenuCluster[] = [
     // B. UNIVERSITY
     {
         id: 'university',
-        title: 'КОРПОРАТИВНЫЙ УНИВЕРСИТЕТ',
+        title: 'РАЗВИТИЕ (УНИВЕРСИТЕТ)',
         icon: 'BookOutlined',
         emulatedRoles: [EmulatedRole.EMPLOYEE, EmulatedRole.TACTICAL, EmulatedRole.STRATEGIC, EmulatedRole.SUPERUSER],
         items: [
-            { label: 'Каталог программ', path: '/university', icon: 'ReadOutlined' },
-            { label: 'Мое обучение', path: '/my-courses', icon: 'SolutionOutlined' },
             {
-                label: 'Кабинет тренера',
-                path: '/university/trainer/dashboard',
-                icon: 'ExperimentOutlined',
-                roles: [UserRole.TRAINER, UserRole.ADMIN, UserRole.HR_MANAGER]
+                label: 'Контур Допуска',
+                path: '/foundation/start',
+                icon: 'SafetyCertificateOutlined' // Canonical semantic for Admission 
+            },
+            {
+                label: 'Центры обучения (Академии)',
+                path: '/university',
+                icon: 'ApartmentOutlined'
+            },
+            {
+                label: 'Мое обучение',
+                path: '/my-courses',
+                icon: 'SolutionOutlined'
+            },
+            {
+                label: 'Квалификация и Рост',
+                path: '/gamification/status',
+                icon: 'TrophyOutlined'
+            },
+            {
+                label: 'Библиотечный фонд',
+                path: '/library',
+                icon: 'BookOutlined'
+            },
+            {
+                label: 'УПРАВЛЕНИЕ ОБУЧЕНИЕМ',
+                path: '/university/admin',
+                icon: 'SettingOutlined',
+                roles: [UserRole.TRAINER, UserRole.ADMIN, UserRole.HR_MANAGER],
+                children: [
+                    { label: 'Кабинет тренера', path: '/university/trainer/dashboard' },
+                    { label: 'Аналитика обучения', path: '/university/admin/analytics' },
+                    { label: 'Безопасность (Аудит)', path: '/university/admin/security' }
+                ]
             }
         ]
     },
@@ -147,7 +175,7 @@ export const MENU_CONFIG: MenuCluster[] = [
                     { label: 'Трудовые договоры', path: '/personnel/contracts' }
                 ]
             },
-            { label: 'Регистрация заявок', path: '/employee-registration', icon: 'UserAddOutlined' },
+            { label: 'Регистрация заявок', path: '/personnel/registration', icon: 'UserAddOutlined' },
             {
                 label: 'Оргструктура и ЦКП',
                 path: '/ofs',

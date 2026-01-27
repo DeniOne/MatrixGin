@@ -145,12 +145,35 @@ class TelegramService {
                     { parse_mode: 'Markdown', ...this.getMainMenuKeyboard() }
                 );
             } else {
-                await ctx.reply(
-                    `👋 Добро пожаловать в MatrixGin!\n\n` +
-                    `Для начала работы необходимо привязать ваш Telegram аккаунт.\n\n` +
-                    `Ваш Telegram ID: \`${telegramId}\``,
-                    { parse_mode: 'Markdown' }
-                );
+                // SECURITY: Self-Registration with Anti-Fraud check
+                const existingRequest = await prisma.$queryRaw<any[]>`
+                    SELECT id FROM employee_registration_requests 
+                    WHERE telegram_id = ${telegramId} 
+                    AND status IN ('PENDING'::registration_status, 'IN_PROGRESS'::registration_status)
+                `;
+
+                if (existingRequest.length > 0) {
+                    await ctx.reply(
+                        `⚠️ *У вас уже есть активная заявка на регистрацию.*\n\n` +
+                        `Пожалуйста, завершите её или дождитесь решения администратора.`,
+                        { parse_mode: 'Markdown' }
+                    );
+                } else {
+                    await ctx.reply(
+                        `👋 Добро пожаловать в MatrixGin!\n\n` +
+                        `Вы не найдены в системе.\n` +
+                        `Если вы сотрудник, нажмите кнопку ниже для начала регистрации.\n\n` +
+                        `Ваш Telegram ID: \`${telegramId}\``,
+                        {
+                            parse_mode: 'Markdown',
+                            reply_markup: {
+                                inline_keyboard: [[
+                                    { text: '📝 Начать регистрацию', callback_data: 'start_registration' }
+                                ]]
+                            }
+                        }
+                    );
+                }
             }
         });
 
@@ -360,6 +383,15 @@ class TelegramService {
             }
             await ctx.answerCbQuery();
             return;
+        } else if (data.startsWith('position_')) {
+            const positionId = data.replace('position_', '');
+            const telegramId = ctx.from?.id.toString();
+            const registration = await employeeRegistrationService.getRegistrationByTelegramId(telegramId);
+            if (registration) {
+                await employeeRegistrationService.handlePositionCallback(ctx, registration, positionId);
+            }
+            await ctx.answerCbQuery();
+            return;
         } else if (data.startsWith('location_')) {
             const locationId = data.replace('location_', '');
             const telegramId = ctx.from?.id.toString();
@@ -376,6 +408,14 @@ class TelegramService {
                 await employeeRegistrationService.completeRegistration(ctx, registration);
             }
             await ctx.answerCbQuery();
+            return;
+        } else if (data.startsWith('approve_login_')) {
+            const sessionId = data.replace('approve_login_', '');
+            await this.handleLoginDecision(ctx, sessionId, 'APPROVED');
+            return;
+        } else if (data.startsWith('reject_login_')) {
+            const sessionId = data.replace('reject_login_', '');
+            await this.handleLoginDecision(ctx, sessionId, 'REJECTED');
             return;
         } else if (data === 'upload_more_docs') {
             await ctx.reply('Отправь документ или фото документа.');
@@ -684,6 +724,58 @@ class TelegramService {
         } catch (error) {
             console.error('Error sending Telegram notification:', error);
             return false;
+        }
+    }
+
+    /**
+     * Send Login Approval Push to user.
+     */
+    public async sendLoginPush(sessionId: string, telegramId: string, ip?: string): Promise<boolean> {
+        if (!this.bot) return false;
+
+        const message =
+            `🔐 *Запрос на вход в MatrixGin*\n\n` +
+            `Кто-то пытается войти в систему под вашим именем.\n` +
+            (ip ? `📍 IP: \`${ip}\`\n` : '') +
+            `Это вы?`;
+
+        const keyboard = Markup.inlineKeyboard([
+            [
+                Markup.button.callback('✅ Да, это я', `approve_login_${sessionId}`),
+                Markup.button.callback('❌ Нет, это не я', `reject_login_${sessionId}`)
+            ]
+        ]);
+
+        try {
+            await this.bot.telegram.sendMessage(telegramId, message, { parse_mode: 'Markdown', ...keyboard });
+            return true;
+        } catch (error) {
+            console.error('Error sending Login Push:', error);
+            return false;
+        }
+    }
+
+    private async handleLoginDecision(ctx: any, sessionId: string, status: 'APPROVED' | 'REJECTED'): Promise<void> {
+        try {
+            const session = await prisma.authSession.findUnique({ where: { id: sessionId } });
+            if (!session || session.status !== 'PENDING') {
+                await ctx.editMessageText('⚠️ Срок действия этого запроса истек.');
+                return;
+            }
+
+            await prisma.authSession.update({
+                where: { id: sessionId },
+                data: { status: status as any }
+            });
+
+            if (status === 'APPROVED') {
+                await ctx.editMessageText('✅ Вход разрешен. Вы можете вернуться в браузер.');
+            } else {
+                await ctx.editMessageText('❌ Вход отклонен.');
+            }
+        } catch (error) {
+            console.error('Error handling login decision:', error);
+            await ctx.reply('❌ Ошибка при обработке решения.');
         }
     }
 

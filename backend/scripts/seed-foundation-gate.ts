@@ -5,7 +5,8 @@ import * as crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
-const FOUNDATION_PATH = path.join(__dirname, '../../documentation/01-modules/13-Corporate-University/University structure/FOUNDATIONAL');
+const DOCUMENTATION_PATH = path.join(__dirname, '../../documentation/01-modules/13-Corporate-University/University structure/FOUNDATIONAL');
+const VIDEO_PATH = path.join(process.cwd(), '../content/videos/foundation');
 const VERSION = 'v2.2-canon';
 
 const BLOCKS = [
@@ -22,18 +23,29 @@ async function main() {
     // 1. Read files and calculate combined hash
     let combinedContent = '';
     const materialsData = BLOCKS.map((block, index) => {
-        const filePath = path.join(FOUNDATION_PATH, block.file);
-        if (!fs.existsSync(filePath)) {
-            throw new Error(`File not found: ${filePath}`);
+        const order = index + 1;
+        const textFilePath = path.join(DOCUMENTATION_PATH, block.file);
+
+        if (!fs.existsSync(textFilePath)) {
+            throw new Error(`Text file not found: ${textFilePath}`);
         }
-        const content = fs.readFileSync(filePath, 'utf-8');
+
+        const content = fs.readFileSync(textFilePath, 'utf-8');
         combinedContent += content;
 
+        // CANON Search for Video: BLOCK_01 -> content/videos/foundation/block-01.mp4
+        const videoFileName = `block-${order.toString().padStart(2, '0')}.mp4`;
+        const videoFilePath = path.join(VIDEO_PATH, videoFileName);
+        const relativeVideoPath = fs.existsSync(videoFilePath)
+            ? `/content/videos/foundation/${videoFileName}`
+            : null;
+
         return {
-            order: index + 1,
+            order,
             title: block.title,
             content: content,
-            file: block.file
+            file: block.file,
+            videoUrl: relativeVideoPath
         };
     });
 
@@ -94,6 +106,8 @@ async function main() {
             update: {
                 title: data.title,
                 content_text: data.content,
+                content_url: data.videoUrl,
+                is_video_required: true, // Methodology Enforcement
                 academy_id: academy.id,
                 status: 'PUBLISHED',
                 version: 2, // Canon 2.2
@@ -103,6 +117,8 @@ async function main() {
                 id: materialId,
                 title: data.title,
                 content_text: data.content,
+                content_url: data.videoUrl,
+                is_video_required: true, // Methodology Enforcement
                 type: 'TEXT',
                 academy_id: academy.id,
                 status: 'PUBLISHED',

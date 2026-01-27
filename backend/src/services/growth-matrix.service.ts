@@ -55,11 +55,10 @@ export class GrowthMatrixService {
         const capitalScore = Math.min((mcBalance / 5000) * 100, 100); // 5000 MC as a soft-cap per level
 
         return [
-            { axis: 'Компетенции', value: Math.round(competencyScore), fullMark: 100 },
-            { axis: 'Заработок', value: Math.round(earningsScore), fullMark: 100 },
-            { axis: 'Статус', value: Math.round(statusScore), fullMark: 100 },
-            { axis: 'Активность', value: Math.round(activityScore), fullMark: 100 },
-            { axis: 'Капитал', value: Math.round(capitalScore), fullMark: 100 }
+            { axis: 'Качество', value: Math.round(activityScore), fullMark: 100 },
+            { axis: 'Скорость', value: Math.round(earningsScore), fullMark: 100 },
+            { axis: 'Продажи', value: Math.round(capitalScore), fullMark: 100 },
+            { axis: 'Команда', value: Math.round(statusScore), fullMark: 100 }
         ];
     }
 }

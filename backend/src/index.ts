@@ -1,6 +1,9 @@
-import 'reflect-metadata'; // Required for class-transformer/validator
-import express from 'express';
 import dotenv from 'dotenv';
+dotenv.config();
+
+import path from 'path';
+import 'reflect-metadata';
+import express from 'express';
 import passport from 'passport';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
@@ -37,6 +40,7 @@ import aiOpsRoutes from './ai-ops/ai-ops.routes';
 import adaptationRoutes from './routes/adaptation.routes';
 import managerToolsRoutes from './routes/manager-tools.routes';
 import statusRoutes from './routes/status.routes';
+import foundationRoutes from './routes/foundation.routes';
 import { universityEventDispatcher } from './events/university-event.dispatcher';
 
 
@@ -44,8 +48,6 @@ import { universityEventDispatcher } from './events/university-event.dispatcher'
 (BigInt.prototype as any).toJSON = function () {
     return this.toString();
 };
-
-dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -63,18 +65,27 @@ app.use(cors({
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 100, // limit each IP to 100 requests per windowMs
+    handler: (req, res, next, options) => {
+        res.status(options.statusCode).json({ message: options.message });
+    },
     message: 'Too many requests from this IP, please try again later.'
 });
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // limit each IP to 5 requests per windowMs
+    max: 100, // limit each IP to 100 requests per windowMs
+    handler: (req, res, next, options) => {
+        res.status(options.statusCode).json({ message: options.message });
+    },
     message: 'Too many authentication attempts, please try again later.'
 });
 
 const telegramLimiter = rateLimit({
     windowMs: 1 * 60 * 1000, // 1 minute
     max: 60, // 60 requests per minute
+    handler: (req, res, next, options) => {
+        res.status(options.statusCode).json({ message: options.message });
+    },
     message: 'Too many Telegram updates from this IP.'
 });
 
@@ -84,6 +95,8 @@ app.use(auditLogMiddleware);
 
 // Middleware
 app.use(express.json());
+app.use('/content', express.static(path.join(__dirname, '../../content')));
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 app.use(passport.initialize());
 passport.use(jwtStrategy);
 
@@ -123,6 +136,7 @@ app.use('/api/ai-ops', aiOpsRoutes);
 app.use('/api/adaptation', adaptationRoutes);
 app.use('/api/manager', managerToolsRoutes);
 app.use('/api/status', statusRoutes);
+app.use('/api/foundation', foundationRoutes);
 
 app.get('/', (req, res) => {
     res.send('MatrixGin v2.0 API');

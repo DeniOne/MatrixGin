@@ -73,7 +73,7 @@ export const growthApi = createApi({
     }),
     endpoints: (builder) => ({
         getGrowthPulse: builder.query<GrowthPulse[], void>({
-            query: () => 'growth-matrix/pulse',
+            query: () => 'adaptation/pulse',
         }),
         getAdaptationStatus: builder.query<AdaptationData, void>({
             query: () => 'adaptation/my',

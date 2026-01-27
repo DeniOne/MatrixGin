@@ -13,6 +13,7 @@ import { ResultPage } from './pages/foundation/ResultPage';
 // Main App Pages
 import DashboardPage from './pages/DashboardPage';
 import LoginPage from './pages/LoginPage';
+import ChangePasswordPage from './pages/ChangePasswordPage';
 import TasksPage from './pages/TasksPage';
 import TaskDetailsPage from './pages/TaskDetailsPage';
 import OFSPage from './pages/OFSPage';
@@ -63,6 +64,7 @@ import {
     OrdersListPage,
     ContractsListPage,
     HRDashboardPage,
+    RegistrationRequestsPage
 } from './pages/personnel';
 
 // Layout wrapper that shows sidebar except on login page
@@ -85,6 +87,7 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 import { RequireAuth } from './components/auth/RequireAuth';
+import { FoundationGuard } from './components/auth/FoundationGuard';
 
 // ... other imports ...
 
@@ -93,6 +96,7 @@ const AppRoutes: React.FC = () => {
         <Routes>
             {/* PUBLIC ROUTE */}
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/change-password" element={<RequireAuth><ChangePasswordPage /></RequireAuth>} />
 
             {/* ISOLATED REGISTRY MODULE (Protected?) - Assuming Protected for now */}
             <Route path="/registry" element={<RequireAuth><RegistryLayout /></RequireAuth>}>
@@ -114,70 +118,77 @@ const AppRoutes: React.FC = () => {
             {/* MAIN APPLICATION (Protected) */}
             <Route path="*" element={
                 <RequireAuth>
-                    <AppLayout>
-                        <Routes>
-                            {/* Login moved out, but keep here if lazy routing requires it? No, duplicate routes are bad. Remove Login from here. */}
-                            <Route path="/" element={<DashboardPage />} />
-                            <Route path="/manager" element={<ManagerDashboard />} />
-                            <Route path="/employees" element={<EmployeesPage />} />
-                            <Route path="/profile" element={<EmployeeProfilePage />} />
-                            <Route path="/departments" element={<OFSPage />} />
-                            <Route path="/tasks" element={<TasksPage />} />
-                            <Route path="/tasks/:id" element={<TaskDetailsPage />} />
-                            <Route path="/ofs" element={<ExecutiveOFSPage />} />
-                            <Route path="/ofs/legacy" element={<OFSPage />} />
-                            <Route path="/university" element={<UniversityPage />} />
-                            <Route path="/my-courses" element={<MyCoursesPage />} />
-                            <Route path="/university/course/:enrollmentId" element={<CourseReaderPage />} />
-                            <Route path="/university/trainer/dashboard" element={<TrainerDashboardPage />} />
-                            <Route path="/university/admin/security" element={<UniversitySecurityDashboard />} />
-                            <Route path="/university/admin/analytics" element={<UniversityAnalyticsDashboard />} />
-                            {/* Gamification routes */}
-                            <Route path="/gamification" element={<LeaderboardPage />} />
-                            <Route path="/gamification/leaderboard" element={<LeaderboardPage />} />
-                            <Route path="/gamification/achievements" element={<AchievementsGallery />} />
-                            <Route path="/gamification/status" element={<StatusProgressCard />} />
-                            <Route path="/gamification/quests" element={<QuestTracker />} />
-                            {/* Analytics routes */}
-                            <Route path="/analytics/personal" element={<PersonalAnalyticsPage />} />
-                            <Route path="/analytics/executive" element={<ExecutiveAnalyticsPage />} />
+                    <FoundationGuard>
+                        <AppLayout>
+                            <Routes>
+                                {/* Login moved out, but keep here if lazy routing requires it? No, duplicate routes are bad. Remove Login from here. */}
+                                <Route path="/" element={<DashboardPage />} />
+                                <Route path="/manager" element={<ManagerDashboard />} />
+                                <Route path="/employees" element={<EmployeesPage />} />
+                                <Route path="/profile" element={<EmployeeProfilePage />} />
+                                <Route path="/departments" element={<OFSPage />} />
+                                <Route path="/tasks" element={<TasksPage />} />
+                                <Route path="/tasks/:id" element={<TaskDetailsPage />} />
+                                <Route path="/ofs" element={<ExecutiveOFSPage />} />
+                                <Route path="/ofs/legacy" element={<OFSPage />} />
+                                <Route path="/university" element={<UniversityPage />} />
+                                <Route path="/my-courses" element={<MyCoursesPage />} />
+                                <Route path="/university/course/:enrollmentId" element={<CourseReaderPage />} />
+                                <Route path="/university/trainer/dashboard" element={<TrainerDashboardPage />} />
+                                <Route path="/university/admin/security" element={<UniversitySecurityDashboard />} />
+                                <Route path="/university/admin/analytics" element={<UniversityAnalyticsDashboard />} />
+                                {/* Gamification routes */}
+                                <Route path="/gamification" element={<LeaderboardPage />} />
+                                <Route path="/gamification/leaderboard" element={<LeaderboardPage />} />
+                                <Route path="/gamification/achievements" element={<AchievementsGallery />} />
+                                <Route path="/gamification/status" element={<StatusProgressCard />} />
+                                <Route path="/gamification/quests" element={<QuestTracker />} />
+                                {/* Analytics routes */}
+                                <Route path="/analytics/personal" element={<PersonalAnalyticsPage />} />
+                                <Route path="/analytics/executive" element={<ExecutiveAnalyticsPage />} />
 
-                            {/* AI Recommendations routes */}
-                            <Route path="/ai/recommendations/personal" element={<PersonalAIRecommendationsPage />} />
-                            <Route path="/ai/recommendations/executive" element={<ExecutiveAIRecommendationsPage />} />
+                                {/* AI Recommendations routes */}
+                                <Route path="/ai/recommendations/personal" element={<PersonalAIRecommendationsPage />} />
+                                <Route path="/ai/recommendations/executive" element={<ExecutiveAIRecommendationsPage />} />
 
-                            {/* Production routes */}
-                            <Route path="/production/sessions" element={<ProductionSessionsPage />} />
-                            {/* Economy routes */}
-                            <Route path="/store" element={<StorePage />} />
-                            <Route path="/economy/wallet" element={<WalletPage />} />
-                            <Route path="/economy/transactions" element={<TransactionsPage />} />
-                            <Route path="/economy/analytics" element={<EconomyDashboard />} />
-                            <Route path="/admin/status-management" element={<StatusManagement />} />
+                                {/* Production routes */}
+                                <Route path="/production/sessions" element={<ProductionSessionsPage />} />
+                                {/* Economy routes */}
+                                <Route path="/store" element={<StorePage />} />
+                                <Route path="/economy/wallet" element={<WalletPage />} />
+                                <Route path="/economy/transactions" element={<TransactionsPage />} />
+                                <Route path="/economy/analytics" element={<EconomyDashboard />} />
+                                <Route path="/admin/status-management" element={<StatusManagement />} />
 
-                            {/* Personnel Module routes */}
-                            <Route path="/personnel" element={<PersonnelLayout />}>
-                                <Route index element={<PersonnelFilesListPage />} />
-                                <Route path="files/:id" element={<PersonalFileDetailPage />} />
-                                <Route path="orders" element={<OrdersListPage />} />
-                                <Route path="contracts" element={<ContractsListPage />} />
-                                <Route path="dashboard" element={<HRDashboardPage />} />
-                            </Route>
-                        </Routes>
-                    </AppLayout>
+                                {/* Personnel Module routes */}
+                                <Route path="/personnel" element={<PersonnelLayout />}>
+                                    <Route index element={<PersonnelFilesListPage />} />
+                                    <Route path="files/:id" element={<PersonalFileDetailPage />} />
+                                    <Route path="orders" element={<OrdersListPage />} />
+                                    <Route path="contracts" element={<ContractsListPage />} />
+                                    <Route path="dashboard" element={<HRDashboardPage />} />
+                                    <Route path="registration" element={<RegistrationRequestsPage />} />
+                                </Route>
+                            </Routes>
+                        </AppLayout>
+                    </FoundationGuard>
                 </RequireAuth>
             } />
         </Routes>
     );
 };
 
+import { AuthInitializer } from './components/auth/AuthInitializer';
+
 const App: React.FC = () => {
     return (
         <ConfigProvider theme={matrixGinTheme}>
             <AntdApp>
-                <Router>
-                    <AppRoutes />
-                </Router>
+                <AuthInitializer>
+                    <Router>
+                        <AppRoutes />
+                    </Router>
+                </AuthInitializer>
             </AntdApp>
         </ConfigProvider>
     );

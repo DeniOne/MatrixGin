@@ -16,8 +16,13 @@ export enum FoundationBlockType {
 
 export interface FoundationBlock {
     id: FoundationBlockType;
+    materialId: string;
     title: string;
     description: string;
+    contentText?: string;
+    videoUrl?: string;
+    isVideoRequired: boolean;
+    isMethodologyViolated?: boolean;
     order: number;
     mandatory: boolean;
     status: 'LOCKED' | 'OPEN' | 'COMPLETED';

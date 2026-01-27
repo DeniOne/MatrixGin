@@ -19,9 +19,18 @@ interface GrowthRadarChartProps {
  * - Glassmorphism aesthetics
  * - No red/green zones
  */
-const GrowthRadarChart: React.FC<GrowthRadarChartProps> = ({ data, size = 300 }) => {
+const GrowthRadarChart: React.FC<GrowthRadarChartProps> = ({ data = [], size = 300 }) => {
     const center = size / 2;
     const radius = (size / 2) * 0.8;
+
+    if (!Array.isArray(data) || data.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center bg-white rounded-2xl p-6 border border-black/10 shadow-sm h-full min-h-[300px]">
+                <span className="text-[#717182] animate-pulse">Инициализация Матрицы...</span>
+            </div>
+        );
+    }
+
     const axesCount = data.length;
 
     // Calculate hexagon/polygon points for background rings
@@ -35,7 +44,7 @@ const GrowthRadarChart: React.FC<GrowthRadarChartProps> = ({ data, size = 300 })
     // Calculate individual points for the actual value polygon
     const valuePoints = data.map((d, i) => {
         const angle = (Math.PI * 2 * i) / axesCount - Math.PI / 2;
-        const valRadius = (d.value / d.fullMark) * radius;
+        const valRadius = ((d?.value || 0) / (d?.fullMark || 100)) * radius;
         return `${center + valRadius * Math.cos(angle)},${center + valRadius * Math.sin(angle)}`;
     }).join(' ');
 
