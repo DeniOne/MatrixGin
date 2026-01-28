@@ -111,7 +111,7 @@ export class EmployeeRegistrationService {
                     ${randomUUID()},
                     ${telegramId}, 
                     'PENDING'::registration_status, 
-                    'PHOTO'::registration_step,
+                    'BASE'::registration_step,
                     ${invitedByUserId},
                     ${departmentId || null},
                     ${locationId || null},
@@ -127,16 +127,16 @@ export class EmployeeRegistrationService {
         }
 
         // Send welcome message with registration button
-        const welcomeMessage =
-            `🎉 Приветствуем Тебя в системе MatrixGin!\n\n` +
-            `Добро пожаловать в нашу команду! Для завершения регистрации в системе, ` +
-            `пожалуйста, нажми на кнопку ниже и пройди простой процесс регистрации.\n\n` +
-            `Это займет всего несколько минут!`;
+        const welcomeMessage = `🎉 Приветствуем Тебя в системе MatrixGin!\n\n` +
+            `Добро пожаловать в нашу команду! Для того чтобы стать частью проекта, ` +
+            `тебе необходимо первым делом ознакомиться с нашей Базой — это фундамент, ` +
+            `на котором строится вся работа.\n\n` +
+            `Пожалуйста, нажми на кнопку ниже, чтобы начать знакомство с Базой.`;
 
         await bot.telegram.sendMessage(telegramId, welcomeMessage, {
             reply_markup: {
                 inline_keyboard: [
-                    [{ text: '📝 Начать регистрацию', callback_data: 'start_registration' }]
+                    [{ text: '🧭 Узнать Базу', callback_data: 'start_registration' }]
                 ]
             }
         });
@@ -169,7 +169,7 @@ export class EmployeeRegistrationService {
                     ${telegramId}, 
                     ${username || null},
                     'IN_PROGRESS'::registration_status, 
-                    'PHOTO'::registration_step,
+                    'BASE'::registration_step,
                     NOW(),
                     NOW()
                 )
@@ -179,21 +179,26 @@ export class EmployeeRegistrationService {
             await prisma.$executeRaw`
                 UPDATE employee_registration_requests
                 SET status = 'IN_PROGRESS'::registration_status,
-                    current_step = 'PHOTO'::registration_step,
+                    current_step = 'BASE'::registration_step,
                     updated_at = NOW()
                 WHERE telegram_id = ${telegramId}
             `;
         }
 
-        // Send first step instructions
+        // Send "Learn Base" command trigger
         await ctx.reply(
-            `📸 *Шаг 1/11: Фото профиля*\n\n` +
-            `Пожалуйста, отправь своё селфи.\n\n` +
-            `Ты можешь:\n` +
-            `• Сделать фото прямо сейчас 📷\n` +
-            `• Загрузить из галереи 🖼️\n\n` +
-            `_Фото должно быть четким и на нейтральном фоне_`,
-            { parse_mode: 'Markdown' }
+            `🧭 *Шаг 1: Ознакомление с Базой*\n\n` +
+            `MatrixGin — это не просто ERP, это проект с четкими принципами.\n\n` +
+            `Тебе нужно ознакомиться с несколькими блоками Базы и принять их. Только после этого мы перейдем к заполнению анкеты.\n\n` +
+            `Нажми на кнопку ниже, чтобы начать.`,
+            {
+                parse_mode: 'Markdown',
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: '🚀 Начать погружение', callback_data: 'start_foundation' }]
+                    ]
+                }
+            }
         );
     }
 
@@ -204,6 +209,9 @@ export class EmployeeRegistrationService {
         const currentStep = registration.current_step;
 
         switch (currentStep) {
+            case 'BASE':
+                await ctx.reply('🧭 Сначала необходимо ознакомиться с Базой и принять её. Используйте кнопку выше или команду /start. Только после этого мы перейдем к заполнению анкеты.');
+                break;
             case 'PHOTO':
                 await this.handlePhotoStep(ctx, registration);
                 break;
@@ -944,7 +952,12 @@ export class EmployeeRegistrationService {
                 phone_number: reg.phone,
                 telegram_id: reg.telegram_id,
                 role: 'EMPLOYEE',
+                // @ts-ignore
                 status: 'ACTIVE',
+                // @ts-ignore
+                admission_status: 'ADMITTED',
+                // @ts-ignore
+                foundation_status: 'ACCEPTED',
                 department_id: finalDepartmentId,
                 // @ts-ignore
                 must_reset_password: true,
@@ -1002,8 +1015,18 @@ export class EmployeeRegistrationService {
                 `🎉 *Поздравляем!*\n\n` +
                 `Твоя регистрация одобрена!\n\n` +
                 `Добро пожаловать в команду MatrixGin! 🚀\n\n` +
-                `На твой Email (${reg.email}) отправлена ссылка для установки пароля.`,
-                { parse_mode: 'Markdown' }
+                `На твой Email (${reg.email}) отправлена ссылка для установки пароля.\n\n` +
+                `🧱 *База*\n\n` +
+                `База — это обязательные правила и принципы системы.\n` +
+                `После ознакомления необходимо принять Базу, иначе доступ к системе предоставлен не будет. По возникшим вопросам обратись к куратору.`,
+                {
+                    parse_mode: 'Markdown',
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{ text: '🧭 Узнай Базу', callback_data: 'start_foundation' }]
+                        ]
+                    }
+                }
             );
         }
     }

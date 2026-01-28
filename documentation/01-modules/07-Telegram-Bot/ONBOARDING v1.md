@@ -1,9 +1,9 @@
 Онбординг сотрудника после ACTIVE_FULL
 
 Статус: DESIGN LOCKED
-Триггер: USER_STATUS_CHANGED → ACTIVE_FULL
+Триггер: USER_ADMISSION_STATUS_CHANGED → ADMITTED
 Контуры: Telegram (C) → Sandbox (B) → Core Services (A)
-Цель: безопасно и осознанно ввести сотрудника в работу, не перегружая интерфейс и не нарушая этику.
+Цель: безопасно и осознанно ввести сотрудника в работу, не перегружая интерфейс и не нарушая этику. См. [ADMISSION_FLOW.md](file:///f:/Matrix_Gin/documentation/00-strategic/ADMISSION_FLOW.md).
 
 1. КАНОНИЧЕСКИЙ ПРИНЦИП
 
@@ -21,8 +21,8 @@
 
 После завершения личной карточки и верификации HR система инициирует событие:
 
-EMPLOYEE_PROFILE_VERIFIED
-→ USER_STATUS = ACTIVE_FULL
+EMPLOYEE_REGISTRATION_APPROVED
+→ USER_ADMISSION_STATUS = ADMITTED
 
 
 Telegram отправляет приветственное сообщение:
@@ -187,7 +187,7 @@ ONBOARDING_COMPLETED
 
 10. ДОСТУП И ПРАВА ВО ВРЕМЯ ОНБОРДИНГА
 Статус	Доступ
-ACTIVE_FULL	Полный доступ
+ADMITTED	Полный доступ
 Онбординг skipped	Полный доступ
 Онбординг in progress	Полный доступ
 

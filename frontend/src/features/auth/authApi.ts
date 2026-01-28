@@ -10,6 +10,7 @@ export interface User {
     departmentId?: string;
     mustResetPassword: boolean;
     foundationStatus?: 'NOT_STARTED' | 'IN_PROGRESS' | 'ACCEPTED';
+    admissionStatus?: 'PENDING_BASE' | 'BASE_ACCEPTED' | 'PROFILE_COMPLETE' | 'ADMITTED';
 }
 
 export interface LoginResponse {

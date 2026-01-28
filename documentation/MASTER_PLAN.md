@@ -100,6 +100,7 @@ Auth → Employees → Tasks → Economy → Analytics → ERP
 | RBAC | Role-Based Access Control | ✅ Done |
 | Refresh Tokens | Обновление токенов | ✅ Done |
 | Login UI | Страница входа | ✅ Done |
+| Admission Gate | Base-First Admission (см. ADMISSION_FLOW.md) | ✅ Done |
 | Password Reset | Восстановление пароля | ⏳ TODO |
 | 2FA | Двухфакторная (optional) | ⏳ TODO |
 

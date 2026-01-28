@@ -10,24 +10,34 @@ export const FoundationGuard: React.FC<FoundationGuardProps> = ({ children }) =>
     const { user } = useAuth();
     const location = useLocation();
 
-    // Safe state default
-    const status = user?.foundationStatus || 'NOT_STARTED';
+    const admissionStatus = user?.admissionStatus || 'PENDING_BASE';
 
-    // Routes that are ALWAYS blocked if Foundation is not accepted
-    // Note: Dashboard is allowed but will have restricted content logic inside it
-    // Foundation routes are naturally allowed since they are the path to acceptance
-
-    // Simplest logic: If NOT ACCEPTED, block everything except:
-    // - /foundation/*
-    // - / (Dashboard)
-    // - /profile (Maybe allow profile editing?)
-    // - /logout (Implicitly allowed by AuthLayout usually)
-
-    // Assuming this Guard wraps specific routes in App.tsx
-
-    if (status !== 'ACCEPTED') {
-        return <Navigate to="/foundation" replace state={{ from: location }} />;
+    // 1. If user is completely admitted, allow access
+    if (admissionStatus === 'ADMITTED') {
+        return <>{children}</>;
     }
+
+    // 2. If user hasn't accepted the Base yet, force redirect to Foundation
+    if (admissionStatus === 'PENDING_BASE') {
+        // Prevent infinite redirect if already on /foundation
+        if (location.pathname.startsWith('/foundation')) {
+            return <>{children}</>;
+        }
+        return <Navigate to="/foundation/start" replace state={{ from: location }} />;
+    }
+
+    // 3. If user accepted the Base but hasn't completed enrollment (Personal Data), force to Registration
+    if (admissionStatus === 'BASE_ACCEPTED') {
+        // If we have a dedicated registration completion page, redirect there.
+        // For now, redirecting to a placeholder or specific onboarding route.
+        if (location.pathname.startsWith('/registration')) {
+            return <>{children}</>;
+        }
+        return <Navigate to="/registration" replace state={{ from: location }} />;
+    }
+
+    // Default: allow children but with restricted scopes (enforced by backend)
+    return <>{children}</>;
 
     return <>{children}</>;
 };

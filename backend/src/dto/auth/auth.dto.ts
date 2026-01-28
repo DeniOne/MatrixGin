@@ -145,6 +145,11 @@ export class UserResponseDto {
     @IsOptional()
     @IsString()
     foundationStatus?: 'NOT_STARTED' | 'IN_PROGRESS' | 'ACCEPTED';
+
+    @IsOptional()
+    @IsString()
+    @IsEnum(['PENDING_BASE', 'BASE_ACCEPTED', 'PROFILE_COMPLETE', 'ADMITTED'])
+    admissionStatus?: string;
 }
 
 /**

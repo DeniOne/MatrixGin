@@ -12,6 +12,7 @@
 - [x] **Phase 5: Motivational Organism (Employee Layer)** ✅ **COMPLETED 2026-01-19**
 - [x] **Phase 5.5: UI Standardization & Canon Enforcement** ✅ **COMPLETED 2026-01-24**
 - [x] **Phase 5.6: Backend Stability & Dashboard Reframing** ✅ **COMPLETED 2026-01-27**
+- [x] **Phase 5.7: Admission Gate (Base-First) & Security Canon** ✅ **COMPLETED 2026-01-29**
 - [ ] **Phase 6: Advanced Motivation & Managerial Layer** ← ТЕКУЩАЯ ФАЗА
 
 ## Module Status (Audit 2026-01-25)
@@ -91,9 +92,15 @@
 - [x] **Seeding**: Automated `v2.2-canon` seeding with SHA-256 hash validation.
 
 #### Sprint 16: Stability & Reframing ✅ **COMPLETED 2026-01-28**
-- [x] **Process Audit**: Identified and killed duplicate Node.js processes causing 500 errors.
-- [x] **UI Refinement**: Component `StartGrowthWeb3D` refactored (Geist typography, glassmorphism, accent indigo).
-- [x] **Foundation & Registration Fix**: Corrected video paths, fixed `::uuid` SQL errors, added Telegram selection buttons, and unblocked admin.
+- [x] **Process Audit**: Identified and killed duplicate Node.js processes.
+- [x] **UI Refinement**: Component `StartGrowthWeb3D` refactored.
+- [x] **Registration Fix**: Mandatory Dept/Location selection.
+
+#### Sprint 17: Admission Gate (Base-First) ✅ **COMPLETED 2026-01-29**
+- [x] **Architectural Core**: `AdmissionStatus` FSM & JWT Scopes.
+- [x] **Security Enforcement**: Telegram Bot Guard & Frontend FoundationGuard.
+- [x] **Canon**: Consolidated `ADMISSION_FLOW.md` and recorded ADR-001 in `DECISIONS.log`.
+- [x] **Documentation Sync**: Updated all manuals, process docs, and module specs.
 
 ## Key Blockers
 - **None critical**: Все зависит от приоритизации спринтов.

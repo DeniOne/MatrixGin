@@ -1,4 +1,4 @@
-# Active Context: MatrixGin (2026-01-27)
+# Active Context: MatrixGin (2026-01-29)
 
 ## Current Project State
 Проект находится в фазе **Трансформации мотивационной системы**.
@@ -32,12 +32,13 @@ MatrixGin должен трансформироваться из **систем�
 - **Backend & UI Stabilization**: ✅ **COMPLETED 2026-01-27**.
   - **Backend**: Resolved 500 error on login by eliminating duplicate Node.js processes.
   - **UI (Dashboard)**: Refactored `StartGrowthWeb3D.tsx` to align with Geist Canon (glassmorphism, premium typography, optimized SVG).
-- **Registration Approval Validation**: ✅ **COMPLETED 2026-01-28**.
-  - **Backend Layer**: Implemented strict validation for mandatory `departmentId` and `locationId` in `EmployeeRegistrationService`.
-  - **UI (Modal)**: Enforced mandatory selection in `ApproveRegistrationModal` with visual feedback and button locking.
-  - **Data Resilience**: Fixed legacy registrations via `fix-legacy-data.ts` and restored missed notifications via `resend-notifications.ts`.
-  - **Documentation**: Created comprehensive [User Manual](file:///f:/Matrix_Gin/documentation/USER-MANUAL-REGISTRATION.md) for HR and candidates.
-  - **Logic Audit**: Successfully verified via script-based automated testing.
+- **Admission Gate (Base-First)**: ✅ **COMPLETED 2026-01-29**.
+  - **Security Core**: Implemented `AdmissionStatus` FSM (Pending -> Accepted -> Profile -> Admitted).
+  - **JWT Scopes**: Dynamic access control based on admission status (Layer 0/1 enforcement).
+  - **Bot Guard**: Global command filtering in Telegram until `ADMITTED`.
+  - **Frontend Gate**: `FoundationGuard` multi-stage redirection.
+  - **Documentation**: Consolidated `ADMISSION_FLOW.md` and synchronized all manual/process docs.
+  - **Canon**: Architectural decision recorded in `DECISIONS.log` (ADR-001).
 
 ## GAP-анализ модулей (Updated 2026-01-25)
 

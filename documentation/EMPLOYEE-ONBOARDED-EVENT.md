@@ -13,7 +13,8 @@
 ### Семантика
 
 **employee.onboarded** означает:
-- Сотрудник **впервые** зарегистрирован и активирован в системе
+- Сотрудник успешно прошел Admission Gate (База + Анкета)
+- Статус `admission_status` переведен в `ADMITTED`
 - Создан User + Employee
 - Начинается процесс onboarding
 
@@ -128,13 +129,15 @@ if (existing) return; // Already created
 ```
 EmployeeRegistrationService.approveRegistration()
   ↓
-1. Create User (role: EMPLOYEE, status: ACTIVE)
+1. Update admission_status → ADMITTED
   ↓
-2. Create Employee (position, hire_date)
+2. Create User (role: EMPLOYEE, status: ACTIVE)
   ↓
-3. Update registration status → APPROVED
+3. Create Employee (position, hire_date)
   ↓
-4. Emit employee.onboarded event
+4. Update registration status → APPROVED
+  ↓
+5. Emit employee.onboarded event
   ↓
   ├─→ EmployeeOnboardedListener (Module 33)
   │     ├─ Check idempotency

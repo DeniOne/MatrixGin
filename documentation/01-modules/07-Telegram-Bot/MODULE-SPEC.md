@@ -104,10 +104,13 @@ Telegram не является
 ## 5. Функциональные блоки (Capabilities)
 
 ### 5.1 Registration & Identity
-— регистрация сотрудников
-— привязка Telegram ID
-— первичное согласие (consent)
-— онбординг
+— Admission Gate (Base-First): принятие принципов MatrixGin
+— Регистрация сотрудников (анкета)
+— Привязка Telegram ID
+— Первичное согласие (consent)
+— Онбординг
+
+❗ **Admission Gate** является первым и обязательным фильтром. Бот блокирует все функции до перехода в статус `BASE_ACCEPTED` и далее в `ADMITTED`. См. [ADMISSION_FLOW.md](file:///f:/Matrix_Gin/documentation/00-strategic/ADMISSION_FLOW.md).
 
 Telegram — точка входа, но не хранилище данных.
 

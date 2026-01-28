@@ -176,7 +176,8 @@ export class AuthService {
             }
 
             // Generate new access token only (NO rotation of refresh token)
-            const newPayload = { sub: user.id, email: user.email, role: user.role };
+            const scopes = this.getScopesForStatus((user as any).admission_status);
+            const newPayload = { sub: user.id, email: user.email, role: user.role, scopes };
             const accessToken = jwt.sign(newPayload, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
 
             logger.info('Token refresh successful', { userId: user.id });
@@ -225,7 +226,8 @@ export class AuthService {
     }
 
     private generateAuthResponse(user: User): AuthResponseDto {
-        const payload = { sub: user.id, email: user.email, role: user.role };
+        const scopes = this.getScopesForStatus((user as any).admission_status);
+        const payload = { sub: user.id, email: user.email, role: user.role, scopes };
         const accessToken = jwt.sign(payload, this.jwtSecret, { expiresIn: this.jwtExpiresIn });
         const refreshToken = jwt.sign(payload, this.jwtSecret, { expiresIn: this.refreshTokenExpiresIn });
         return {
@@ -255,6 +257,22 @@ export class AuthService {
             personalDataConsent: user.personal_data_consent,
             mustResetPassword: (user as any).must_reset_password || false,
             foundationStatus: (user as any).foundation_status || 'NOT_STARTED',
+            admissionStatus: (user as any).admission_status || 'PENDING_BASE',
         };
+    }
+
+    private getScopesForStatus(status: string): string[] {
+        switch (status) {
+            case 'PENDING_BASE':
+                return ['foundation:read', 'foundation:accept'];
+            case 'BASE_ACCEPTED':
+                return ['profile:write', 'foundation:read'];
+            case 'PROFILE_COMPLETE':
+                return ['profile:read', 'foundation:read'];
+            case 'ADMITTED':
+                return ['*'];
+            default:
+                return ['foundation:read'];
+        }
     }
 }

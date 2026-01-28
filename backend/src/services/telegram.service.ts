@@ -1,6 +1,8 @@
 import { Telegraf, Context, Markup, Scenes, session } from 'telegraf';
 import employeeRegistrationService, { EmployeeRegistrationService } from './employee-registration.service';
 import { prisma } from '../config/prisma';
+import { foundationService } from './foundation.service';
+import { FOUNDATION_BLOCKS } from '../config/foundation.constants';
 
 // Wizard Scene Definition
 const taskWizard = new Scenes.WizardScene(
@@ -88,6 +90,10 @@ class TelegramService {
         return TelegramService.instance;
     }
 
+    public getBot(): Telegraf<any> | null {
+        return this.bot;
+    }
+
     public async initializeBot(): Promise<void> {
         const token = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -142,7 +148,7 @@ class TelegramService {
                     `• Рекомендации на основе реальных метрик PhotoCompany\n` +
                     `• Без давления и санкций\n\n` +
                     `Используйте меню ниже для навигации:`,
-                    { parse_mode: 'Markdown', ...this.getMainMenuKeyboard() }
+                    { parse_mode: 'Markdown', ...this.getMainMenuKeyboard((user as any).foundation_status) }
                 );
             } else {
                 // SECURITY: Self-Registration with Anti-Fraud check
@@ -178,43 +184,61 @@ class TelegramService {
         });
 
         // /newtask command
-        this.bot.command('newtask', (ctx) => ctx.scene.enter('task-wizard'));
+        this.bot.command('newtask', async (ctx) => {
+            if (await this.ensureAdmissionGuard(ctx)) {
+                await ctx.scene.enter('task-wizard');
+            }
+        });
 
         // /mytasks command
         this.bot.command('mytasks', async (ctx) => {
-            await this.handleMyTasks(ctx);
+            if (await this.ensureAdmissionGuard(ctx)) {
+                await this.handleMyTasks(ctx);
+            }
         });
 
         // /balance command
         this.bot.command('balance', async (ctx) => {
-            await this.handleBalance(ctx);
+            if (await this.ensureAdmissionGuard(ctx)) {
+                await this.handleBalance(ctx);
+            }
         });
 
         // /profile command
         this.bot.command('profile', async (ctx) => {
-            await this.handleProfile(ctx);
+            if (await this.ensureAdmissionGuard(ctx)) {
+                await this.handleProfile(ctx);
+            }
         });
 
         // MVP Learning Contour Commands
 
         // /learning command - Show active courses and recommendations
         this.bot.command('learning', async (ctx) => {
-            await this.handleLearning(ctx);
+            if (await this.ensureAdmissionGuard(ctx)) {
+                await this.handleLearning(ctx);
+            }
         });
 
         // /courses command - Browse available courses
         this.bot.command('courses', async (ctx) => {
-            await this.handleCourses(ctx);
+            if (await this.ensureAdmissionGuard(ctx)) {
+                await this.handleCourses(ctx);
+            }
         });
 
         // /mycourses command - Show enrolled courses
         this.bot.command('mycourses', async (ctx) => {
-            await this.handleMyCourses(ctx);
+            if (await this.ensureAdmissionGuard(ctx)) {
+                await this.handleMyCourses(ctx);
+            }
         });
 
         // /enroll command - Enroll in a course
         this.bot.command('enroll', async (ctx) => {
-            await this.handleEnroll(ctx);
+            if (await this.ensureAdmissionGuard(ctx)) {
+                await this.handleEnroll(ctx);
+            }
         });
 
 
@@ -255,7 +279,9 @@ class TelegramService {
             }
 
             if (ctx.message.text === '➕ Новая задача') {
-                await ctx.scene.enter('task-wizard');
+                if (await this.ensureAdmissionGuard(ctx)) {
+                    await ctx.scene.enter('task-wizard');
+                }
                 return;
             }
 
@@ -265,9 +291,33 @@ class TelegramService {
                 '/newtask - Создать задачу\n' +
                 '/balance - Мой баланс\n' +
                 '/profile - Мой профиль',
-                this.getMainMenuKeyboard()
+                this.getMainMenuKeyboard((user as any).foundation_status)
             );
         });
+    }
+
+    private async ensureAdmissionGuard(ctx: Context): Promise<boolean> {
+        const telegramId = ctx.from?.id.toString();
+        if (!telegramId) return false;
+
+        const user = await this.getUserByTelegramId(telegramId);
+        if (!user) {
+            await ctx.reply('Аккаунт не привязан. Используйте /start');
+            return false;
+        }
+
+        // @ts-ignore
+        if (user.admission_status !== 'ADMITTED') {
+            await ctx.reply(
+                `⚠️ *Доступ ограничен*\n\n` +
+                `Для использования команд системы необходимо сначала принять Базу и завершить регистрацию.\n\n` +
+                `Используйте команду /start для продолжения.`,
+                { parse_mode: 'Markdown' }
+            );
+            return false;
+        }
+
+        return true;
     }
 
     private async handleMyTasks(ctx: Context): Promise<void> {
@@ -419,6 +469,48 @@ class TelegramService {
             return;
         } else if (data === 'upload_more_docs') {
             await ctx.reply('Отправь документ или фото документа.');
+            await ctx.answerCbQuery();
+            return;
+        } else if (data === 'start_foundation') {
+            await this.handleFoundation(ctx);
+            await ctx.answerCbQuery();
+            return;
+        } else if (data.startsWith('view_foundation_block_')) {
+            const blockId = data.replace('view_foundation_block_', '');
+            const telegramId = ctx.from?.id.toString();
+            const user = await this.getUserByTelegramId(telegramId);
+            if (user) {
+                try {
+                    await foundationService.registerBlockView(user.id, blockId, 'TELEGRAM_BOT');
+                    await this.handleFoundation(ctx);
+                } catch (error: any) {
+                    await ctx.reply(`❌ ${error.message}`);
+                }
+            }
+            await ctx.answerCbQuery();
+            return;
+        } else if (data === 'accept_foundation') {
+            const telegramId = ctx.from?.id.toString();
+            const user = await this.getUserByTelegramId(telegramId);
+            if (user) {
+                try {
+                    const result = await foundationService.submitDecision(user.id, 'ACCEPT', 'TELEGRAM_BOT');
+                    if (result.status === 'ACCEPTED') {
+                        await ctx.reply(
+                            `🎉 *База принята!*\n\n` +
+                            `Добро пожаловать в систему MatrixGin в качестве полноправного участника.\n` +
+                            `Теперь вам доступны все функции обучения и работы.`,
+                            { parse_mode: 'Markdown', ...this.getMainMenuKeyboard('ACCEPTED') }
+                        );
+                    }
+                } catch (error: any) {
+                    await ctx.reply(`❌ ${error.message}`);
+                }
+            }
+            await ctx.answerCbQuery();
+            return;
+        } else if (data === 'decline_foundation') {
+            await ctx.reply('⚠️ Без принятия Базы доступ к системе останется ограниченным. Вы можете вернуться к ознакомлению в любое время через меню.');
             await ctx.answerCbQuery();
             return;
         }
@@ -688,17 +780,24 @@ class TelegramService {
         }
     }
 
-    private getMainMenuKeyboard() {
-        return Markup.inlineKeyboard([
-            [
-                Markup.button.callback('📋 Мои задачи', 'my_tasks'),
-                Markup.button.callback('➕ Новая задача', 'new_task')
-            ],
-            [
-                Markup.button.callback('💰 Баланс', 'my_balance'),
-                Markup.button.callback('👤 Профиль', 'my_profile')
-            ]
+    private getMainMenuKeyboard(foundationStatus: string = 'ACCEPTED') {
+        const buttons = [];
+
+        if (foundationStatus !== 'ACCEPTED') {
+            buttons.push([Markup.button.callback('🧭 Узнай Базу', 'start_foundation')]);
+        }
+
+        buttons.push([
+            Markup.button.callback('📋 Мои задачи', 'my_tasks'),
+            Markup.button.callback('➕ Новая задача', 'new_task')
         ]);
+
+        buttons.push([
+            Markup.button.callback('💰 Баланс', 'my_balance'),
+            Markup.button.callback('👤 Профиль', 'my_profile')
+        ]);
+
+        return Markup.inlineKeyboard(buttons);
     }
 
     private async getUserByTelegramId(telegramId: string) {
@@ -814,6 +913,53 @@ class TelegramService {
 
         if (registration && registration.status === 'IN_PROGRESS') {
             await employeeRegistrationService.handleRegistrationStep(ctx, registration);
+        }
+    }
+
+    /**
+     * Foundation (Base) walkthrough handler
+     */
+    private async handleFoundation(ctx: any): Promise<void> {
+        const telegramId = ctx.from?.id.toString();
+        if (!telegramId) return;
+
+        const user = await this.getUserByTelegramId(telegramId);
+        if (!user) {
+            await ctx.reply('Аккаунт не привязан.');
+            return;
+        }
+
+        const progress = (user as any).foundation_progress || 0;
+        const status = (user as any).foundation_status;
+
+        if (status === 'ACCEPTED') {
+            await ctx.reply('✅ Вы уже приняли Базу. Доступ к системе открыт!');
+            return;
+        }
+
+        if (progress < FOUNDATION_BLOCKS.length) {
+            const block = FOUNDATION_BLOCKS[progress];
+            const message = `🧱 *База: Блок ${progress + 1} из ${FOUNDATION_BLOCKS.length}*\n\n` +
+                `*${block.title}*\n\n` +
+                `${block.description}`;
+
+            const keyboard = Markup.inlineKeyboard([
+                [Markup.button.callback('✅ Прочитано', `view_foundation_block_${block.id}`)]
+            ]);
+
+            await ctx.reply(message, { parse_mode: 'Markdown', ...keyboard });
+        } else {
+            const message = `📜 *Принятие Базы*\n\n` +
+                `Вы ознакомились со всеми принципами Базы MatrixGin.\n\n` +
+                `Принятие Базы — это ваше осознанное решение следовать этим правилам. Без этого доступ к системе невозможен.\n\n` +
+                `Вы готовы принять Базу?`;
+
+            const keyboard = Markup.inlineKeyboard([
+                [Markup.button.callback('📜 Принимаю Базу', 'accept_foundation')],
+                [Markup.button.callback('❌ Отказаться', 'decline_foundation')]
+            ]);
+
+            await ctx.reply(message, { parse_mode: 'Markdown', ...keyboard });
         }
     }
 }

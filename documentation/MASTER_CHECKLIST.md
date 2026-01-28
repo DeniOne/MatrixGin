@@ -56,6 +56,14 @@ MODULE → PHASE → TRACK
 | Login UI | Страница входа | ✅ Done |
 | Password Reset | Восстановление пароля | ⏳ TODO |
 | 2FA | Двухфакторная (optional) | ⏳ TODO |
+ 
+ ### 1.1.1 Admission Gate (Base-First) — 100% **CLOSED**
+ > **Дата внедрения:** 2026-01-29 | **Status:** ENFORCED
+ - [x] AdmissionStatus FSM (Prisma/Service)
+ - [x] Dynamic JWT Scopes (@default/base/full)
+ - [x] Telegram Bot Guard (ensureAdmissionGuard)
+ - [x] Frontend multi-stage redirect (FoundationGuard)
+ - [x] Canonical documentation (ADMISSION_FLOW.md)
 
 ### 1.5 System Registry (Foundational Layer)
 **Status:** ✅ **COMPLETED (Steps 8-12)**

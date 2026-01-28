@@ -2,11 +2,15 @@ import { prisma } from '../config/prisma';
 import { FOUNDATION_BLOCKS, FOUNDATION_VERSION, FoundationBlockType, FoundationStatus } from '../config/foundation.constants';
 import { FoundationDecision } from '@prisma/client';
 import { logger } from '../config/logger';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 export class FoundationService {
     private static instance: FoundationService;
+    private eventEmitter: EventEmitter2;
 
-    private constructor() { }
+    private constructor(eventEmitter?: EventEmitter2) {
+        this.eventEmitter = eventEmitter || new EventEmitter2();
+    }
 
     public static getInstance(): FoundationService {
         if (!FoundationService.instance) {
@@ -105,59 +109,162 @@ export class FoundationService {
     /**
      * Register that a user has viewed a block
      */
-    async registerBlockView(userId: string, blockId: string) {
-        // Validate Block ID
-        const isValidBlock = FOUNDATION_BLOCKS.some(b => b.id === blockId);
-        if (!isValidBlock) {
+    /**
+     * Register that a user has viewed a block
+     */
+    async registerBlockView(userId: string, blockId: string, source: string = 'API') {
+        const blockIndex = FOUNDATION_BLOCKS.findIndex(b => b.id === blockId);
+        if (blockIndex === -1) {
             throw new Error('Invalid Foundation Block ID');
         }
 
-        // Idempotency: Check if already viewed to avoid spamming Audit Log?
-        // Canon: Audit Log is append-only. Repetitive views are fine, but we can debounce if needed.
-        // Strategies:
-        // A) Log every view (Good for analytics: "read it 5 times")
-        // B) Log unique only
-        // Let's log unique per day or just log it. "BLOCK_VIEWED" implies an action.
-
-        // Let's check if already viewed for this version to keep log clean (optional)
-        const existing = await prisma.foundationAuditLog.findFirst({
-            where: {
-                user_id: userId,
-                event_type: 'BLOCK_VIEWED',
-                metadata: {
-                    path: ['blockId'],
-                    equals: blockId
-                }
-            }
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            // @ts-ignore - added via migration
+            select: { foundation_progress: true, foundation_status: true }
         });
 
-        // Actually, Prisma JSON filtering is tricky. Let's just create.
+        if (!user) throw new Error('User not found');
+
+        // Sequential Check: Only allow increment if viewing exactly the NEXT block
+        // @ts-ignore
+        const currentProgress = user.foundation_progress || 0;
+        let newProgress = currentProgress;
+
+        if (blockIndex === currentProgress) {
+            newProgress = currentProgress + 1;
+        }
+
+        // Standard Audit Log
         await prisma.foundationAuditLog.create({
             data: {
                 user_id: userId,
-                event_type: 'BLOCK_VIEWED',
+                event_type: 'FOUNDATION_BLOCK_VIEWED',
+                foundation_version: FOUNDATION_VERSION,
                 timestamp: new Date(),
                 metadata: {
+                    userId,
+                    action: 'FOUNDATION_BLOCK_VIEWED',
+                    block: blockIndex + 1,
                     blockId,
                     version: FOUNDATION_VERSION,
-                    userAgent: 'API' // Context could be passed
+                    source,
+                    progressAfter: newProgress
                 }
             }
         });
 
-        // Sync User status to IN_PROGRESS if not already
-        // @ts-ignore
-        await prisma.user.updateMany({
-            where: {
-                id: userId,
+        // Update User State
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
                 // @ts-ignore
-                foundation_status: 'NOT_STARTED'
-            },
-            // @ts-ignore
-            data: { foundation_status: 'IN_PROGRESS' }
+                foundation_progress: newProgress,
+                foundation_current_block_id: blockId,
+                // @ts-ignore
+                foundation_status: newProgress > 0 && user.foundation_status === 'NOT_STARTED'
+                    ? 'IN_PROGRESS'
+                    : user.foundation_status
+            }
         });
 
-        return { success: true };
+        return { success: true, currentProgress: newProgress };
+    }
+
+    /**
+     * Submit decision on 'Base' (Foundation)
+     * CANON: Accepted, Not_Accepted
+     */
+    async submitDecision(userId: string, decision: 'ACCEPT' | 'DECLINE', source: string = 'API') {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            // @ts-ignore
+            select: { foundation_progress: true, foundation_status: true }
+        });
+
+        if (!user) throw new Error('User not found');
+
+        if (decision === 'ACCEPT') {
+            // Guard: All blocks must be viewed
+            // @ts-ignore
+            if (user.foundation_progress < FOUNDATION_BLOCKS.length) {
+                await this.logGatingViolation(userId, 'SUBMIT_DECISION_INCOMPLETE_PROGRESS', {
+                    // @ts-ignore
+                    currentProgress: user.foundation_progress,
+                    requiredProgress: FOUNDATION_BLOCKS.length
+                });
+                throw new Error('FOUNDATION_REQUIRED: Необходимо ознакомиться со всеми блоками Базы перед принятием.');
+            }
+
+            // Acceptance Record
+            await prisma.foundationAcceptance.upsert({
+                where: { person_id: userId },
+                create: {
+                    person_id: userId,
+                    decision: FoundationDecision.ACCEPTED,
+                    version: FOUNDATION_VERSION,
+                    accepted_at: new Date()
+                },
+                update: {
+                    decision: FoundationDecision.ACCEPTED,
+                    version: FOUNDATION_VERSION,
+                    accepted_at: new Date()
+                }
+            });
+
+            await prisma.user.update({
+                where: { id: userId },
+                data: {
+                    // @ts-ignore
+                    foundation_status: 'ACCEPTED',
+                    // @ts-ignore
+                    admission_status: 'BASE_ACCEPTED',
+                    base_accepted_at: new Date(),
+                    base_version: FOUNDATION_VERSION
+                }
+            });
+
+            // Standard Audit Log
+            await prisma.foundationAuditLog.create({
+                data: {
+                    user_id: userId,
+                    event_type: 'FOUNDATION_ACCEPTED',
+                    foundation_version: FOUNDATION_VERSION,
+                    timestamp: new Date(),
+                    metadata: {
+                        userId,
+                        action: 'FOUNDATION_ACCEPTED',
+                        version: FOUNDATION_VERSION,
+                        source,
+                    }
+                }
+            });
+
+            // Emit event for business effects (e.g., unlocking tasks)
+            this.eventEmitter.emit('foundation.accepted', {
+                userId,
+                version: FOUNDATION_VERSION,
+                timestamp: new Date()
+            });
+
+            return { success: true, status: 'ACCEPTED' };
+        } else {
+            await prisma.foundationAuditLog.create({
+                data: {
+                    user_id: userId,
+                    event_type: 'FOUNDATION_DECLINED',
+                    foundation_version: FOUNDATION_VERSION,
+                    timestamp: new Date(),
+                    metadata: {
+                        userId,
+                        action: 'FOUNDATION_DECLINED',
+                        source
+                    }
+                }
+            });
+            // @ts-ignore
+            return { success: true, status: user.foundation_status };
+        }
     }
 
     /**

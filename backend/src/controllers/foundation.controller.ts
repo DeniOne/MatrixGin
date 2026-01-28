@@ -52,48 +52,21 @@ export class FoundationController {
                 return res.status(400).json({ error: 'Valid decision (ACCEPT/DECLINE) is required' });
             }
 
-            // Create acceptance record
-            await prisma.foundationAcceptance.upsert({
-                where: { person_id: userId },
-                create: {
-                    person_id: userId,
-                    decision: decision === 'ACCEPT' ? 'ACCEPTED' : 'NOT_ACCEPTED',
-                    version: FOUNDATION_VERSION,
-                    accepted_at: new Date()
-                },
-                update: {
-                    decision: decision === 'ACCEPT' ? 'ACCEPTED' : 'NOT_ACCEPTED',
-                    version: FOUNDATION_VERSION,
-                    accepted_at: new Date()
-                }
-            });
+            const result = await foundationService.submitDecision(
+                userId,
+                decision as 'ACCEPT' | 'DECLINE',
+                req.get('User-Agent') || 'WEB_API'
+            );
 
-            // Sync User status
-            // @ts-ignore
-            await prisma.user.update({
-                where: { id: userId },
-                data: {
-                    // @ts-ignore
-                    foundation_status: decision === 'ACCEPT' ? 'ACCEPTED' : 'IN_PROGRESS'
-                }
-            });
-
-            // Audit log
-            await prisma.foundationAuditLog.create({
-                data: {
-                    user_id: userId,
-                    event_type: decision === 'ACCEPT' ? 'FOUNDATION_ACCEPTED' : 'FOUNDATION_DECLINED',
-                    foundation_version: FOUNDATION_VERSION,
-                    timestamp: new Date(),
-                    metadata: {
-                        userAgent: req.get('User-Agent')
-                    }
-                }
-            });
-
-            res.json({ success: true });
+            res.json(result);
         } catch (error: any) {
-            logger.error('Failed to submit foundation decision', { error: error.message });
+            logger.error('Failed to submit foundation decision', { error: error.message, userId: (req as any).user?.id });
+
+            // Handle specific guard errors with 403 or 400
+            if (error.message.includes('FOUNDATION_REQUIRED')) {
+                return res.status(403).json({ error: error.message });
+            }
+
             res.status(500).json({ error: 'Internal Server Error' });
         }
     }
