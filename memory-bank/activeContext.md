@@ -32,11 +32,11 @@ MatrixGin должен трансформироваться из **систем�
 - **Backend & UI Stabilization**: ✅ **COMPLETED 2026-01-27**.
   - **Backend**: Resolved 500 error on login by eliminating duplicate Node.js processes.
   - **UI (Dashboard)**: Refactored `StartGrowthWeb3D.tsx` to align with Geist Canon (glassmorphism, premium typography, optimized SVG).
-- **Foundation Gate & Registration Flow Evolution**: ✅ **COMPLETED 2026-01-28**.
-  - **Foundation**: Resolved "Methodology Lock" by fixing video paths in `seed-foundation-gate.ts`.
-  - **Registration**: Evolved to **Registry-Driven** model (Positions/Locations tables) and implemented **Structured Interactivity** (Inline Buttons) in Telegram.
-  - **Stability**: Standardized String-based ID handling to eliminate `::uuid` SQL errors.
-  - **Admin Access**: Restored via force-unblock script.
+- **Registration Approval Validation**: ✅ **COMPLETED 2026-01-28**.
+  - **Backend Layer**: Implemented strict validation for mandatory `departmentId` and `locationId` in `EmployeeRegistrationService`.
+  - **UI (Modal)**: Enforced mandatory selection in `ApproveRegistrationModal` with visual feedback and button locking.
+  - **Data Resilience**: Fixed legacy registrations via `fix-legacy-data.ts` and restored missed notifications via `resend-notifications.ts`.
+  - **Logic Audit**: Successfully verified via script-based automated testing.
 
 ## GAP-анализ модулей (Updated 2026-01-25)
 

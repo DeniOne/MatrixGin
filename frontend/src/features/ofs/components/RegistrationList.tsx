@@ -3,6 +3,7 @@ import { useGetRegistrationsQuery, useApproveRegistrationMutation, useRejectRegi
 import { CheckCircle2, XCircle, UserPlus, Search, Filter, Eye } from 'lucide-react';
 import RegistrationDetailModal from './RegistrationDetailModal';
 import SendInvitationModal from './SendInvitationModal';
+import ApproveRegistrationModal from './ApproveRegistrationModal';
 
 const STATUS_COLORS = {
   PENDING: 'bg-gray-100 text-gray-800',
@@ -26,6 +27,7 @@ export default function RegistrationList() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [showInviteModal, setShowInviteModal] = useState(false);
+  const [approvingRegistration, setApprovingRegistration] = useState<any | null>(null);
 
   const { data, isLoading, refetch } = useGetRegistrationsQuery({
     status: statusFilter || undefined,
@@ -36,11 +38,8 @@ export default function RegistrationList() {
   const [approve] = useApproveRegistrationMutation();
   const [reject] = useRejectRegistrationMutation();
 
-  const handleApprove = async (id: string) => {
-    if (confirm('Одобрить регистрацию?')) {
-      await approve(id);
-      refetch();
-    }
+  const handleApprove = (registration: any) => {
+    setApprovingRegistration(registration);
   };
 
   const handleReject = async (id: string) => {
@@ -212,7 +211,7 @@ export default function RegistrationList() {
                         {registration.status === 'REVIEW' && (
                           <>
                             <button
-                              onClick={() => handleApprove(registration.id)}
+                              onClick={() => handleApprove(registration)}
                               className="text-green-600 hover:text-green-900"
                               title="Одобрить"
                             >
@@ -279,6 +278,17 @@ export default function RegistrationList() {
           onClose={() => setShowInviteModal(false)}
           onSuccess={() => {
             setShowInviteModal(false);
+            refetch();
+          }}
+        />
+      )}
+
+      {approvingRegistration && (
+        <ApproveRegistrationModal
+          registration={approvingRegistration}
+          onClose={() => setApprovingRegistration(null)}
+          onSuccess={() => {
+            setApprovingRegistration(null);
             refetch();
           }}
         />

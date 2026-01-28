@@ -788,6 +788,48 @@ class OFSController {
             });
         }
     }
+
+    /**
+     * GET /api/ofs/locations
+     * Get all active locations
+     */
+    async getLocations(req: Request, res: Response): Promise<void> {
+        try {
+            const locations = await ofsService.getLocations();
+
+            res.status(200).json({
+                success: true,
+                data: locations
+            });
+        } catch (error) {
+            console.error('Get locations error:', error);
+            res.status(500).json({
+                success: false,
+                error: { message: 'Internal server error' }
+            });
+        }
+    }
+
+    /**
+     * GET /api/ofs/positions
+     * Get all active positions
+     */
+    async getPositions(req: Request, res: Response): Promise<void> {
+        try {
+            const positions = await ofsService.getPositions();
+
+            res.status(200).json({
+                success: true,
+                data: positions
+            });
+        } catch (error) {
+            console.error('Get positions error:', error);
+            res.status(500).json({
+                success: false,
+                error: { message: 'Internal server error' }
+            });
+        }
+    }
 }
 
 export default new OFSController();

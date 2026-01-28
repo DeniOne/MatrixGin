@@ -155,9 +155,9 @@ model User {
   qualification_level_id       String?
   role_id                      String?
   must_reset_password          Boolean                      @default(true)
-  foundation_status            FoundationStatus             @default(NOT_STARTED)
   reset_password_token         String?                      @unique
   reset_token_expires_at       DateTime?
+  foundation_status            FoundationStatus             @default(NOT_STARTED)
   ai_feedback                  AIFeedback[]
   audit_logs                   AuditLog[]
   auth_sessions                AuthSession[]
@@ -1629,12 +1629,12 @@ model Position {
 model AuthSession {
   id         String            @id @default(uuid())
   user_id    String
-  status     AuthSessionStatus @default(PENDING)
   ip_address String?
   user_agent String?
   expires_at DateTime
   created_at DateTime          @default(now())
   updated_at DateTime          @updatedAt
+  status     AuthSessionStatus @default(PENDING)
   user       User              @relation(fields: [user_id], references: [id])
 
   @@map("auth_sessions")
@@ -1644,8 +1644,6 @@ model EmployeeRegistrationRequest {
   id                   String                    @id @default(uuid())
   telegram_id          String                    @unique
   telegram_username    String?
-  status               RegistrationStatus        @default(PENDING)
-  current_step         RegistrationStep          @default(PHOTO)
   photo_url            String?
   first_name           String?
   last_name            String?
@@ -1669,6 +1667,8 @@ model EmployeeRegistrationRequest {
   completed_at         DateTime?
   created_at           DateTime                  @default(now())
   updated_at           DateTime                  @updatedAt
+  status               RegistrationStatus        @default(PENDING)
+  current_step         RegistrationStep          @default(PHOTO)
   step_history         RegistrationStepHistory[]
 
   @@map("employee_registration_requests")
@@ -1677,9 +1677,9 @@ model EmployeeRegistrationRequest {
 model RegistrationStepHistory {
   id              String                      @id @default(uuid())
   registration_id String
-  step            RegistrationStep
   data            Json?
   completed_at    DateTime                    @default(now())
+  step            RegistrationStep
   registration    EmployeeRegistrationRequest @relation(fields: [registration_id], references: [id], onDelete: Cascade)
 
   @@index([registration_id])

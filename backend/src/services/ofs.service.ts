@@ -373,6 +373,20 @@ export class OFSService {
             ORDER BY count DESC
         `;
     }
+
+    // ==================== Locations & Positions ====================
+
+    async getLocations() {
+        return await prisma.$queryRaw<any[]>`
+            SELECT * FROM locations WHERE is_active = true ORDER BY name
+        `;
+    }
+
+    async getPositions() {
+        return await prisma.$queryRaw<any[]>`
+            SELECT * FROM positions WHERE is_active = true ORDER BY name
+        `;
+    }
 }
 
 export default OFSService.getInstance();

@@ -4,11 +4,14 @@ import { foundationApi } from '../../features/foundation/api/foundation.api';
 import { FoundationStatus, ImmersionState } from '../../features/foundation/types/foundation.types';
 import { AlertTriangle, ArrowRight, ShieldAlert } from 'lucide-react';
 
+import { useGetMeQuery } from '../../features/auth/authApi';
+
 export const StartPage: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [state, setState] = useState<ImmersionState | null>(null);
+    const { refetch } = useGetMeQuery();
 
     useEffect(() => {
         checkStatus();
@@ -20,6 +23,7 @@ export const StartPage: React.FC = () => {
             setState(state);
             // Intelligent Routing based on Status
             if (state.status === FoundationStatus.ACCEPTED) {
+                await refetch(); // Sync user data with Redux
                 navigate('/'); // Go to Dashboard
             } else if (state.status === FoundationStatus.IN_PROGRESS) {
                 // Find first unlocked block

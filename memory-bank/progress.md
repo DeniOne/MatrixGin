@@ -109,3 +109,12 @@
 - **2026-01-27**: Устранена критическая ошибка 500 при логине, нормализована среда выполнения Node.js.
 - **2026-01-27**: Рефрейминг Dashboard: `StartGrowthWeb3D` канонизирован под Geist Design System.
 - **2026-01-28**: Фикс "Методологической блокировки" Foundation Gate. Видео-пути исправлены, админ принудительно разблокирован через `ACCEPTED` статус.
+- **2026-01-28**: **Исправление критических регрессий UI**:
+  - **SQL**: Добавлены `"кавычки"` во все сырые SQL-запросы в `employee-registration.controller.ts` для совместимости с PostgreSQL (устранена ошибка "relation does not exist").
+  - **Dev Mode**: Восстановлен переключатель ролей (`RoleEmulator`). Позиционирование вынесено на `bottom-32`, поднят `z-index: 9999` для предотвращения перекрытия элементами сайдбара.
+  - **Sidebar**: Откачен проп-дриллинг стейта ролей, возвращен стабильный внутренний стейт (`emulatedRole`).
+- [x] **Strict Registration Approval Validation**: ✅ **COMPLETED 2026-01-28**.
+  - **Backend**: Mandatory `departmentId`/`locationId` for self-registrations.
+  - **Frontend**: API typing & Modal enforcement (button blocking, visual cues).
+  - **Data Integrity**: Incomplete legacy registrations backfilled via `fix-legacy-data.ts`.
+  - **Communications**: Restore missed notifications via HTML-based `resend-notifications.ts`.

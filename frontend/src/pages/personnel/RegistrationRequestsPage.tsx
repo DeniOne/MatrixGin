@@ -1,31 +1,18 @@
 import React from 'react';
 import { Table, Tag, Space, Button, Typography, Card, message, Modal } from 'antd';
-import { useGetRegistrationsQuery, useApproveRegistrationMutation, useRejectRegistrationMutation, RegistrationRequest } from '../../features/ofs/api/registrationApi';
-import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined, UserOutlined } from '@ant-design/icons';
+import { useGetRegistrationsQuery, useRejectRegistrationMutation, RegistrationRequest } from '../../features/ofs/api/registrationApi';
+import { CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import ApproveRegistrationModal from '../../features/ofs/components/ApproveRegistrationModal';
 
 const { Title, Text } = Typography;
 
 export const RegistrationRequestsPage: React.FC = () => {
     const { data: response, isLoading, refetch } = useGetRegistrationsQuery({ status: 'REVIEW' });
-    const [approve] = useApproveRegistrationMutation();
     const [reject] = useRejectRegistrationMutation();
+    const [approvingRegistration, setApprovingRegistration] = React.useState<RegistrationRequest | null>(null);
 
-    const handleApprove = (id: string) => {
-        Modal.confirm({
-            title: 'Одобрить регистрацию?',
-            content: 'Это создаст учетную запись сотрудника и отправит ему уведомление в Telegram.',
-            okText: 'Да, одобрить',
-            cancelText: 'Отмена',
-            onOk: async () => {
-                try {
-                    await approve(id).unwrap();
-                    message.success('Регистрация одобрена');
-                    refetch();
-                } catch (err: any) {
-                    message.error(err.data?.message || 'Ошибка одобрения');
-                }
-            }
-        });
+    const handleApprove = (record: RegistrationRequest) => {
+        setApprovingRegistration(record);
     };
 
     const handleReject = (id: string) => {
@@ -67,8 +54,8 @@ export const RegistrationRequestsPage: React.FC = () => {
             key: 'name',
             render: (record: RegistrationRequest) => (
                 <Space direction="vertical" size={0}>
-                    <Text strong>{`${record.last_name} ${record.first_name} ${record.middle_name || ''}`}</Text>
-                    <Text type="secondary" size="small">@{record.telegram_id}</Text>
+                    <Text strong>{record.last_name} {record.first_name} {record.middle_name || ''}</Text>
+                    <Text type="secondary" style={{ fontSize: '12px' }}>@{record.telegram_id}</Text>
                 </Space>
             ),
         },
@@ -82,8 +69,8 @@ export const RegistrationRequestsPage: React.FC = () => {
             key: 'contacts',
             render: (record: RegistrationRequest) => (
                 <Space direction="vertical" size={0}>
-                    <Text size="small">{record.email}</Text>
-                    <Text size="small">{record.phone}</Text>
+                    <Text style={{ fontSize: '12px' }}>{record.email}</Text>
+                    <Text style={{ fontSize: '12px' }}>{record.phone}</Text>
                 </Space>
             ),
         },
@@ -114,7 +101,7 @@ export const RegistrationRequestsPage: React.FC = () => {
                         type="primary"
                         size="small"
                         ghost
-                        onClick={() => handleApprove(record.id)}
+                        onClick={() => handleApprove(record)}
                     >
                         Одобрить
                     </Button>
@@ -144,6 +131,18 @@ export const RegistrationRequestsPage: React.FC = () => {
                     pagination={{ pageSize: 10 }}
                 />
             </Card>
+
+            {approvingRegistration && (
+                <ApproveRegistrationModal
+                    registration={approvingRegistration}
+                    onClose={() => setApprovingRegistration(null)}
+                    onSuccess={() => {
+                        setApprovingRegistration(null);
+                        message.success('Регистрация одобрена');
+                        refetch();
+                    }}
+                />
+            )}
         </div>
     );
 };

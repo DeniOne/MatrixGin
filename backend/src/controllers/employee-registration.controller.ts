@@ -53,7 +53,7 @@ class EmployeeRegistrationController {
 
             let whereClause = '';
             if (status) {
-                whereClause = `WHERE status = '${status}'::registration_status`;
+                whereClause = `WHERE r.status = '${status}'::registration_status`;
             }
 
             const requests = await prisma.$queryRawUnsafe<any[]>(`
@@ -63,10 +63,10 @@ class EmployeeRegistrationController {
                     u.last_name as invited_by_last_name,
                     d.name as department_name,
                     l.name as location_name
-                FROM employee_registration_requests r
-                LEFT JOIN users u ON r.invited_by = u.id
-                LEFT JOIN departments d ON r.department_id = d.id
-                LEFT JOIN locations l ON r.location_id = l.id
+                FROM "employee_registration_requests" r
+                LEFT JOIN "users" u ON r.invited_by = u.id
+                LEFT JOIN "departments" d ON r.department_id = d.id
+                LEFT JOIN "locations" l ON r.location_id = l.id
                 ${whereClause}
                 ORDER BY r.created_at DESC
                 LIMIT ${Number(limit)} OFFSET ${offset}
@@ -74,7 +74,7 @@ class EmployeeRegistrationController {
 
             const totalResult = await prisma.$queryRawUnsafe<any[]>(`
                 SELECT COUNT(*) as total 
-                FROM employee_registration_requests 
+                FROM "employee_registration_requests" r
                 ${whereClause}
             `);
 
@@ -114,10 +114,10 @@ class EmployeeRegistrationController {
                     u.last_name as invited_by_last_name,
                     d.name as department_name,
                     l.name as location_name
-                FROM employee_registration_requests r
-                LEFT JOIN users u ON r.invited_by = u.id
-                LEFT JOIN departments d ON r.department_id = d.id
-                LEFT JOIN locations l ON r.location_id = l.id
+                FROM "employee_registration_requests" r
+                LEFT JOIN "users" u ON r.invited_by = u.id
+                LEFT JOIN "departments" d ON r.department_id = d.id
+                LEFT JOIN "locations" l ON r.location_id = l.id
                 WHERE r.id = ${id}::uuid
             `;
 
@@ -132,7 +132,7 @@ class EmployeeRegistrationController {
             // Get step history
             const history = await prisma.$queryRaw<any[]>`
                 SELECT step, data, completed_at
-                FROM registration_step_history
+                FROM "registration_step_history"
                 WHERE registration_id = ${id}::uuid
                 ORDER BY completed_at ASC
             `;
@@ -161,9 +161,10 @@ class EmployeeRegistrationController {
         try {
             const { id } = req.params;
             const userId = (req.user as any)?.id;
-            const { departmentId, locationId } = req.body;
 
-            await employeeRegistrationService.approveRegistration(id, userId, { departmentId, locationId });
+            console.log(`[Approve] Approving registration ${id} by user ${userId}. Payload:`, req.body);
+
+            await employeeRegistrationService.approveRegistration(id, userId, req.body);
 
             res.status(200).json({
                 success: true,
@@ -221,7 +222,7 @@ class EmployeeRegistrationController {
                 SELECT 
                     status,
                     COUNT(*) as count
-                FROM employee_registration_requests
+                FROM "employee_registration_requests"
                 GROUP BY status
             `;
 
@@ -229,7 +230,7 @@ class EmployeeRegistrationController {
                 SELECT 
                     DATE(created_at) as date,
                     COUNT(*) as count
-                FROM employee_registration_requests
+                FROM "employee_registration_requests"
                 WHERE created_at >= NOW() - INTERVAL '30 days'
                 GROUP BY DATE(created_at)
                 ORDER BY date DESC

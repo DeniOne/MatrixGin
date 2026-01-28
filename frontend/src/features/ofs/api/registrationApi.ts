@@ -23,6 +23,9 @@ export interface RegistrationRequest {
   registration_address?: string;
   residential_address?: string;
   additional_documents?: any[];
+  invited_by?: string;
+  invited_by_first_name?: string;
+  invited_by_last_name?: string;
   created_at: string;
   completed_at?: string;
   reviewed_at?: string;
@@ -91,10 +94,15 @@ export const registrationApi = createApi({
     }),
 
     // Approve registration
-    approveRegistration: builder.mutation<{ success: boolean; message: string }, string>({
-      query: (id) => ({
+    approveRegistration: builder.mutation<{ success: boolean; message: string }, {
+      id: string;
+      departmentId: string;
+      locationId: string;
+    }>({
+      query: ({ id, ...body }) => ({
         url: `/requests/${id}/approve`,
         method: 'POST',
+        body,
       }),
       invalidatesTags: ['Registrations', 'Stats'],
     }),

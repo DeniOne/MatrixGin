@@ -300,6 +300,18 @@ export const ofsApi = createApi({
     getStructureReport: builder.query<{ success: boolean; data: any }, void>({
       query: () => '/reports/structure',
     }),
+
+    // Locations
+    getLocations: builder.query<{ success: boolean; data: any[] }, void>({
+      query: () => '/locations',
+      providesTags: (result) => result ? result.data.map(({ id }) => ({ type: 'Departments' as const, id })) : ['Departments'],
+    }),
+
+    // Positions
+    getPositions: builder.query<{ success: boolean; data: any[] }, void>({
+      query: () => '/positions',
+      providesTags: (result) => result ? result.data.map(({ id }) => ({ type: 'Roles' as const, id })) : ['Roles'],
+    }),
   }),
 });
 
@@ -326,4 +338,6 @@ export const {
   useSubmitIdeaMutation,
   useGetIdeasQuery,
   useGetStructureReportQuery,
+  useGetLocationsQuery,
+  useGetPositionsQuery,
 } = ofsApi;

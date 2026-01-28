@@ -32,20 +32,22 @@ export const RoleEmulator: React.FC<RoleEmulatorProps> = ({ onRoleChange }) => {
 
     if (!isVisible) {
         return (
-            <div className="fixed bottom-4 left-4 z-50">
+            <div className="fixed bottom-32 left-4 z-[9999]">
                 <Button
                     type="primary"
                     danger
                     shape="circle"
+                    size="large"
                     icon={<span style={{ fontSize: '10px' }}>DEV</span>}
                     onClick={() => setIsVisible(true)}
+                    className="shadow-lg border-2 border-white"
                 />
             </div>
         );
     }
 
     return (
-        <div className="fixed bottom-4 left-4 z-50">
+        <div className="fixed bottom-32 left-4 z-[9999]">
             <Card
                 size="small"
                 title={<span className="text-xs font-bold text-red-600">ЭМУЛЯТОР РОЛЕЙ (DEV)</span>}

@@ -908,6 +908,15 @@ export class EmployeeRegistrationService {
 
         const reg = registration[0];
 
+        // Validation for Self-Registration (without invited_by)
+        // Self-registration MUST have departmentId and locationId at approval time
+        const finalDepartmentId = overrides?.departmentId || reg.department_id;
+        const finalLocationId = overrides?.locationId || reg.location_id;
+
+        if (!reg.invited_by && (!finalDepartmentId || !finalLocationId)) {
+            throw new Error('departmentId and locationId are required for self-registration approval');
+        }
+
         // Idempotency check: prevent duplicate approval
         if (reg.status === 'APPROVED') {
             console.warn(`[EmployeeRegistrationService] Registration ${registrationId} already approved`);
@@ -924,8 +933,6 @@ export class EmployeeRegistrationService {
         const dummyPassword = randomUUID();
         const hashedPassword = await bcrypt.hash(dummyPassword, 12);
 
-        const departmentId = overrides?.departmentId || reg.department_id;
-
         // Create user account
         const user = await prisma.user.create({
             data: {
@@ -938,7 +945,7 @@ export class EmployeeRegistrationService {
                 telegram_id: reg.telegram_id,
                 role: 'EMPLOYEE',
                 status: 'ACTIVE',
-                department_id: departmentId,
+                department_id: finalDepartmentId,
                 // @ts-ignore
                 must_reset_password: true,
                 // @ts-ignore
@@ -957,7 +964,7 @@ export class EmployeeRegistrationService {
         const employee = await prisma.employee.create({
             data: {
                 user_id: user.id,
-                department_id: departmentId,
+                department_id: finalDepartmentId,
                 position: reg.position,
                 hire_date: new Date()
             }
@@ -970,8 +977,8 @@ export class EmployeeRegistrationService {
                 reviewed_by = ${reviewedByUserId},
                 reviewed_at = NOW(),
                 updated_at = NOW(),
-                department_id = ${departmentId},
-                location_id = ${overrides?.locationId ? overrides.locationId : reg.location_id}
+                department_id = ${finalDepartmentId},
+                location_id = ${finalLocationId}
             WHERE id = ${registrationId}
         `;
 
