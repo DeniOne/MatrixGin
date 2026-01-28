@@ -4,27 +4,44 @@ import { foundationApi } from '../../features/foundation/api/foundation.api';
 import { FoundationStatus, ImmersionState } from '../../features/foundation/types/foundation.types';
 import { AlertTriangle, ArrowRight, ShieldAlert } from 'lucide-react';
 
-import { useGetMeQuery } from '../../features/auth/authApi';
+import { useGetMeQuery, useLazyGetMeQuery } from '../../features/auth/authApi';
+import { useAppDispatch } from '../../app/hooks';
+import { setCredentials } from '../../features/auth/authSlice';
 
 export const StartPage: React.FC = () => {
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [state, setState] = useState<ImmersionState | null>(null);
-    const { refetch } = useGetMeQuery();
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [triggerGetMe] = useLazyGetMeQuery();
+    const dispatch = useAppDispatch();
 
     useEffect(() => {
         checkStatus();
     }, []);
 
     const checkStatus = async () => {
+        if (isProcessing) return;
         try {
+            console.log('[StartPage] Checking status...');
             const state = await foundationApi.getStatus();
+            console.log('[StartPage] Received status:', state.status);
             setState(state);
             // Intelligent Routing based on Status
             if (state.status === FoundationStatus.ACCEPTED) {
-                await refetch(); // Sync user data with Redux
-                navigate('/'); // Go to Dashboard
+                console.log('[StartPage] Status is ACCEPTED, syncing user...');
+                setIsProcessing(true);
+                const userData = await triggerGetMe().unwrap();
+                console.log('[StartPage] User data received:', userData?.admissionStatus);
+                if (userData) {
+                    const token = localStorage.getItem('token');
+                    if (token) {
+                        dispatch(setCredentials({ user: userData, accessToken: token }));
+                        console.log('[StartPage] Redux updated, navigating to /');
+                    }
+                }
+                navigate('/');
             } else if (state.status === FoundationStatus.IN_PROGRESS) {
                 // Find first unlocked block
                 const firstUnlocked = state.blocks.find(b => b.status !== 'COMPLETED');

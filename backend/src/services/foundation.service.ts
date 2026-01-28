@@ -97,13 +97,24 @@ export class FoundationService {
             };
         });
 
-        return {
-            status,
-            currentVersion: FOUNDATION_VERSION,
-            blocks: blocksWithLocking,
-            canAccept: viewedBlockIds.size === FOUNDATION_BLOCKS.length,
-            acceptedAt: acceptance?.accepted_at?.toISOString()
-        };
+        try {
+            return {
+                status,
+                currentVersion: FOUNDATION_VERSION,
+                blocks: blocksWithLocking,
+                canAccept: viewedBlockIds.size === FOUNDATION_BLOCKS.length,
+                acceptedAt: (acceptance?.accepted_at instanceof Date) ? acceptance.accepted_at.toISOString() : undefined
+            };
+        } catch (error: any) {
+            logger.error('CRITICAL ERROR in getImmersionState (return block):', {
+                error: error.message,
+                stack: error.stack,
+                userId,
+                acceptanceExists: !!acceptance,
+                accepted_at: acceptance?.accepted_at
+            });
+            throw error;
+        }
     }
 
     /**

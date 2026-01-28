@@ -11,6 +11,7 @@ export const FoundationGuard: React.FC<FoundationGuardProps> = ({ children }) =>
     const location = useLocation();
 
     const admissionStatus = user?.admissionStatus || 'PENDING_BASE';
+    console.log('[FoundationGuard] admissionStatus:', admissionStatus, 'user exists:', !!user);
 
     // 1. If user is completely admitted, allow access
     if (admissionStatus === 'ADMITTED') {

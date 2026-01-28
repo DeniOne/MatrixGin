@@ -8,19 +8,19 @@
  */
 export enum UserRole {
     /** Администратор системы */
-    ADMIN = 'admin',
+    ADMIN = 'ADMIN',
     /** HR менеджер */
-    HR_MANAGER = 'hr_manager',
+    HR_MANAGER = 'HR_MANAGER',
     /** Руководитель департамента */
-    DEPARTMENT_HEAD = 'department_head',
+    DEPARTMENT_HEAD = 'DEPARTMENT_HEAD',
     /** Управляющий филиалом */
-    BRANCH_MANAGER = 'branch_manager',
+    BRANCH_MANAGER = 'BRANCH_MANAGER',
     /** Менеджер (общий) */
-    MANAGER = 'manager',
+    MANAGER = 'MANAGER',
     /** Менеджер производства */
-    PRODUCTION_MANAGER = 'production_manager',
+    PRODUCTION_MANAGER = 'PRODUCTION_MANAGER',
     /** Сотрудник */
-    EMPLOYEE = 'employee',
+    EMPLOYEE = 'EMPLOYEE',
 }
 
 /**
@@ -28,11 +28,11 @@ export enum UserRole {
  */
 export enum UserStatus {
     /** Активный */
-    ACTIVE = 'active',
+    ACTIVE = 'ACTIVE',
     /** Неактивный */
-    INACTIVE = 'inactive',
+    INACTIVE = 'INACTIVE',
     /** Приостановлен */
-    SUSPENDED = 'suspended',
+    SUSPENDED = 'SUSPENDED',
 }
 
 /**

@@ -54,6 +54,7 @@ export const authApi = api.injectEndpoints({
 export const {
     useLoginMutation,
     useGetMeQuery,
+    useLazyGetMeQuery,
     useChangePasswordMutation,
     useInitTelegramLoginMutation,
     useLazyVerifyTelegramLoginQuery // Use lazy for polling

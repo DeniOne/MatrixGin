@@ -239,26 +239,57 @@ export class AuthService {
     }
 
     private mapToUserResponse(user: User): UserResponseDto {
-        return {
-            id: user.id,
-            email: user.email,
-            role: user.role as unknown as UserRole, // Cast Prisma enum to DTO enum
-            status: user.status as unknown as UserStatus, // Cast Prisma enum to DTO enum
-            firstName: user.first_name,
-            lastName: user.last_name,
-            middleName: user.middle_name || undefined, // Handle null
-            phoneNumber: user.phone_number || undefined, // Handle null
-            avatar: user.avatar || undefined, // Handle null
-            departmentId: user.department_id || undefined, // Handle null
-            lastLoginAt: user.last_login_at?.toISOString(),
-            createdAt: user.created_at.toISOString(),
+        try {
+            logger.info('Mapping user to response', {
+                userId: user.id,
+                admission_status: user.admission_status,
+                foundation_status: user.foundation_status
+            });
+            let finalAdmissionStatus = user.admission_status || 'PENDING_BASE';
 
-            updatedAt: user.updated_at.toISOString(),
-            personalDataConsent: user.personal_data_consent,
-            mustResetPassword: (user as any).must_reset_password || false,
-            foundationStatus: (user as any).foundation_status || 'NOT_STARTED',
-            admissionStatus: (user as any).admission_status || 'PENDING_BASE',
-        };
+            // COMPATIBILITY FIX: If foundation is accepted but admission status is pending (legacy data),
+            // upgrade it to BASE_ACCEPTED to prevent redirect loops.
+            if ((user.foundation_status === 'ACCEPTED' || (user.foundation_status as string) === 'OldCanon') &&
+                finalAdmissionStatus === 'PENDING_BASE') {
+                finalAdmissionStatus = 'BASE_ACCEPTED';
+            }
+
+            const response: UserResponseDto = {
+                id: user.id,
+                email: user.email,
+                role: user.role as UserRole,
+                status: user.status as UserStatus,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                middleName: user.middle_name || undefined,
+                phoneNumber: user.phone_number || undefined,
+                avatar: user.avatar || undefined,
+                departmentId: user.department_id || undefined,
+                lastLoginAt: user.last_login_at instanceof Date ? user.last_login_at.toISOString() : undefined,
+                createdAt: user.created_at instanceof Date ? user.created_at.toISOString() : new Date().toISOString(),
+                updatedAt: user.updated_at instanceof Date ? user.updated_at.toISOString() : new Date().toISOString(),
+                personalDataConsent: user.personal_data_consent,
+                mustResetPassword: user.must_reset_password || false,
+                foundationStatus: user.foundation_status || 'NOT_STARTED',
+                admissionStatus: finalAdmissionStatus as any,
+            };
+            return response;
+        } catch (error: any) {
+            logger.error('CRITICAL ERROR in mapToUserResponse:', {
+                error: error.message,
+                stack: error.stack,
+                userId: user.id,
+                userEmail: user.email,
+                userData: {
+                    last_login_at: user.last_login_at,
+                    created_at: user.created_at,
+                    updated_at: user.updated_at,
+                    role: user.role,
+                    status: user.status
+                }
+            });
+            throw error;
+        }
     }
 
     private getScopesForStatus(status: string): string[] {

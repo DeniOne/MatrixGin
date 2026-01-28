@@ -32,6 +32,9 @@ MatrixGin должен трансформироваться из **систем�
 - **Backend & UI Stabilization**: ✅ **COMPLETED 2026-01-27**.
   - **Backend**: Resolved 500 error on login by eliminating duplicate Node.js processes.
   - **UI (Dashboard)**: Refactored `StartGrowthWeb3D.tsx` to align with Geist Canon (glassmorphism, premium typography, optimized SVG).
+- **Stabilization & Polling Fixes**: ✅ **COMPLETED 2026-01-29**.
+  - **StartPage**: Implemented self-healing admission logic for legacy data (Prisma + AuthService).
+  - **Loop**: Resolved infinite redirect loop between `FoundationGuard` and `StartPage`.
 - **Admission Gate (Base-First)**: ✅ **COMPLETED 2026-01-29**.
   - **Security Core**: Implemented `AdmissionStatus` FSM (Pending -> Accepted -> Profile -> Admitted).
   - **JWT Scopes**: Dynamic access control based on admission status (Layer 0/1 enforcement).

@@ -64,7 +64,7 @@ app.use(cors({
 // Rate Limiting
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    max: 10000, // INCREASED FOR DEV
     handler: (req, res, next, options) => {
         res.status(options.statusCode).json({ message: options.message });
     },
@@ -73,7 +73,7 @@ const limiter = rateLimit({
 
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
+    max: 10000, // INCREASED FOR DEV
     handler: (req, res, next, options) => {
         res.status(options.statusCode).json({ message: options.message });
     },
