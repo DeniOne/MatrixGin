@@ -36,6 +36,7 @@ MatrixGin должен трансформироваться из **систем�
   - **Backend Layer**: Implemented strict validation for mandatory `departmentId` and `locationId` in `EmployeeRegistrationService`.
   - **UI (Modal)**: Enforced mandatory selection in `ApproveRegistrationModal` with visual feedback and button locking.
   - **Data Resilience**: Fixed legacy registrations via `fix-legacy-data.ts` and restored missed notifications via `resend-notifications.ts`.
+  - **Documentation**: Created comprehensive [User Manual](file:///f:/Matrix_Gin/documentation/USER-MANUAL-REGISTRATION.md) for HR and candidates.
   - **Logic Audit**: Successfully verified via script-based automated testing.
 
 ## GAP-анализ модулей (Updated 2026-01-25)
