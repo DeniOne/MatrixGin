@@ -158,11 +158,11 @@ model User {
   reset_password_token         String?                      @unique
   reset_token_expires_at       DateTime?
   foundation_status            FoundationStatus             @default(NOT_STARTED)
+  foundation_current_block_id  String?
   foundation_progress          Int                          @default(0)
   admission_status             AdmissionStatus              @default(PENDING_BASE)
   base_accepted_at             DateTime?
   base_version                 String?
-  foundation_current_block_id  String?
   ai_feedback                  AIFeedback[]
   audit_logs                   AuditLog[]
   auth_sessions                AuthSession[]
@@ -1679,15 +1679,6 @@ model EmployeeRegistrationRequest {
   @@map("employee_registration_requests")
 }
 
-enum AdmissionStatus {
-  PENDING_BASE
-  BASE_ACCEPTED
-  PROFILE_COMPLETE
-  ADMITTED
-
-  @@map("admission_status")
-}
-
 model RegistrationStepHistory {
   id              String                      @id @default(uuid())
   registration_id String
@@ -1698,6 +1689,15 @@ model RegistrationStepHistory {
 
   @@index([registration_id])
   @@map("registration_step_history")
+}
+
+enum AdmissionStatus {
+  PENDING_BASE
+  BASE_ACCEPTED
+  PROFILE_COMPLETE
+  ADMITTED
+
+  @@map("admission_status")
 }
 
 enum QuizMode {
@@ -2089,7 +2089,6 @@ enum RegistrationStatus {
 }
 
 enum RegistrationStep {
-  BASE
   PHOTO
   FULL_NAME
   BIRTH_DATE
@@ -2102,6 +2101,7 @@ enum RegistrationStep {
   PASSPORT_SCAN
   DOCUMENTS
   COMPLETED
+  BASE
 
   @@map("registration_step")
 }

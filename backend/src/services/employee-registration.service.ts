@@ -188,14 +188,14 @@ export class EmployeeRegistrationService {
         // Send "Learn Base" command trigger
         await ctx.reply(
             `🧭 *Шаг 1: Ознакомление с Базой*\n\n` +
-            `MatrixGin — это не просто ERP, это проект с четкими принципами.\n\n` +
-            `Тебе нужно ознакомиться с несколькими блоками Базы и принять их. Только после этого мы перейдем к заполнению анкеты.\n\n` +
+            `База — это обязательные правила и принципы системы.\n` +
+            `После ознакомления необходимо принять Базу, иначе доступ к системе не предоставляется.\n\n` +
             `Нажми на кнопку ниже, чтобы начать.`,
             {
                 parse_mode: 'Markdown',
                 reply_markup: {
                     inline_keyboard: [
-                        [{ text: '🚀 Начать погружение', callback_data: 'start_foundation' }]
+                        [{ text: '🧭 Узнай Базу', callback_data: 'start_foundation' }]
                     ]
                 }
             }
