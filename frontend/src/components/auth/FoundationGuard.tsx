@@ -28,14 +28,18 @@ export const FoundationGuard: React.FC<FoundationGuardProps> = ({ children }) =>
     }
 
     // 3. If user accepted the Base but hasn't completed enrollment (Personal Data), force to Registration
+    // 3. If user accepted the Base but hasn't completed enrollment (Personal Data), force to Registration
+    // [TEMPORARY DISABLE] - User doesn't have a registration form yet, so don't block them.
+    /*
     if (admissionStatus === 'BASE_ACCEPTED') {
         // If we have a dedicated registration completion page, redirect there.
         // For now, redirecting to a placeholder or specific onboarding route.
-        if (location.pathname.startsWith('/registration')) {
+        if (location.pathname.startsWith('/profile')) {
             return <>{children}</>;
         }
-        return <Navigate to="/registration" replace state={{ from: location }} />;
+        return <Navigate to="/profile" replace state={{ from: location }} />;
     }
+    */
 
     // Default: allow children but with restricted scopes (enforced by backend)
     return <>{children}</>;

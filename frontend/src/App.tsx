@@ -169,6 +169,9 @@ const AppRoutes: React.FC = () => {
                                     <Route path="dashboard" element={<HRDashboardPage />} />
                                     <Route path="registration" element={<RegistrationRequestsPage />} />
                                 </Route>
+
+                                {/* Catch-all for authenticated routes: Redirect to Dashboard */}
+                                <Route path="*" element={<Navigate to="/" replace />} />
                             </Routes>
                         </AppLayout>
                     </FoundationGuard>

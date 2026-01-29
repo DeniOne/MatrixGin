@@ -7,7 +7,7 @@ import ApproveRegistrationModal from '../../features/ofs/components/ApproveRegis
 const { Title, Text } = Typography;
 
 export const RegistrationRequestsPage: React.FC = () => {
-    const { data: response, isLoading, refetch } = useGetRegistrationsQuery({ status: 'REVIEW' });
+    const { data: response, isLoading, refetch } = useGetRegistrationsQuery({});
     const [reject] = useRejectRegistrationMutation();
     const [approvingRegistration, setApprovingRegistration] = React.useState<RegistrationRequest | null>(null);
 

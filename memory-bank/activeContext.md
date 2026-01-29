@@ -18,6 +18,7 @@ MatrixGin должен трансформироваться из **систем�
 
 ## ⚔️ Recent Changes
 - **Sprint 9-12 Completed**: Decoupled Reward Engine, PSEE Integration, Bot v2, Growth Web 3D.
+- **Sprint- [2026-01-29] **Foundation Loop & Canon**: Fixed infinite redirect, enforced hard canon for Bot texts, and fixed registration request visibility. See `MEMORY-2026-01-29-foundation-loop-and-canon.md`.
 - **Sprint 14 Completed**: **Module 09 (Status & Ranks)** implementation.
   - **Backend**: Managed statuses (MANUAL) and automated Ranks (GMC-based).
   - **Frontend**: Status Management Admin UI and Profile badges.
@@ -58,3 +59,9 @@ MatrixGin должен трансформироваться из **систем�
 - MatrixCoin Economy (Module 08) = **CANONICAL** — НЕ ТРОГАТЬ
 - Status System = **CANONICAL** — изменения только через Governance
 - **Foundation Admission Gate** = **SCRIPT-ONLY** — редактирование через UI запрещено. Markdown в `FOUNDATIONAL` папке — единственный источник истины.
+
+## 🛡️ CANON COMPLIANCE
+Перед реализацией любой функции **ОБЯЗАТЕЛЬНО**:
+1. Проверить папку `documentation/00-strategic/`.
+2. Если в `ADMISSION_FLOW.md` или `UI_DESIGN_CANON.md` есть жесткие требования (тексты, цвета, логика) — следовать им БУКВАЛЬНО.
+3. Отсебятина в текстах интерфейса/бота запрещена. Тексты брать только из документации.
