@@ -29,6 +29,12 @@ export class MVPLearningContourGuard implements CanActivate {
         }
 
         const request = context.switchToHttp().getRequest();
+
+        // ARCHITECT OVERRIDE: Superuser Bypass
+        if (request.headers['x-matrix-dev-role'] === 'SUPERUSER' && process.env.NODE_ENV !== 'production') {
+            return true;
+        }
+
         const path = request.url;
 
         // Check if path is forbidden

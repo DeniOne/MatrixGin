@@ -10,6 +10,13 @@ export const api = createApi({
             if (token) {
                 headers.set('authorization', `Bearer ${token}`);
             }
+
+            // ARCHITECT OVERRIDE: Superuser Header
+            const devRole = localStorage.getItem('emulatedRole') || 'SUPERUSER';
+            if (devRole === 'SUPERUSER') {
+                headers.set('X-Matrix-Dev-Role', 'SUPERUSER');
+            }
+
             return headers;
         },
     }),

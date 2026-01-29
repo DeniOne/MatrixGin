@@ -614,7 +614,7 @@ class TelegramService {
     private getMainMenuKeyboard(foundationStatus: string = 'ACCEPTED') {
         const buttons = [];
         if (foundationStatus !== 'ACCEPTED') {
-            buttons.push([Markup.button.callback('🧭 Узнай Базу', 'start_foundation')]);
+            buttons.push([Markup.button.callback('🧭 Узнать Базу', 'start_foundation')]);
         }
         buttons.push([
             Markup.button.callback('📋 Мои задачи', 'my_tasks'),
@@ -706,13 +706,21 @@ class TelegramService {
             await ctx.reply('✅ Вы уже приняли Базу.');
             return;
         }
-        if (progress < FOUNDATION_BLOCKS.length) {
-            const block = FOUNDATION_BLOCKS[progress];
+        const blocks = await foundationService.getBlocks();
+        const totalBlocks = blocks.length;
+
+        if (progress < totalBlocks) {
+            const block = blocks[progress];
             const keyboard = Markup.inlineKeyboard([[Markup.button.callback('✅ Прочитано', `view_foundation_block_${block.id}`)]]);
             await ctx.reply(`🧱 *Блок ${progress + 1}*\n\n*${block.title}*\n\n${block.description}`, { parse_mode: 'Markdown', ...keyboard });
-        } else {
-            const keyboard = Markup.inlineKeyboard([[Markup.button.callback('📜 Принимаю Базу', 'accept_foundation'), Markup.button.callback('❌ Отказаться', 'decline_foundation')]]);
+        } else if (totalBlocks > 0) {
+            const keyboard = Markup.inlineKeyboard([[
+                Markup.button.callback('📜 ПРИНЯТЬ БАЗУ', 'accept_foundation'),
+                Markup.button.callback('❌ Отказаться', 'decline_foundation')
+            ]]);
             await ctx.reply('📜 *Принятие Базы*\n\nВы ознакомились со всеми блоками. Готовы принять?', { parse_mode: 'Markdown', ...keyboard });
+        } else {
+            await ctx.reply('⚠️ Данные Базы временно недоступны.');
         }
     }
 }

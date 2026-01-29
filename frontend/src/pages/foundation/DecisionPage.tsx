@@ -34,67 +34,82 @@ export const DecisionPage: React.FC = () => {
     };
 
     return (
-        <div className="p-8 md:p-12">
-            <div className="flex justify-center mb-6 text-gray-900">
-                <Scale size={64} />
-            </div>
+        <div className="flex-grow flex flex-col items-center justify-center p-6 bg-[#F3F3F5] font-sans selection:bg-indigo-100/30">
+            <div className="w-full max-w-xl bg-white shadow-sm rounded-[2.5rem] border border-black/5 p-16">
+                <div className="flex justify-center mb-10 text-indigo-600">
+                    <Scale size={64} strokeWidth={1.5} />
+                </div>
 
-            <h2 className="text-3xl font-medium text-center mb-6 text-gray-900">Финальное решение</h2>
+                <h2 className="text-4xl font-medium text-center mb-8 text-[#030213] tracking-tight">Принятие Базы</h2>
 
-            <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-8 prose prose-sm text-gray-600">
-                <p>
-                    Принимая, вы соглашаетесь соблюдать
-                    <strong> Constitution, Code of Honor, and Golden Standards</strong>.
-                </p>
-                <p>
-                    Вы признаете, что:
-                </p>
-                <ul className="list-disc pl-5 space-y-1">
-                    <li>Нарушение Кодекса ведет к увольнению.</li>
-                    <li>Результат важнее усилий (MDR).</li>
-                    <li>Экономика основана на заслугах.</li>
-                </ul>
-                <p className="font-medium text-gray-900 mt-4">
-                    Решение обязательно и записано в Аудит-лог.
-                </p>
-            </div>
+                <div className="bg-[#F3F3F5] p-8 rounded-3xl border border-black/5 mb-10 text-[#030213]/70 text-lg leading-relaxed">
+                    <p className="mb-4">
+                        Принимая Базу, вы подтверждаете свою готовность следовать
+                        <strong className="text-[#030213] font-medium ml-1">Конституции, Кодексу Чести и Золотым Стандартам</strong> системы MatrixGin.
+                    </p>
 
-            <div className="mb-8">
-                <label className="flex items-start space-x-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
-                    <input
-                        type="checkbox"
-                        checked={agreed}
-                        onChange={(e) => setAgreed(e.target.checked)}
-                        className="h-6 w-6 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-0.5"
-                    />
-                    <span className="text-gray-900 font-medium select-none">
-                        Подтверждаю прочтение Блоков Фундамента и ПРИНИМАЮ правила.
-                    </span>
-                </label>
-            </div>
+                    <ul className="space-y-3 mt-6">
+                        <li className="flex items-start">
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mr-4 mt-2.5 shrink-0" />
+                            <span>Нарушение Кодекса ведет к немедленному увольнению.</span>
+                        </li>
+                        <li className="flex items-start">
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mr-4 mt-2.5 shrink-0" />
+                            <span>Результат (MDR) всегда приоритетнее усилий.</span>
+                        </li>
+                        <li className="flex items-start">
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mr-4 mt-2.5 shrink-0" />
+                            <span>Экономика системы основана на личных заслугах.</span>
+                        </li>
+                    </ul>
 
-            <div className="space-y-4">
-                <button
-                    onClick={handleAccept}
-                    disabled={!agreed || submitting}
-                    className={`
-                        w-full flex justify-center items-center px-6 py-4 rounded-lg text-lg font-medium shadow-md transition-all
-                        ${(!agreed || submitting)
-                            ? 'bg-gray-200 text-[#717182] cursor-not-allowed'
-                            : 'bg-green-600 text-[#030213] hover:bg-green-700 hover:scale-[1.01]'
-                        }
-                    `}
-                >
-                    {submitting ? 'Processing...' : 'ACCEPT FOUNDATION'}
-                </button>
+                    <p className="text-xs font-medium uppercase tracking-widest text-indigo-600 mt-8 opacity-60">
+                        Решение фиксируется в децентрализованном аудит-логе.
+                    </p>
+                </div>
 
-                <button
-                    onClick={handleDecline}
-                    disabled={submitting}
-                    className="w-full py-3 text-[#717182] hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
-                >
-                    Отказываюсь (Выход)
-                </button>
+                <div className="mb-10">
+                    <label className={`
+                        flex items-start space-x-4 p-6 rounded-2xl border transition-all cursor-pointer
+                        ${agreed ? 'bg-indigo-50/50 border-indigo-200' : 'bg-white border-black/10 hover:border-black/20'}
+                    `}>
+                        <div className="relative flex items-center mt-0.5">
+                            <input
+                                type="checkbox"
+                                checked={agreed}
+                                onChange={(e) => setAgreed(e.target.checked)}
+                                className="h-6 w-6 text-indigo-600 border-black/10 rounded-lg cursor-pointer transition-all"
+                            />
+                        </div>
+                        <span className="text-[#030213] font-medium text-lg leading-snug select-none">
+                            Я подтверждаю, что полностью осознаю Базу и ПРИНИМАЮ правила системы.
+                        </span>
+                    </label>
+                </div>
+
+                <div className="flex flex-col space-y-4">
+                    <button
+                        onClick={handleAccept}
+                        disabled={!agreed || submitting}
+                        className={`
+                            w-full flex justify-center items-center px-8 py-6 rounded-2xl text-xl font-medium transition-all shadow-xl shadow-indigo-100
+                            ${(!agreed || submitting)
+                                ? 'bg-white border border-black/5 text-[#717182] cursor-not-allowed'
+                                : 'bg-black text-white hover:bg-[#030213] active:scale-[0.98]'
+                            }
+                        `}
+                    >
+                        {submitting ? 'Запись в ядро...' : '📜 ПРИНЯТЬ БАЗУ'}
+                    </button>
+
+                    <button
+                        onClick={handleDecline}
+                        disabled={submitting}
+                        className="w-full py-5 text-[#717182] hover:text-red-600 transition-colors font-medium text-lg"
+                    >
+                        Отказаться и покинуть систему
+                    </button>
+                </div>
             </div>
         </div>
     );

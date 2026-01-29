@@ -89,8 +89,10 @@ const Sidebar: React.FC = () => {
     const [collapsedClusters, setCollapsedClusters] = useState<string[]>([]);
 
     // Role Emulator State
-    // Default to SUPERUSER in DEV for convenience, or EMPLOYEE
-    const [emulatedRole, setEmulatedRole] = useState<EmulatedRole>(EmulatedRole.SUPERUSER);
+    const [emulatedRole, setEmulatedRole] = useState<EmulatedRole>(() => {
+        const saved = localStorage.getItem('emulatedRole');
+        return (saved as EmulatedRole) || EmulatedRole.SUPERUSER;
+    });
 
     const isLocked = useMemo(() => {
         // Superuser is never locked out from a UI perspective (for dev/management)
@@ -127,6 +129,9 @@ const Sidebar: React.FC = () => {
         // We trust the "EmulatedRole" array in the config.
 
         return MENU_CONFIG.filter(cluster => {
+            // ARCHITECT OVERRIDE: SUPERUSER sees everything
+            if (emulatedRole === EmulatedRole.SUPERUSER) return true;
+
             // 0. LOCKOUT LOGIC: If locked, only Cluster B is potentially visible
             if (isLocked && cluster.id !== 'university') return false;
 
@@ -201,6 +206,19 @@ const Sidebar: React.FC = () => {
                         <div className="flex items-center gap-3">
                             <Icon className={clsx("w-[18px] h-[18px]", isActive ? "text-[#3B82F6]" : "text-[#717182]")} />
                             <span className={clsx("tracking-tight", depth === 0 ? "text-[14px]" : "text-[13px]")}>{item.label}</span>
+
+                            {/* Superuser Status Badge */}
+                            {emulatedRole === EmulatedRole.SUPERUSER && item.status && (
+                                <span className={clsx(
+                                    "text-[8px] px-1 rounded-sm font-bold uppercase",
+                                    item.status === 'PRODUCTION' && "bg-green-100 text-green-600",
+                                    item.status === 'PARTIAL' && "bg-yellow-100 text-yellow-600",
+                                    item.status === 'PLANNED' && "bg-gray-100 text-gray-500",
+                                    item.status === 'DOC ONLY' && "bg-blue-100 text-blue-600"
+                                )}>
+                                    {item.status === 'DOC ONLY' ? 'DOC' : item.status.substring(0, 4)}
+                                </span>
+                            )}
                         </div>
                         {isExpanded ? <ChevronDown className="w-3.5 h-3.5 opacity-50" /> : <ChevronRight className="w-3.5 h-3.5 opacity-50" />}
                     </div>
@@ -217,7 +235,20 @@ const Sidebar: React.FC = () => {
                         }
                     >
                         <Icon className={clsx("w-[18px] h-[18px] mr-3 shrink-0", isActive ? "text-[#3B82F6]" : "text-[#717182]")} />
-                        <span className={clsx("tracking-tight", depth === 0 ? "text-[14px]" : "text-[13px]")}>{item.label}</span>
+                        <span className={clsx("tracking-tight flex-1", depth === 0 ? "text-[14px]" : "text-[13px]")}>{item.label}</span>
+
+                        {/* Superuser Status Badge */}
+                        {emulatedRole === EmulatedRole.SUPERUSER && item.status && (
+                            <span className={clsx(
+                                "text-[8px] px-1 rounded-sm font-bold uppercase whitespace-nowrap",
+                                item.status === 'PRODUCTION' && "bg-green-100 text-green-600",
+                                item.status === 'PARTIAL' && "bg-yellow-100 text-yellow-600",
+                                item.status === 'PLANNED' && "bg-gray-100 text-gray-500",
+                                item.status === 'DOC ONLY' && "bg-blue-100 text-blue-600"
+                            )}>
+                                {item.status === 'DOC ONLY' ? 'DOC' : item.status.substring(0, 4)}
+                            </span>
+                        )}
                     </NavLink>
                 )}
 

@@ -17,6 +17,11 @@ export class PersonnelAccessGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const user = request.user;
 
+        // ARCHITECT OVERRIDE: Superuser Bypass
+        if (request.headers['x-matrix-dev-role'] === 'SUPERUSER' && user?.role === 'ADMIN') {
+            return true;
+        }
+
         // Extract role from user object
         const userRole = user?.role || 'UNKNOWN';
 

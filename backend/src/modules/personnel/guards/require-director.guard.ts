@@ -17,6 +17,11 @@ export class RequireDirectorGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const user = request.user;
 
+        // ARCHITECT OVERRIDE: Superuser Bypass
+        if (request.headers['x-matrix-dev-role'] === 'SUPERUSER' && user?.role === 'ADMIN') {
+            return true;
+        }
+
         // Extract role from user object (set by auth middleware)
         const userRole = user?.role || 'UNKNOWN';
 

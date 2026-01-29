@@ -23,6 +23,7 @@ export interface MenuItem {
     roles?: UserRole[];
     children?: MenuItem[];
     isExternal?: boolean;
+    status?: 'PRODUCTION' | 'PARTIAL' | 'PLANNED' | 'DOC ONLY';
 }
 
 export interface MenuCluster {
@@ -42,8 +43,8 @@ export const MENU_CONFIG: MenuCluster[] = [
         icon: 'UserOutlined',
         emulatedRoles: [EmulatedRole.EMPLOYEE, EmulatedRole.TACTICAL, EmulatedRole.STRATEGIC, EmulatedRole.SUPERUSER],
         items: [
-            { label: 'Мой Дашборд', path: '/', icon: 'DashboardOutlined' },
-            { label: 'Мои Задачи', path: '/tasks', icon: 'CheckSquareOutlined' },
+            { label: 'Мой Дашборд', path: '/', icon: 'DashboardOutlined', status: 'PRODUCTION' },
+            { label: 'Мои Задачи', path: '/tasks', icon: 'CheckSquareOutlined', status: 'PARTIAL' },
             {
                 label: 'Финансы и Магазин',
                 path: '/economy',
@@ -86,7 +87,7 @@ export const MENU_CONFIG: MenuCluster[] = [
         emulatedRoles: [EmulatedRole.EMPLOYEE, EmulatedRole.TACTICAL, EmulatedRole.STRATEGIC, EmulatedRole.SUPERUSER],
         items: [
             {
-                label: 'Контур Допуска',
+                label: 'База (Допуск)',
                 path: '/foundation/start',
                 icon: 'SafetyCertificateOutlined' // Canonical semantic for Admission 
             },
@@ -108,7 +109,8 @@ export const MENU_CONFIG: MenuCluster[] = [
             {
                 label: 'Библиотечный фонд',
                 path: '/library',
-                icon: 'BookOutlined'
+                icon: 'BookOutlined',
+                status: 'PARTIAL'
             },
             {
                 label: 'УПРАВЛЕНИЕ ОБУЧЕНИЕМ',
@@ -147,11 +149,10 @@ export const MENU_CONFIG: MenuCluster[] = [
         emulatedRoles: [EmulatedRole.TACTICAL, EmulatedRole.STRATEGIC, EmulatedRole.SUPERUSER],
         roles: [UserRole.PRODUCTION, UserRole.WAREHOUSE_MANAGER, UserRole.PROCUREMENT_MANAGER, UserRole.ADMIN],
         items: [
-            { label: 'Управление производством', path: '/production/sessions', icon: 'ThunderboltOutlined' },
-            // Planned items commented out or disabled until implemented
-            // { label: 'Складской учет (WMS)', path: '/wms', icon: 'CodeSandboxOutlined' },
-            // { label: 'Закупки и снабжение', path: '/procurement', icon: 'ShoppingOutlined' },
-            // { label: 'Бюджетирование', path: '/finance', icon: 'DollarOutlined', roles: [UserRole.FINANCIAL_CONTROLLER] }
+            { label: 'Управление производством', path: '/production/sessions', icon: 'ThunderboltOutlined', status: 'PARTIAL' },
+            { label: 'Складской учет (WMS)', path: '/wms', icon: 'CodeSandboxOutlined', status: 'PLANNED' },
+            { label: 'Закупки и снабжение', path: '/procurement', icon: 'ShoppingOutlined', status: 'PLANNED' },
+            { label: 'Бюджетирование', path: '/finance', icon: 'DollarOutlined', roles: [UserRole.FINANCIAL_CONTROLLER], status: 'DOC ONLY' }
         ]
     },
 

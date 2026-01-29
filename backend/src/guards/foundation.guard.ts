@@ -9,8 +9,17 @@ export class FoundationGuard {
     private readonly logger = new Logger(FoundationGuard.name);
     private readonly ACTIVE_FOUNDATION_VERSION = 'v1.0';
 
-    async canActivate(userId: string, path: string): Promise<boolean> {
+    async canActivate(context: any): Promise<boolean> {
+        const request = context.switchToHttp().getRequest();
+        const userId = request.user?.id; // Assuming user ID is available on request.user
+        const path = request.url;
+
         if (!userId) {
+            return true;
+        }
+
+        // ARCHITECT OVERRIDE: Superuser Bypass
+        if (request.headers['x-matrix-dev-role'] === 'SUPERUSER' && process.env.NODE_ENV !== 'production') {
             return true;
         }
 

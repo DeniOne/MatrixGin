@@ -20,6 +20,16 @@ export class FoundationService {
     }
 
     /**
+     * Get all Foundation Blocks from DB
+     */
+    async getBlocks() {
+        return await prisma.foundationBlock.findMany({
+            orderBy: { order: 'asc' },
+            include: { material: true }
+        });
+    }
+
+    /**
      * Get user's Immersion Progress and Acceptance Status
      */
     async getImmersionState(userId: string) {
@@ -31,19 +41,19 @@ export class FoundationService {
         const isAccepted = acceptance?.decision === FoundationDecision.ACCEPTED;
         const isVersionMatch = acceptance?.version === FOUNDATION_VERSION;
 
-        // 2. Fetch Materials for content
-        const materialIds = FOUNDATION_BLOCKS.map(b => b.materialId);
-        const materials = await prisma.material.findMany({
-            where: { id: { in: materialIds } },
-            select: { id: true, content_text: true, content_url: true, is_video_required: true }
+        // 2. Fetch Blocks and Materials from DB
+        const dbBlocks = await prisma.foundationBlock.findMany({
+            orderBy: { order: 'asc' },
+            include: { material: true }
         });
-        const materialMap = new Map(materials.map(m => [m.id, { text: m.content_text, url: m.content_url, required: m.is_video_required }]));
+
+        const totalBlocks = dbBlocks.length;
 
         // 3. Calculate Block Progress (from Audit Log)
         const blockLogs = await prisma.foundationAuditLog.findMany({
             where: {
                 user_id: userId,
-                event_type: 'BLOCK_VIEWED',
+                event_type: 'FOUNDATION_BLOCK_VIEWED',
             },
             select: { metadata: true }
         });
@@ -57,17 +67,22 @@ export class FoundationService {
             }
         });
 
-        const blocks = FOUNDATION_BLOCKS.map(block => {
-            const material = materialMap.get(block.materialId);
+        const blocks = dbBlocks.map(dbBlock => {
+            const material = dbBlock.material;
 
             // Critical Methodology Check: If video is required but content_url is missing
-            const isMethodologyViolated = material?.required && !material?.url;
+            const isMethodologyViolated = material?.is_video_required && !material?.content_url;
 
             return {
-                ...block,
-                contentText: material?.text || '',
-                videoUrl: material?.url || undefined,
-                isVideoRequired: material?.required || false,
+                id: dbBlock.id,
+                materialId: dbBlock.material_id,
+                title: dbBlock.title,
+                description: dbBlock.description,
+                order: dbBlock.order,
+                mandatory: dbBlock.mandatory,
+                contentText: material?.content_text || '',
+                videoUrl: material?.content_url || undefined,
+                isVideoRequired: material?.is_video_required || false,
                 isMethodologyViolated
             };
         });
@@ -102,7 +117,7 @@ export class FoundationService {
                 status,
                 currentVersion: FOUNDATION_VERSION,
                 blocks: blocksWithLocking,
-                canAccept: viewedBlockIds.size === FOUNDATION_BLOCKS.length,
+                canAccept: viewedBlockIds.size === totalBlocks && totalBlocks > 0,
                 acceptedAt: (acceptance?.accepted_at instanceof Date) ? acceptance.accepted_at.toISOString() : undefined
             };
         } catch (error: any) {
@@ -124,7 +139,10 @@ export class FoundationService {
      * Register that a user has viewed a block
      */
     async registerBlockView(userId: string, blockId: string, source: string = 'API') {
-        const blockIndex = FOUNDATION_BLOCKS.findIndex(b => b.id === blockId);
+        const dbBlocks = await prisma.foundationBlock.findMany({
+            orderBy: { order: 'asc' }
+        });
+        const blockIndex = dbBlocks.findIndex(b => b.id === blockId);
         if (blockIndex === -1) {
             throw new Error('Invalid Foundation Block ID');
         }
@@ -196,13 +214,14 @@ export class FoundationService {
         if (!user) throw new Error('User not found');
 
         if (decision === 'ACCEPT') {
+            const totalBlocks = await prisma.foundationBlock.count();
             // Guard: All blocks must be viewed
             // @ts-ignore
-            if (user.foundation_progress < FOUNDATION_BLOCKS.length) {
+            if (user.foundation_progress < totalBlocks) {
                 await this.logGatingViolation(userId, 'SUBMIT_DECISION_INCOMPLETE_PROGRESS', {
                     // @ts-ignore
                     currentProgress: user.foundation_progress,
-                    requiredProgress: FOUNDATION_BLOCKS.length
+                    requiredProgress: totalBlocks
                 });
                 throw new Error('FOUNDATION_REQUIRED: Необходимо ознакомиться со всеми блоками Базы перед принятием.');
             }

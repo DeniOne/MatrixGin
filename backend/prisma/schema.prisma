@@ -772,12 +772,36 @@ model Material {
   reviewed_by       String?
   created_at        DateTime       @default(now())
   updated_at        DateTime       @updatedAt
-  is_video_required Boolean        @default(false)
+  is_video_required Boolean          @default(false)
   course_modules    CourseModule[]
-  academy           Academy?       @relation(fields: [academy_id], references: [id])
+  academy           Academy?         @relation(fields: [academy_id], references: [id])
   quizzes           Quiz[]
+  foundation_block  FoundationBlock?
 
   @@map("materials")
+}
+
+model FoundationBlock {
+  id          String   @id
+  material_id String   @unique
+  title       String
+  description String
+  order       Int
+  mandatory   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  material    Material @relation(fields: [material_id], references: [id])
+
+  @@map("foundation_blocks")
+}
+
+model FoundationVersion {
+  version     String   @id
+  is_active   Boolean  @default(true)
+  created_at  DateTime @default(now())
+  description String?
+
+  @@map("foundation_versions")
 }
 
 model Course {

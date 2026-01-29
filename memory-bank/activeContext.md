@@ -43,6 +43,11 @@ MatrixGin должен трансформироваться из **систем�
   - **Frontend Gate**: `FoundationGuard` multi-stage redirection.
   - **Documentation**: Consolidated `ADMISSION_FLOW.md` and synchronized all manual/process docs.
   - **Canon**: Architectural decision recorded in `DECISIONS.log` (ADR-001).
+- **Foundation UI Refinement & Terminology Sync**: ✅ **COMPLETED 2026-01-29**.
+  - **Terminology Migration**: "Immersion" -> "Base" across all layers (UI, Routes, Bot).
+  - **UI Canon**: Enforced MatrixGin Light (Geist) across the Foundation module.
+  - **Review Access**: Admitted users can now review Base blocks without restrictions.
+  - **Architect View**: Implementation of technical data reflection for Superuser (ADR-002).
 
 ## GAP-анализ модулей (Updated 2026-01-25)
 
@@ -58,7 +63,8 @@ MatrixGin должен трансформироваться из **систем�
 ## Active Decisions
 - MatrixCoin Economy (Module 08) = **CANONICAL** — НЕ ТРОГАТЬ
 - Status System = **CANONICAL** — изменения только через Governance
-- **Foundation Admission Gate** = **SCRIPT-ONLY** — редактирование через UI запрещено. Markdown в `FOUNDATIONAL` папке — единственный источник истины.
+- **Foundation Admission Gate** = **SCRIPT-ONLY** — редактирование через UI запрещено. Markdown в `FOUNDATIONAL` папке — единственный источник истины. Все материалы Базы (Base) жестко закреплены в каноне v2.2.
+- **MatrixGin UI Design Canon** = **MANDATORY** — все новые компоненты и рефакторинг старых должны следовать шрифту Geist и теме MatrixGin Light.
 
 ## 🛡️ CANON COMPLIANCE
 Перед реализацией любой функции **ОБЯЗАТЕЛЬНО**:

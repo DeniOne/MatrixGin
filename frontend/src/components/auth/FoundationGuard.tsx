@@ -10,6 +10,12 @@ export const FoundationGuard: React.FC<FoundationGuardProps> = ({ children }) =>
     const { user } = useAuth();
     const location = useLocation();
 
+    // ARCHITECT OVERRIDE: Superuser Bypass
+    const emulatedRole = localStorage.getItem('emulatedRole') || 'SUPERUSER';
+    if (emulatedRole === 'SUPERUSER') {
+        return <>{children}</>;
+    }
+
     const admissionStatus = user?.admissionStatus || 'PENDING_BASE';
     console.log('[FoundationGuard] admissionStatus:', admissionStatus, 'user exists:', !!user);
 

@@ -978,6 +978,109 @@ async function main() {
         console.error('⚠️ Values & Culture Academy not found! Skipping foundational courses.');
     }
 
+    // ==========================================================================
+    // MODULE 07 - FOUNDATION BLOCKS (Admission Gate)
+    // ==========================================================================
+    const existingFoundationBlocks = await prisma.foundationBlock.count();
+
+    if (existingFoundationBlocks === 0) {
+        console.log('\n📋 Creating Foundation Blocks and Materials for Admission Gate...');
+
+        const foundationBlocks = [
+            {
+                id: 'CONSTITUTION',
+                material_id: 'foundation-block-1',
+                title: 'Внутренняя Конституция',
+                description: 'Высший Устав Компании. Права, Иерархия и Власть.',
+                order: 1,
+                content: 'Конституция — это наш основной закон. Здесь определены правила взаимодействия, иерархия и верховная власть системы.'
+            },
+            {
+                id: 'CODEX',
+                material_id: 'foundation-block-2',
+                title: 'Код поведения и антифрод',
+                description: 'Кодекс Чести, борьба с мошенничеством и этические границы.',
+                order: 2,
+                content: 'Кодекс определяет этические стандарты. Мы не терпим обмана и мошенничества. Любое нарушение карается обнулением заслуг.'
+            },
+            {
+                id: 'GOLDEN_STANDARD',
+                material_id: 'foundation-block-3',
+                title: 'Золотой Стандарт Фотоматрицы',
+                description: 'Ценности: "Клиент — это Гость", Чистота, Скорость.',
+                order: 3,
+                content: 'Наш стандарт: Клиент — это Гость. Мы работаем быстро, чисто и с любовью к конечному продукту.'
+            },
+            {
+                id: 'ROLE_MODEL',
+                material_id: 'foundation-block-4',
+                title: 'Ролевая модель и ответственность',
+                description: 'Как работают Роли, Результаты и Зоны Ответственности.',
+                order: 4,
+                content: 'Система основана на ролях. Каждая роль — это контракт с четкими KPI и ответственностью за результат.'
+            },
+            {
+                id: 'MOTIVATION',
+                material_id: 'foundation-block-5',
+                title: 'Мотивация и последствия',
+                description: 'Экономика Заслуг: MC, GMC и последствия нарушений.',
+                order: 5,
+                content: 'Экономика MatrixGin — это баланс между MC (внутренней валютой) и GMC (влиянием). Ваши действия определяют ваше будущее.'
+            }
+        ];
+
+        for (const block of foundationBlocks) {
+            // Ensure material exists
+            await prisma.material.upsert({
+                where: { id: block.material_id },
+                create: {
+                    id: block.material_id,
+                    type: 'TEXT',
+                    title: block.title,
+                    content_text: block.content,
+                    status: 'PUBLISHED'
+                },
+                update: {
+                    title: block.title,
+                    content_text: block.content,
+                    status: 'PUBLISHED'
+                }
+            });
+
+            // Create foundation block link
+            await prisma.foundationBlock.create({
+                data: {
+                    id: block.id,
+                    material_id: block.material_id,
+                    title: block.title,
+                    description: block.description,
+                    order: block.order,
+                    mandatory: true
+                }
+            });
+        }
+
+        console.log('  ✅ Created 5 Foundation Blocks and Materials');
+    } else {
+        console.log('✅ Foundation Blocks already exist');
+    }
+
+    // Foundation Version Seed
+    const existingVersion = await prisma.foundationVersion.findUnique({
+        where: { version: '2.2' }
+    });
+
+    if (!existingVersion) {
+        await prisma.foundationVersion.create({
+            data: {
+                version: '2.2',
+                is_active: true,
+                description: 'Geit Canon V2.2 - Unified System Foundation'
+            }
+        });
+        console.log('  ✅ Created Foundation Version 2.2');
+    }
+
     console.log('\n🎉 Seeding completed successfully!');
     console.log('\nAdmin credentials:');
     console.log('Email: admin@photomatrix.ru');

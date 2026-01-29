@@ -1,5 +1,5 @@
 /**
- * Foundation Immersion Blocks
+ * Base Foundation Blocks
  * CANON v2.2: Mandatory Admission Scope
  * 
  * These are NOT courses. They are fundamental distinct implementation units.
@@ -33,6 +33,10 @@ export interface FoundationBlock {
     mandatory: boolean; // Always true for this set
 }
 
+/**
+ * @deprecated Use prisma.foundationBlock in FoundationService instead.
+ * This is kept for reference but NO LONGER DRIVES THE LOGIC.
+ */
 export const FOUNDATION_BLOCKS: FoundationBlock[] = [
     {
         id: FoundationBlockType.CONSTITUTION,

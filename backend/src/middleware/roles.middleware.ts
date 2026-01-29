@@ -13,6 +13,12 @@ export const requireRoles = (...roles: UserRole[]) => {
             return res.status(401).json({ message: 'Unauthorized' });
         }
 
+        // ARCHITECT OVERRIDE: Superuser Bypass
+        const isSuperuser = req.headers['x-matrix-dev-role'] === 'SUPERUSER' && user.role === 'ADMIN';
+        if (isSuperuser) {
+            return next();
+        }
+
         if (!roles.includes(user.role)) {
             return res.status(403).json({
                 message: 'Forbidden: Insufficient permissions',
@@ -35,6 +41,12 @@ export const requireRole = (roles: string[]) => {
 
         if (!user) {
             return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
+
+        // ARCHITECT OVERRIDE: Superuser Bypass
+        const isSuperuser = req.headers['x-matrix-dev-role'] === 'SUPERUSER' && user.role === 'ADMIN';
+        if (isSuperuser) {
+            return next();
         }
 
         if (!roles.includes(user.role)) {

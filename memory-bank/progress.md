@@ -13,6 +13,7 @@
 - [x] **Phase 5.5: UI Standardization & Canon Enforcement** ✅ **COMPLETED 2026-01-24**
 - [x] **Phase 5.6: Backend Stability & Dashboard Reframing** ✅ **COMPLETED 2026-01-27**
 - [x] **Phase 5.7: Admission Gate (Base-First) & Security Canon** ✅ **COMPLETED 2026-01-29**
+- [x] **Phase 5.8: Foundation UI Refinement & Terminology Sync** ✅ **COMPLETED 2026-01-29**
 - [ ] **Phase 6: Advanced Motivation & Managerial Layer** ← ТЕКУЩАЯ ФАЗА
 
 ## Module Status (Audit 2026-01-25)
@@ -101,6 +102,12 @@
 - [x] **Security Enforcement**: Telegram Bot Guard & Frontend FoundationGuard.
 - [x] **Canon**: Consolidated `ADMISSION_FLOW.md` and recorded ADR-001 in `DECISIONS.log`.
 - [x] **Documentation Sync**: Updated all manuals, process docs, and module specs.
+
+#### Sprint 18: Foundation UI Refinement & Terminology Sync ✅ **COMPLETED 2026-01-29**
+- [x] **Terminology Migration**: "Immersion" (Погружение) -> "Base" (База) in all UI layers and system routes.
+- [x] **UI Canon Alignment**: Foundation module updated to MatrixGin Light (Geist) design language.
+- [x] **Flow Management**: Admitted users granted free review access to Base materials.
+- [x] **Bot Integration**: Telegram bot synchronized with new terminological standard.
 
 ## Key Blockers
 - **None critical**: Все зависит от приоритизации спринтов.

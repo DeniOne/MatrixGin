@@ -195,7 +195,7 @@ export class EmployeeRegistrationService {
                 parse_mode: 'Markdown',
                 reply_markup: {
                     inline_keyboard: [
-                        [{ text: '🧭 Узнай Базу', callback_data: 'start_foundation' }]
+                        [{ text: '🧭 Узнать Базу', callback_data: 'start_foundation' }]
                     ]
                 }
             }

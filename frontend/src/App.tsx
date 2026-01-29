@@ -106,11 +106,11 @@ const AppRoutes: React.FC = () => {
                 <Route path=":entityType/:id" element={<EntityPage />} />
             </Route>
 
-            {/* FOUNDATIONAL IMMERSION - STRICT ISOLATION (Protected) */}
+            {/* FOUNDATION: BASE - STRICT ISOLATION (Protected) */}
             <Route path="/foundation" element={<RequireAuth><FoundationLayout /></RequireAuth>}>
                 <Route index element={<Navigate to="start" replace />} />
                 <Route path="start" element={<StartPage />} />
-                <Route path="immersion/:blockId" element={<BlockPage />} />
+                <Route path="base/:blockId" element={<BlockPage />} />
                 <Route path="decision" element={<DecisionPage />} />
                 <Route path="result" element={<ResultPage />} />
             </Route>

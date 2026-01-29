@@ -16,17 +16,25 @@ interface RoleEmulatorProps {
 }
 
 export const RoleEmulator: React.FC<RoleEmulatorProps> = ({ onRoleChange }) => {
-    const [role, setRole] = useState<EmulatedRole>(EmulatedRole.SUPERUSER);
+    const [role, setRole] = useState<EmulatedRole>(() => {
+        const saved = localStorage.getItem('emulatedRole');
+        return (saved as EmulatedRole) || EmulatedRole.SUPERUSER;
+    });
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         // Initial sync
         onRoleChange(role);
+        // Persist default if not set
+        if (!localStorage.getItem('emulatedRole')) {
+            localStorage.setItem('emulatedRole', role);
+        }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const handleRoleChange = (e: any) => {
         const newRole = e.target.value;
         setRole(newRole);
+        localStorage.setItem('emulatedRole', newRole);
         onRoleChange(newRole);
     };
 

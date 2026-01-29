@@ -29,30 +29,32 @@ export const ResultPage: React.FC = () => {
     }, [isAccepted, navigate]);
 
     return (
-        <div className="p-12 text-center">
-            {isAccepted ? (
-                <div className="animate-fade-in">
-                    <div className="flex justify-center mb-6 text-green-500">
-                        <CheckCircle size={80} />
+        <div className="flex-grow flex flex-col items-center justify-center p-6 bg-[#F3F3F5] font-sans selection:bg-indigo-100/30">
+            <div className="w-full max-w-xl bg-white shadow-sm rounded-[2.5rem] border border-black/5 p-16 text-center">
+                {isAccepted ? (
+                    <div className="animate-in fade-in zoom-in duration-1000">
+                        <div className="flex justify-center mb-10 text-emerald-500">
+                            <CheckCircle size={100} strokeWidth={1} />
+                        </div>
+                        <h2 className="text-4xl font-medium text-[#030213] mb-6 tracking-tight">Принятие подтверждено</h2>
+                        <p className="text-xl text-[#717182] leading-relaxed">
+                            Добро пожаловать в Университет, Коллега.<br />
+                            <span className="text-xs font-mono uppercase tracking-[0.3em] mt-8 block opacity-40">Accessing Corporate University Core...</span>
+                        </p>
                     </div>
-                    <h2 className="text-3xl font-medium text-gray-900 mb-4">Фундамент принят</h2>
-                    <p className="text-lg text-gray-600">
-                        Добро пожаловать в Матрицу, Коллега.<br />
-                        Accessing Corporate University...
-                    </p>
-                </div>
-            ) : (
-                <div className="animate-fade-in">
-                    <div className="flex justify-center mb-6 text-[#717182]">
-                        <XCircle size={80} />
+                ) : (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="flex justify-center mb-10 text-[#717182]/30">
+                            <XCircle size={100} strokeWidth={1} />
+                        </div>
+                        <h2 className="text-4xl font-medium text-[#030213] mb-6 tracking-tight">Доступ отклонен</h2>
+                        <p className="text-xl text-[#717182] leading-relaxed">
+                            Вы выбрали не принимать Базу.<br />
+                            Доступ к системе ограничен.
+                        </p>
                     </div>
-                    <h2 className="text-3xl font-medium text-gray-900 mb-4">Доступ запрещен</h2>
-                    <p className="text-lg text-gray-600">
-                        Вы отклонили Фундамент.<br />
-                        Выход...
-                    </p>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 };
